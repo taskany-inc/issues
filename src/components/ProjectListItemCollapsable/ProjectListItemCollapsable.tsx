@@ -13,8 +13,8 @@ import s from './ProjectListItemCollapsable.module.css';
 
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
-    project: NonNullable<DashboardProjectV2>;
-    parent?: NonNullable<DashboardProjectV2>;
+    project: NonNullable<Omit<DashboardProjectV2, 'children'>>;
+    parent?: NonNullable<Omit<DashboardProjectV2, 'children'>>;
     goals?: ReactNode;
     children?: React.ReactNode;
     onClick?: MouseEventHandler<HTMLElement>;
@@ -45,7 +45,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                         ))}
                         {project.title}
                     </TableRowItemTitle>
-                    {nullable(project._count.children, (count) => (
+                    {nullable(project._count?.children, (count) => (
                         <div className={s.ProjectIcons}>
                             <IconServersOutline size="xs" />
                             <Text size="xs">{count}</Text>
