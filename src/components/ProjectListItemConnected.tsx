@@ -1,4 +1,4 @@
-import { FC, useMemo, useEffect, ComponentProps, MouseEventHandler } from 'react';
+import { FC, useEffect, ComponentProps, MouseEventHandler, useReducer, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { TreeViewElement } from '@taskany/bricks/harmony';
 
@@ -41,6 +41,8 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     const { on } = useGoalPreview();
     const utils = trpc.useContext();
 
+    const [isOpen, setIsOpen] = useReducer((isOpen) => !isOpen, false);
+
     const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
             id: project.id,
@@ -49,11 +51,18 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
         {
             keepPreviousData: true,
             staleTime: refreshInterval,
+            enabled: isOpen,
         },
     );
 
-    const ids = useMemo(() => project?.children?.map(({ id }) => id) || [], [project]);
-    const { data: childrenProjects = [], isLoading } = trpc.project.getByIds.useQuery({ ids, goalsQuery: queryState });
+    const { data: childrenProjects = [], isLoading } = trpc.v2.project.getProjectChildren.useQuery(
+        {
+            id: project.id,
+        },
+        {
+            enabled: isOpen,
+        },
+    );
 
     useEffect(() => {
         const unsubUpdate = on('on:goal:update', (updatedId) => {
@@ -133,6 +142,8 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                         </TreeViewElement>
                     ),
                 )}
+                onShow={setIsOpen}
+                onHide={setIsOpen}
                 {...props}
             >
                 <TreeViewElement>
