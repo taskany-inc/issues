@@ -13,6 +13,7 @@ import {
     getWholeGoalCountByProjectIds,
     getDeepChildrenProjectsId,
     getAllProjectsQuery,
+    getChildrenProjectQuery,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema } from '../../src/schema/common';
 import {
@@ -245,7 +246,7 @@ export const project = router({
                 cursor,
                 ids: goalsQuery?.project,
             })
-                .$castTo<ProjectResponse & Pick<ProjectsWithGoals, '_count'>>()
+                .$castTo<Omit<ProjectResponse, 'children'> & Pick<ProjectsWithGoals, '_count'>>()
                 .execute();
 
             return {
@@ -255,5 +256,20 @@ export const project = router({
                     offset: projects.length < limit + 1 ? undefined : cursor + (limit ?? 0),
                 },
             };
+        }),
+    getProjectChildren: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+            }),
+        )
+        .query(async ({ input, ctx }) => {
+            const childrenQuery = getChildrenProjectQuery({ ...ctx.session.user, id: input.id }).$castTo<
+                Omit<ProjectResponse, 'goals'> & Pick<ProjectsWithGoals, '_count'>
+            >();
+
+            const res = await childrenQuery.execute();
+
+            return res;
         }),
 });
