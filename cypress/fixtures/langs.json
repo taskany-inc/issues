@@ -1047,6 +1047,12 @@
             "en": "Create"
         }
     },
+    "ProjectListItem": {
+        "Create Goal": {
+            "ru": "",
+            "en": ""
+        }
+    },
     "ProjectPage": {
         "title": {
             "ru": "Taskany — {project}",

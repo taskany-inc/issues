@@ -151,6 +151,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                             project={project}
                             href={routes.project(project.id, view ? `view=${view}` : undefined)}
                             goals={children}
+                            canCreateGoal
                         >
                             {nullable(!goals?.length, () => (
                                 <InlineCreateGoalControl project={project} />

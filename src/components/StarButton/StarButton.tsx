@@ -16,7 +16,7 @@ interface IconProps {
     filled: boolean;
 }
 
-const Icon: React.FC<IconProps> = ({ filled }) => {
+export const Icon: React.FC<IconProps> = ({ filled }) => {
     const Comp = filled ? IconStarSolid : IconStarOutline;
 
     return <Comp size="s" />;
