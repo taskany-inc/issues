@@ -20,6 +20,7 @@ interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof Tre
     onClick?: MouseEventHandler<HTMLElement>;
     titleSize?: 'm' | 'l';
     editable?: boolean;
+    canCreateGoal?: boolean;
 }
 
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
@@ -33,6 +34,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     titleSize = 'l',
     interactive = true,
     onClick,
+    canCreateGoal,
     ...props
 }) => {
     const projectComponent = (
@@ -57,6 +59,8 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         >
             <ProjectListItem
                 id={project.id}
+                flowId={project.flowId}
+                title={project.title}
                 stargizers={project._count.stargizers}
                 owner={project.activity}
                 participants={project.participants}
@@ -64,6 +68,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                 watching={project._isWatching}
                 averageScore={project.averageScore}
                 editable={editable}
+                canCreateGoal={canCreateGoal}
             />
         </TableRowItem>
     );

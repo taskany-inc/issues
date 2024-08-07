@@ -14,12 +14,13 @@ interface WatchButtonProps {
 
 interface IconProps {
     watching: boolean;
+    className?: string;
 }
 
-const Icon: React.FC<IconProps> = ({ watching }) => {
+export const Icon: React.FC<IconProps> = ({ watching, className }) => {
     const Comp = watching ? IconEyeOutline : IconEyeClosedSolid;
 
-    return <Comp size="s" />;
+    return <Comp size="s" className={className} />;
 };
 
 export const WatchButton: React.FC<WatchButtonProps> = ({ watcher, onToggle }) => {

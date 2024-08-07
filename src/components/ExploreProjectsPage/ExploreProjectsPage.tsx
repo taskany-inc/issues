@@ -27,6 +27,8 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                 <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
                                     <ProjectListItem
                                         id={p.id}
+                                        title={p.title}
+                                        flowId={p.flowId}
                                         stargizers={p._count.stargizers}
                                         owner={p.activity}
                                         starred={p._isStarred}
