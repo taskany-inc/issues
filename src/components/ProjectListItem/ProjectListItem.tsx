@@ -4,6 +4,7 @@ import cn from 'classnames';
 import { IconStarSolid, IconEyeOutline } from '@taskany/icons';
 import { ComponentProps, useMemo } from 'react';
 
+import { ProjectSubscriptionIconButtons } from '../ProjectSubscriptionIconButtons/ProjectSubscriptionIconButtons';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectSubscriptionButtons } from '../ProjectSubscriptionButtons';
 import { safeUserData } from '../../utils/getUserName';
@@ -14,16 +15,21 @@ import s from './ProjectListItem.module.css';
 interface ProjectListItemProps {
     id: string;
     stargizers: number;
+    flowId: string;
+    title: string;
     editable?: boolean;
     owner?: ActivityByIdReturnType;
     participants?: ActivityByIdReturnType[];
     starred?: boolean;
     watching?: boolean;
     averageScore: number | null;
+    canCreateGoal?: boolean;
 }
 
 export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typeof TableRow>> = ({
     id,
+    flowId,
+    title,
     owner,
     participants,
     stargizers,
@@ -32,6 +38,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
     averageScore,
     className,
     editable,
+    canCreateGoal,
     ...attrs
 }) => {
     const ownerUserGroup = useMemo(() => [owner].map(safeUserData).filter(Boolean), [owner]);
@@ -59,19 +66,10 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
             <TableCell
                 width={40}
                 className={cn(s.ProjectListItemIcons, {
-                    [s.ProjectListItemIcons_editable]: editable,
+                    [s.ProjectListItemIcons_editable]: editable || canCreateGoal,
                 })}
             >
-                {nullable(
-                    editable,
-                    () => (
-                        <ProjectSubscriptionButtons
-                            id={id}
-                            starred={starred}
-                            watching={watching}
-                            stargizersCounter={stargizers}
-                        />
-                    ),
+                {nullable(!canCreateGoal && !editable, () => (
                     <>
                         {nullable(starred, () => (
                             <IconStarSolid size="s" />
@@ -79,8 +77,24 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
                         {nullable(watching, () => (
                             <IconEyeOutline size="s" {...watch.attr} />
                         ))}
-                    </>,
-                )}
+                    </>
+                ))}
+                {nullable(editable, () => (
+                    <ProjectSubscriptionButtons
+                        id={id}
+                        starred={starred}
+                        watching={watching}
+                        stargizersCounter={stargizers}
+                    />
+                ))}
+
+                {nullable(canCreateGoal, () => (
+                    <ProjectSubscriptionIconButtons
+                        starred={starred}
+                        watching={watching}
+                        project={{ flowId, id, title }}
+                    />
+                ))}
             </TableCell>
         </TableRow>
     );

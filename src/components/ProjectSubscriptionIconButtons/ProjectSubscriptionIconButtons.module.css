@@ -1,0 +1,9 @@
+.ProjectSubscriptionIconButtons {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.ProjectSubscriptionIconButtonsWatchIcon {
+  margin-top: 3px;
+}
