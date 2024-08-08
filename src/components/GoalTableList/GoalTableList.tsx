@@ -3,6 +3,7 @@ import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { IconGitBranchOutline, IconMessageTextOutline } from '@taskany/icons';
 
+import { DateType } from '../../../generated/kysely/types';
 import { State as StateType } from '../../../trpc/inferredTypes';
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
 import { safeUserData } from '../../utils/getUserName';
@@ -234,3 +235,28 @@ export const GoalTableList = <T extends GoalTableListItem>({
         </Table>
     );
 };
+
+type GoalSource = IdentifierRecord & {
+    priority: IdentifierRecord | null;
+    estimate: Date | null;
+    estimateType: DateType | null;
+    [key: string]: unknown;
+};
+
+export function mapToRenderProps<T extends GoalSource>(
+    goals: T[],
+    mapper: <T1 extends T>(val: T1 & Pick<GoalTableListItem, 'priority' | 'estimate'>) => GoalTableListItem,
+): GoalTableListItem[] {
+    return goals.map((v) =>
+        mapper({
+            ...v,
+            priority: v.priority?.title,
+            estimate: v.estimate
+                ? {
+                      value: v.estimate,
+                      type: v.estimateType,
+                  }
+                : null,
+        }),
+    );
+}
