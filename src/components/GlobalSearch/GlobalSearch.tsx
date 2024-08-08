@@ -39,18 +39,19 @@ export const GlobalSearch = () => {
         [router],
     );
     const resultsExists = Boolean(suggestions.data?.goals?.length || suggestions.data?.projects.length);
+    const nothingFound = Boolean(!resultsExists && query.length);
 
     return (
         <TaskanyGlobalSearch
             value={query}
             onChange={setQuery}
-            searchResultExists={resultsExists}
+            searchResultExists={resultsExists || nothingFound}
             placeholder={tr('Search...')}
             placement="bottom-end"
             offset={[8, -40]}
             outline
         >
-            {resultsExists && (
+            {nullable(resultsExists, () => (
                 <ListView onKeyboardClick={onKeyboardNavigate}>
                     {nullable(suggestions.data?.goals?.length, () => (
                         <>
@@ -72,7 +73,10 @@ export const GlobalSearch = () => {
                                                             <GoalListItemCompact
                                                                 item={item}
                                                                 columns={[
-                                                                    { name: 'title', columnProps: { width: '32%' } },
+                                                                    {
+                                                                        name: 'title',
+                                                                        columnProps: { width: '32%' },
+                                                                    },
                                                                     {
                                                                         name: 'state',
                                                                     },
@@ -129,7 +133,12 @@ export const GlobalSearch = () => {
                         </>
                     ))}
                 </ListView>
-            )}
+            ))}
+            {nullable(nothingFound, () => (
+                <Text size="m" weight="bolder" className={`${s.GroupHeader} ${s.NothingFound}`}>
+                    {tr('Nothing found')}
+                </Text>
+            ))}
         </TaskanyGlobalSearch>
     );
 };

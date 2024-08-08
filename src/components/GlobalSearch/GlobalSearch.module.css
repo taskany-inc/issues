@@ -16,3 +16,7 @@
 .GlobalSearchTable {
     width: 700px;
 }
+
+.NothingFound {
+    border: none;
+}
