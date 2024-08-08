@@ -1,4 +1,4 @@
-import React, { ComponentProps, useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { ListView, TreeViewElement } from '@taskany/bricks/harmony';
 
@@ -9,7 +9,6 @@ import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
-import { buildKanban } from '../../utils/kanban';
 import { getPageTitle } from '../../utils/getPageTitle';
 import { Page } from '../Page/Page';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
@@ -18,10 +17,10 @@ import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { routes } from '../../hooks/router';
-import { GoalTableList } from '../GoalTableList/GoalTableList';
+import { GoalTableList, mapToRenderProps } from '../GoalTableList/GoalTableList';
 import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
-import { Kanban } from '../Kanban/Kanban';
+import { Kanban, buildKanban } from '../Kanban/Kanban';
 import { safeUserData } from '../../utils/getUserName';
 
 import { tr } from './DashboardPage.i18n';
@@ -55,8 +54,14 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             return acc;
         }, []);
 
-        const canbans = gr.reduce<Record<string, ComponentProps<typeof Kanban>['value']>>((acum, project) => {
-            acum[project.id] = buildKanban(project.goals ?? []);
+        const canbans = gr.reduce<Record<string, React.ComponentProps<typeof Kanban>['value']>>((acum, project) => {
+            acum[project.id] = buildKanban(project.goals ?? [], (goal) => ({
+                ...goal,
+                shortId: goal._shortId,
+                id: goal.id,
+                commentsCount: goal._count.comments ?? 0,
+                progress: goal._achivedCriteriaWeight,
+            }));
 
             return acum;
         }, {});
@@ -125,47 +130,14 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                         nullable(goals, (g) => (
                             <TreeViewElement>
                                 <GoalTableList
-                                    goals={g.map(
-                                        ({
-                                            _shortId,
-                                            _counts,
-                                            _achivedCriteriaWeight,
-                                            title,
-                                            id,
-                                            participants,
-                                            owner,
-                                            tags,
-                                            state,
-                                            updatedAt,
-                                            priority,
-                                            partnershipProjects,
-                                            estimate,
-                                            estimateType,
-                                            projectId,
-                                            project: parent,
-                                        }) => ({
-                                            title,
-                                            id,
-                                            shortId: _shortId,
-                                            commentsCount: _counts?.comments,
-                                            tags,
-                                            updatedAt,
-                                            owner: safeUserData(owner),
-                                            participants: participants?.map(safeUserData),
-                                            state,
-                                            estimate: estimate
-                                                ? {
-                                                      value: estimate,
-                                                      type: estimateType,
-                                                  }
-                                                : null,
-                                            priority: priority.title,
-                                            achievedCriteriaWeight: _achivedCriteriaWeight,
-                                            partnershipProjects,
-                                            isInPartnerProject: project.id !== projectId,
-                                            project: parent,
-                                        }),
-                                    )}
+                                    goals={mapToRenderProps(g, (goal) => ({
+                                        ...goal,
+                                        shortId: goal._shortId,
+                                        commentsCount: goal._count.comments,
+                                        owner: safeUserData(goal.owner),
+                                        participants: goal.participants?.map(safeUserData),
+                                        achievedCriteriaWeight: goal._achivedCriteriaWeight,
+                                    }))}
                                 />
                             </TreeViewElement>
                         )),

@@ -33,7 +33,7 @@ interface GoalsKanbanCardProps extends HTMLAttributes<HTMLDivElement> {
     owner?: ActivityByIdReturnType | null;
     estimate?: Date | null;
     estimateType?: DateType | null;
-    tags?: TagObject[];
+    tags?: TagObject[] | null;
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
     priority?: Priority | null;
     progress: number | null;

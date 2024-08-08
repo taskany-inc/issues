@@ -4,17 +4,16 @@ import { TreeViewElement } from '@taskany/bricks/harmony';
 
 import { FilterById, GoalByIdReturnType } from '../../trpc/inferredTypes';
 import { trpc } from '../utils/trpcClient';
-import { buildKanban } from '../utils/kanban';
 import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';
 import { routes } from '../hooks/router';
 import { safeUserData } from '../utils/getUserName';
 
-import { GoalTableList } from './GoalTableList/GoalTableList';
+import { GoalTableList, mapToRenderProps } from './GoalTableList/GoalTableList';
 import { ProjectListItemCollapsable } from './ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { InlineCreateGoalControl } from './InlineCreateGoalControl/InlineCreateGoalControl';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
-import { Kanban } from './Kanban/Kanban';
+import { Kanban, buildKanban } from './Kanban/Kanban';
 
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     parent?: ComponentProps<typeof ProjectListItemCollapsable>['project'];
@@ -78,7 +77,17 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
         };
     }, [on, projectDeepInfo?.goals, utils.project.getByIds, utils.project.getDeepInfo]);
 
-    const kanban = useMemo(() => buildKanban(projectDeepInfo?.goals || []), [projectDeepInfo]);
+    const kanban = useMemo(
+        () =>
+            buildKanban(projectDeepInfo?.goals ?? [], (goal) => ({
+                ...goal,
+                shortId: goal._shortId,
+                id: goal.id,
+                commentsCount: goal._count.comments ?? 0,
+                progress: goal._achivedCriteriaWeight,
+            })),
+        [projectDeepInfo],
+    );
 
     const subNodes = useMemo(
         () =>
@@ -107,47 +116,14 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     ) : (
                         <TreeViewElement>
                             <GoalTableList
-                                goals={goals.map(
-                                    ({
-                                        _shortId,
-                                        _count,
-                                        _achivedCriteriaWeight,
-                                        title,
-                                        id,
-                                        participants,
-                                        owner,
-                                        tags,
-                                        state,
-                                        updatedAt,
-                                        priority,
-                                        partnershipProjects,
-                                        estimate,
-                                        estimateType,
-                                        projectId,
-                                        project: parent,
-                                    }) => ({
-                                        title,
-                                        id,
-                                        shortId: _shortId,
-                                        commentsCount: _count?.comments,
-                                        tags,
-                                        updatedAt,
-                                        owner: safeUserData(owner),
-                                        participants: participants?.map(safeUserData),
-                                        state,
-                                        estimate: estimate
-                                            ? {
-                                                  value: estimate,
-                                                  type: estimateType,
-                                              }
-                                            : null,
-                                        priority: priority?.title,
-                                        achievedCriteriaWeight: _achivedCriteriaWeight,
-                                        partnershipProjects,
-                                        isInPartnerProject: project.id !== projectId,
-                                        project: parent,
-                                    }),
-                                )}
+                                goals={mapToRenderProps(goals, (goal) => ({
+                                    ...goal,
+                                    shortId: goal._shortId,
+                                    commentsCount: goal._count.comments,
+                                    owner: safeUserData(goal.owner),
+                                    participants: goal.participants?.map(safeUserData),
+                                    achievedCriteriaWeight: goal._achivedCriteriaWeight,
+                                }))}
                                 onTagClick={setTagsFilterOutside}
                                 onGoalClick={onProjectClickHandler}
                             />

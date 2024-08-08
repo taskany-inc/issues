@@ -50,7 +50,7 @@ interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
         tags: Tag[] | null;
         owner: ProjectActivity;
         _achivedCriteriaWeight: number | null;
-        _counts: { comments: number };
+        _count: { comments: number };
         state: ExtractTypeFromGenerated<State>;
         priority: ExtractTypeFromGenerated<Priority>;
         partnershipProjects: Array<ExtractTypeFromGenerated<Project>>;
