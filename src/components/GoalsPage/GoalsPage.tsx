@@ -7,7 +7,7 @@ import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { Page } from '../Page/Page';
 import { getPageTitle } from '../../utils/getPageTitle';
-import { GroupedGoalList } from '../GrouppedGoalListV2';
+import { GroupedGoalList } from '../GroupedGoalList';
 import { FlatGoalList } from '../FlatGoalList';
 import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';

@@ -2,15 +2,15 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { ListView } from '@taskany/bricks/harmony';
 
-import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 import { refreshInterval } from '../utils/config';
 import { trpc } from '../utils/trpcClient';
 import { useFMPMetric } from '../utils/telemetry';
 import { FilterById, GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
-import { ProjectListItemConnected } from './ProjectListItemConnected';
+import { ProjectListItemConnected } from './ProjectListItemConnected/ProjectListItemConnected';
 
 interface GroupedGoalListProps {
     filterPreset?: FilterById;
@@ -19,38 +19,34 @@ interface GroupedGoalListProps {
 export const projectsSize = 20;
 
 export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }) => {
+    const { setPreview, on } = useGoalPreview();
+
     const { queryState } = useUrlFilterParams({
         preset: filterPreset,
     });
-    const { setPreview, on } = useGoalPreview();
+
     const utils = trpc.useContext();
-    const { data, fetchNextPage, hasNextPage } = trpc.project.getAll.useInfiniteQuery(
+    const { data, fetchNextPage, hasNextPage } = trpc.v2.project.getAll.useInfiniteQuery(
         {
             limit: projectsSize,
-            includePersonal: true,
-            firstLevel: !queryState?.project?.length,
             goalsQuery: queryState,
+            firstLevel: !!queryState?.project?.length,
         },
         {
-            getNextPageParam: (p) => p.nextCursor,
-            keepPreviousData: true,
+            getNextPageParam: ({ pagination }) => pagination.offset,
             staleTime: refreshInterval,
         },
     );
 
     useEffect(() => {
-        const unsubUpdate = on('on:goal:update', () => {
-            utils.project.getAll.invalidate();
-        });
-        const unsubDelete = on('on:goal:delete', () => {
-            utils.project.getAll.invalidate();
-        });
+        const unsubUpdate = on('on:goal:update', () => utils.v2.project.getAll.invalidate());
+        const unsubDelete = on('on:goal:delete', () => utils.v2.project.getAll.invalidate());
 
         return () => {
             unsubUpdate();
             unsubDelete();
         };
-    }, [on, utils.project.getAll]);
+    }, [on, utils.v2.project.getAll]);
 
     useFMPMetric(!!data);
 
@@ -70,12 +66,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {projectsOnScreen.map((project) => (
-                <ProjectListItemConnected
-                    key={project.id}
-                    actionButtonView="icons"
-                    project={project}
-                    filterPreset={filterPreset}
-                />
+                <ProjectListItemConnected key={project.id} project={project} filterPreset={filterPreset} />
             ))}
 
             {nullable(hasNextPage, () => (
