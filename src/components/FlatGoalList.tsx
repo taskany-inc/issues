@@ -7,8 +7,9 @@ import { trpc } from '../utils/trpcClient';
 import { refreshInterval } from '../utils/config';
 import { useFMPMetric } from '../utils/telemetry';
 import { FilterById, GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { safeUserData } from '../utils/getUserName';
 
-import { GoalTableList } from './GoalTableList/GoalTableList';
+import { GoalTableList, mapToRenderProps } from './GoalTableList/GoalTableList';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
 
@@ -72,7 +73,17 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {nullable(goalsOnScreen, (goals) => (
-                <GoalTableList goals={goals} onTagClick={setTagsFilterOutside} />
+                <GoalTableList
+                    goals={mapToRenderProps(goals, (goal) => ({
+                        ...goal,
+                        owner: safeUserData(goal.owner),
+                        participants: goal.participants?.map(safeUserData),
+                        shortId: goal._shortId,
+                        commentsCount: goal._count.comments,
+                        achievedCriteriaWeight: goal._achivedCriteriaWeight,
+                    }))}
+                    onTagClick={setTagsFilterOutside}
+                />
             ))}
 
             {nullable(hasNextPage, () => (

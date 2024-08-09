@@ -1,8 +1,8 @@
-import { MouseEventHandler, useCallback } from 'react';
+import React, { MouseEventHandler, useCallback } from 'react';
 import { KanbanColumn, KanbanContainer } from '@taskany/bricks/harmony';
 
 import { trpc } from '../../utils/trpcClient';
-import { FilterById, DashboardGoal } from '../../../trpc/inferredTypes';
+import { FilterById } from '../../../trpc/inferredTypes';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { NextLink } from '../NextLink';
 import { State as KanbanState } from '../State';
@@ -12,12 +12,17 @@ import { routes } from '../../hooks/router';
 
 import s from './Kanban.module.css';
 
-interface KanbanProps<T> {
-    value: Record<string, T[]>;
+type KanbanItemProps = Omit<
+    React.ComponentProps<typeof GoalsKanbanCard>,
+    keyof React.HTMLAttributes<HTMLDivElement>
+> & { id: string; shortId: string; title: string };
+
+interface KanbanProps {
+    value: Record<string, KanbanItemProps[]>;
     filterPreset?: FilterById;
 }
 
-export const Kanban = <T extends NonNullable<DashboardGoal>>({ value, filterPreset }: KanbanProps<T>) => {
+export const Kanban = ({ value, filterPreset }: KanbanProps) => {
     const { data: states = [] } = trpc.state.all.useQuery();
 
     const { queryState, setTagsFilterOutside } = useUrlFilterParams({
@@ -54,30 +59,18 @@ export const Kanban = <T extends NonNullable<DashboardGoal>>({ value, filterPres
                     <KanbanColumn key={state.id}>
                         <KanbanState className={s.KanbanState} state={state} />
 
-                        {goals.map((g) => {
-                            const { project: _, ...goal } = g;
-
+                        {goals.map((goal) => {
                             return (
                                 <NextLink
                                     key={goal.id}
-                                    href={routes.goal(goal._shortId)}
-                                    onClick={onGoalPreviewShow(goal)}
+                                    href={routes.goal(goal.shortId)}
+                                    onClick={onGoalPreviewShow({
+                                        _shortId: goal.shortId,
+                                        title: goal.title,
+                                    })}
                                     className={s.KanbanLink}
                                 >
-                                    <GoalsKanbanCard
-                                        id={goal.id}
-                                        key={goal.id}
-                                        commentsCount={goal._count.comments || 0}
-                                        title={goal.title}
-                                        updatedAt={goal.updatedAt}
-                                        owner={goal.owner}
-                                        estimate={goal.estimate}
-                                        estimateType={goal.estimateType}
-                                        tags={goal.tags}
-                                        onTagClick={setTagsFilterOutside}
-                                        priority={goal.priority}
-                                        progress={goal._achivedCriteriaWeight}
-                                    />
+                                    <GoalsKanbanCard {...goal} onTagClick={setTagsFilterOutside} />
                                 </NextLink>
                             );
                         })}
@@ -86,4 +79,29 @@ export const Kanban = <T extends NonNullable<DashboardGoal>>({ value, filterPres
             })}
         </KanbanContainer>
     );
+};
+
+type StateIdRecord = Record<'stateId', string>;
+
+type NullableStateId = StateIdRecord | Record<'stateId', null>;
+
+export const buildKanban = <T extends NullableStateId, M extends (val: T) => KanbanItemProps>(
+    goals: T[],
+    mapper: M,
+): Record<StateIdRecord['stateId'], KanbanItemProps[]> => {
+    return goals.reduce<Record<StateIdRecord['stateId'], KanbanItemProps[]>>((acum, goal) => {
+        const stateKey = goal.stateId;
+
+        if (!stateKey) {
+            return acum;
+        }
+
+        if (!acum[stateKey]) {
+            acum[stateKey] = [];
+        }
+
+        acum[stateKey].push(mapper(goal));
+
+        return acum;
+    }, {});
 };

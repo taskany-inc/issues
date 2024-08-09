@@ -25,3 +25,7 @@
 .GoalTableColumnSecondary {
     color: var(--text-secondary);
 }
+
+.GoalTitlePartnterIcon {
+    margin-right: var(--gap-xs);
+}
