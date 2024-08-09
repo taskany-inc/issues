@@ -29,6 +29,7 @@ import {
 } from '../../generated/kysely/types';
 import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
+import { getGoalsQuery } from '../queries/goalV2';
 
 type ProjectActivity = ExtractTypeFromGenerated<Activity> & {
     user: ExtractTypeFromGenerated<User> | null;
@@ -49,15 +50,14 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
 interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
     goals: (ExtractTypeFromGenerated<Goal> & {
         _shortId: string;
-        participants: ProjectActivity[] | null;
-        tags: Tag[] | null;
+        participants: ProjectActivity[];
+        tags: ExtractTypeFromGenerated<Tag>[];
         owner: ProjectActivity;
         _achivedCriteriaWeight: number | null;
-        _count: { comments: number };
         state: ExtractTypeFromGenerated<State>;
         priority: ExtractTypeFromGenerated<Priority>;
+        project: ExtractTypeFromGenerated<Project> & { parent: ExtractTypeFromGenerated<Project>[] };
         partnershipProjects: Array<ExtractTypeFromGenerated<Project>>;
-        project: ExtractTypeFromGenerated<Project>;
         criteria?: Array<
             ExtractTypeFromGenerated<
                 GoalAchieveCriteria & {
@@ -65,6 +65,12 @@ interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
                 }
             >
         >;
+        _count: {
+            comments: number;
+            stargizers: number;
+            watchers: number;
+            participants: number;
+        };
     })[];
     _count: {
         children: number;
@@ -74,6 +80,16 @@ interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
         goals: number;
     };
 }
+
+type ProjectGoal = ProjectsWithGoals['goals'][number] & {
+    _isWatching: boolean;
+    _isStarred: boolean;
+    _isOwner: boolean;
+    _isEditable: boolean;
+    _isIssuer: boolean;
+    _isParticipant: boolean;
+    _hasAchievementCriteria: boolean;
+};
 
 export const project = router({
     suggestions: protectedProcedure
@@ -197,8 +213,8 @@ export const project = router({
 
                 if (goals) {
                     for (const goal of goals) {
-                        goal.participants = pickUniqueValues(goal.participants, 'id');
-                        goal.tags = pickUniqueValues(goal.tags, 'id');
+                        goal.participants = pickUniqueValues(goal.participants, 'id') || [];
+                        goal.tags = pickUniqueValues(goal.tags, 'id') ?? [];
 
                         goal._achivedCriteriaWeight = null;
 
@@ -271,5 +287,47 @@ export const project = router({
             const res = await childrenQuery.execute();
 
             return res;
+        }),
+
+    getProjectGoalsById: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                limit: z.number().optional(),
+                cursor: z.number().optional(),
+                goalsQuery: queryWithFiltersSchema.optional(),
+            }),
+        )
+        .query(async ({ input, ctx }) => {
+            const { limit = 10, cursor: offset = 0, goalsQuery, id } = input;
+            const goalsByProjectQuery = getGoalsQuery({
+                ...ctx.session.user,
+                projectId: id,
+                limit: limit + 1,
+                offset,
+                goalsQuery,
+            });
+
+            const goals = await goalsByProjectQuery.$castTo<ProjectGoal>().execute();
+
+            for (const goal of goals) {
+                goal._achivedCriteriaWeight = null;
+
+                if (goal.criteria != null) {
+                    const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<
+                        ProjectsWithGoals['goals'][number]['criteria']
+                    >;
+                    goal._achivedCriteriaWeight = baseCalcCriteriaWeight(uniqCriteria);
+                    delete goal.criteria;
+                }
+            }
+
+            return {
+                goals: goals.slice(0, limit),
+                pagination: {
+                    limit,
+                    offset: goals.length < limit + 1 ? undefined : offset + (limit ?? 0),
+                },
+            };
         }),
 });

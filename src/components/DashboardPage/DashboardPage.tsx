@@ -36,7 +36,12 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
     const { data, isLoading, isFetching, fetchNextPage, hasNextPage } =
         trpc.v2.project.userProjectsWithGoals.useInfiniteQuery(
-            { goalsQuery: queryState },
+            {
+                goalsQuery: {
+                    ...queryState,
+                    limit: view === 'kanban' ? 50 : 30,
+                },
+            },
             {
                 getNextPageParam: ({ pagination }) => pagination.offset,
                 keepPreviousData: true,

@@ -1047,6 +1047,12 @@
             "en": "Create"
         }
     },
+    "ProjectListItemConnected": {
+        "Loading ...": {
+            "ru": "",
+            "en": ""
+        }
+    },
     "ProjectPage": {
         "title": {
             "ru": "Taskany — {project}",

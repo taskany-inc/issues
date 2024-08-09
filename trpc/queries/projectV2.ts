@@ -277,6 +277,16 @@ interface GetProjectsWithGoalsByIdsParams extends GetUserProjectsQueryParams {
     offset?: number;
 }
 
+const queryParamsIsExists = (query?: QueryWithFilters | null) => {
+    if (query == null) {
+        return true;
+    }
+
+    const { limit: _limit, offset: _offset, ...restQuery } = query;
+
+    return Object.keys(restQuery).length > 0;
+};
+
 /** Limit for subquery goals by project */
 const dashboardGoalByProjectLimit = 30;
 
@@ -468,6 +478,8 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                         sort: null,
                         starred: null,
                         watching: null,
+                        limit: null,
+                        offset: null,
                     };
 
                     const filterToApply: Array<ReturnType<typeof eb>> = [];
@@ -522,7 +534,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                             eb('goals.projectId', '=', eb.ref('Project.id')),
                         ]),
                     )
-                    .limit(dashboardGoalByProjectLimit)
+                    .limit(params.goalsQuery?.limit ?? dashboardGoalByProjectLimit)
                     .as('goal'),
             (join) => join.onTrue(),
         )
@@ -552,7 +564,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
         )
         .groupBy('Project.id')
         .orderBy('Project.updatedAt desc')
-        .$if(params.goalsQuery != null, (qb) => qb.having(({ fn }) => fn.count('goal.id'), '>', 0))
+        .$if(queryParamsIsExists(params.goalsQuery), (qb) => qb.having(({ fn }) => fn.count('goal.id'), '>', 0))
         .limit(params.limit || 5)
         .offset(params.offset || 0);
 };
@@ -678,6 +690,7 @@ export const getAllProjectsQuery = ({
                                     selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
                                 ),
                             ),
+                            eb('Project.personal', 'is not', true),
                         ]),
                     ),
                 )
@@ -688,7 +701,7 @@ export const getAllProjectsQuery = ({
                 )
                 .limit(limit)
                 .offset(cursor)
-                .orderBy(['Project.updatedAt desc', 'Project.id desc'])
+                .orderBy(['Project.updatedAt desc', 'Project.id asc'])
                 .groupBy(['Project.id'])
                 .as('projects'),
         )
