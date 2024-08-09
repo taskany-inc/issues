@@ -649,6 +649,7 @@ export const getAllProjectsQuery = ({
                                     selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
                                 ),
                             ),
+                            eb('Project.personal', 'is not', true),
                         ]),
                     ),
                 )
@@ -659,7 +660,7 @@ export const getAllProjectsQuery = ({
                 )
                 .limit(limit)
                 .offset(cursor)
-                .orderBy(['Project.updatedAt desc', 'Project.id desc'])
+                .orderBy(['Project.updatedAt desc', 'Project.id asc'])
                 .groupBy(['Project.id'])
                 .as('projects'),
         )
