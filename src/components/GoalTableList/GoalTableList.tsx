@@ -27,7 +27,7 @@ interface GoalTableListProps<T> {
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
 }
 
-export const GoalTableList = <T extends NonNullable<DashboardGoal>>({
+export const GoalTableList = <T extends NonNullable<Omit<DashboardGoal, 'watchers' | 'stargizers'>>>({
     goals,
     onGoalClick,
     onTagClick,

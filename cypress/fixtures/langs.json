@@ -664,6 +664,10 @@
             "ru": "Перенести цель",
             "en": ""
         },
+        "Clone goal": {
+            "ru": "Клонировать цель",
+            "en": ""
+        },
         "Archive goal": {
             "ru": "Архивировать цель",
             "en": ""
@@ -1039,6 +1043,12 @@
             "en": "Create"
         }
     },
+    "ProjectListItemConnected": {
+        "Loading ...": {
+            "ru": "",
+            "en": ""
+        }
+    },
     "ProjectPage": {
         "title": {
             "ru": "Taskany — {project}",
@@ -1259,36 +1269,36 @@
     },
     "SortList": {
         "Title": {
-            "ru": "",
-            "en": ""
+            "ru": "Название",
+            "en": "Title"
         },
         "State": {
-            "ru": "",
-            "en": ""
+            "ru": "Статус",
+            "en": "State"
         },
         "Priority": {
-            "ru": "",
-            "en": ""
+            "ru": "Приоритет",
+            "en": "Priority"
         },
         "Project": {
-            "ru": "",
-            "en": ""
+            "ru": "Проект",
+            "en": "Project"
         },
         "Activity": {
-            "ru": "",
-            "en": ""
+            "ru": "Автор",
+            "en": "Activity"
         },
         "Owner": {
-            "ru": "",
-            "en": ""
+            "ru": "Ответственный",
+            "en": "Owner"
         },
         "UpdatedAt": {
-            "ru": "",
-            "en": ""
+            "ru": "Обновлено",
+            "en": "Updated"
         },
         "CreatedAt": {
-            "ru": "",
-            "en": ""
+            "ru": "Создано",
+            "en": "Created"
         }
     },
     "StarButton": {
