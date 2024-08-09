@@ -444,6 +444,8 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                         sort: null,
                         starred: null,
                         watching: null,
+                        limit: null,
+                        offset: null,
                     };
 
                     const filterToApply: Array<ReturnType<typeof eb>> = [];
@@ -493,7 +495,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                             eb('goals.projectId', '=', eb.ref('Project.id')),
                         ]),
                     )
-                    .limit(dashboardGoalByProjectLimit)
+                    .limit(params.goalsQuery?.limit ?? dashboardGoalByProjectLimit)
                     .as('goal'),
             (join) => join.onTrue(),
         )
@@ -649,6 +651,7 @@ export const getAllProjectsQuery = ({
                                     selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
                                 ),
                             ),
+                            eb('Project.personal', 'is not', true),
                         ]),
                     ),
                 )
@@ -659,7 +662,7 @@ export const getAllProjectsQuery = ({
                 )
                 .limit(limit)
                 .offset(cursor)
-                .orderBy(['Project.updatedAt desc', 'Project.id desc'])
+                .orderBy(['Project.updatedAt desc', 'Project.id asc'])
                 .groupBy(['Project.id'])
                 .as('projects'),
         )

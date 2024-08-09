@@ -36,6 +36,8 @@ export const queryWithFiltersSchema = z.object({
     query: z.string().optional(),
     starred: z.boolean().optional(),
     watching: z.boolean().optional(),
+    limit: z.number().optional(),
+    offset: z.number().optional(),
 });
 
 export type QueryWithFilters = z.infer<typeof queryWithFiltersSchema>;

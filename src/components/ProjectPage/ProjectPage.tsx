@@ -11,7 +11,7 @@ import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { trpc } from '../../utils/trpcClient';
 import { useFiltersPreset } from '../../hooks/useFiltersPreset';
-import { ProjectListItemConnected } from '../ProjectListItemConnected';
+import { ProjectListItemConnected } from '../ProjectListItemConnected/ProjectListItemConnected';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
 import { FiltersBarItem } from '../FiltersBar/FiltersBar';

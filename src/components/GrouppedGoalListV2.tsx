@@ -10,7 +10,7 @@ import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
-import { ProjectListItemConnected } from './ProjectListItemConnected';
+import { ProjectListItemConnected } from './ProjectListItemConnected/ProjectListItemConnected';
 
 interface GroupedGoalListProps {
     filterPreset?: FilterById;
