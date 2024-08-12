@@ -1,13 +1,12 @@
 import { nullable } from '@taskany/bricks';
 import { CircleProgressBar, TableCell, TableRow, UserGroup } from '@taskany/bricks/harmony';
 import cn from 'classnames';
-import { IconStarSolid, IconEyeOutline } from '@taskany/icons';
 import { ComponentProps, useMemo } from 'react';
 
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectSubscriptionButtons } from '../ProjectSubscriptionButtons/ProjectSubscriptionButtons';
 import { safeUserData } from '../../utils/getUserName';
-import { watch, participants as participantsDO } from '../../utils/domObjects';
+import { participants as participantsDO } from '../../utils/domObjects';
 
 import s from './ProjectListItem.module.css';
 
@@ -16,7 +15,6 @@ interface ProjectListItemProps {
     stargizers: number;
     flowId: string;
     title: string;
-    editable?: boolean;
     owner?: ActivityByIdReturnType;
     participants?: ActivityByIdReturnType[];
     starred?: boolean;
@@ -36,7 +34,6 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
     watching,
     averageScore,
     className,
-    editable,
     actionButtonView,
     ...attrs
 }) => {
@@ -62,31 +59,14 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
                     <CircleProgressBar value={score} />
                 </TableCell>
             ))}
-            <TableCell
-                width={40}
-                className={cn(s.ProjectListItemIcons, {
-                    [s.ProjectListItemIcons_editable]: editable,
-                })}
-            >
-                {nullable(!editable, () => (
-                    <>
-                        {nullable(starred, () => (
-                            <IconStarSolid size="s" />
-                        ))}
-                        {nullable(watching, () => (
-                            <IconEyeOutline size="s" {...watch.attr} />
-                        ))}
-                    </>
-                ))}
-                {nullable(editable, () => (
-                    <ProjectSubscriptionButtons
-                        project={{ flowId, id, title }}
-                        starred={starred}
-                        view={actionButtonView}
-                        watching={watching}
-                        stargizersCounter={stargizers}
-                    />
-                ))}
+            <TableCell width={40} className={s.ProjectListItemIcons}>
+                <ProjectSubscriptionButtons
+                    project={{ flowId, id, title }}
+                    starred={starred}
+                    view={actionButtonView}
+                    watching={watching}
+                    stargizersCounter={stargizers}
+                />
             </TableCell>
         </TableRow>
     );

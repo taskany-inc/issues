@@ -35,6 +35,7 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
                                         watching={p._isWatching}
                                         participants={p.participants}
                                         averageScore={p.averageScore}
+                                        actionButtonView="icons"
                                     />
                                 </TableRowItem>
                             </Link>

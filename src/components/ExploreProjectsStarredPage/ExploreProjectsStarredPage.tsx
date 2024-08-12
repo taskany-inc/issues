@@ -41,6 +41,7 @@ export const ExploreProjectsStarredPage = ({ user, ssrTime }: ExternalPageProps)
                                                     watching={!!p._isWatching}
                                                     participants={p.participants as ActivityByIdReturnType[]}
                                                     averageScore={p.averageScore}
+                                                    actionButtonView="icons"
                                                 />
                                             </TableRowItem>
                                         </Link>
