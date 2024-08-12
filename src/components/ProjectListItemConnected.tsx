@@ -11,9 +11,9 @@ import { safeUserData } from '../utils/getUserName';
 
 import { GoalTableList, mapToRenderProps } from './GoalTableList/GoalTableList';
 import { ProjectListItemCollapsable } from './ProjectListItemCollapsable/ProjectListItemCollapsable';
-import { InlineCreateGoalControl } from './InlineCreateGoalControl/InlineCreateGoalControl';
 import { useGoalPreview } from './GoalPreview/GoalPreviewProvider';
 import { Kanban, buildKanban } from './Kanban/Kanban';
+import { NoGoalsText } from './NoGoalsText/NoGoalsText';
 
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     parent?: ComponentProps<typeof ProjectListItemCollapsable>['project'];
@@ -133,10 +133,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                 {...props}
             >
                 <TreeViewElement>
-                    {nullable(
-                        !projectDeepInfo?.goals.length,
-                        () => !isLoading && <InlineCreateGoalControl project={project} />,
-                    )}
+                    {nullable(!projectDeepInfo?.goals.length, () => !isLoading && <NoGoalsText />)}
                 </TreeViewElement>
                 {nullable(view !== 'kanban', () => subNodes)}
             </ProjectListItemCollapsable>
