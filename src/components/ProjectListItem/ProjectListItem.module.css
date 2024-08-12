@@ -1,8 +1,5 @@
 .ProjectListItemIcons {
-    justify-content: space-between;   
-}
-
-.ProjectListItemIcons_editable {
+    justify-content: space-between;
     flex: 1;
     justify-content: end;
     gap: var(--gap-sm)

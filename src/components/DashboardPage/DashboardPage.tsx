@@ -152,7 +152,6 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                             href={routes.project(project.id, view ? `view=${view}` : undefined)}
                             goals={children}
                             actionButtonView="icons"
-                            editable
                         >
                             {nullable(!goals?.length, () => (
                                 <NoGoalsText />

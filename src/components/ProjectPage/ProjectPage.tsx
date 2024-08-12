@@ -119,7 +119,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
                 <ListView onKeyboardClick={handleItemEnter}>
                     {nullable(project, (p) => (
-                        <ProjectListItemConnected key={p.id} visible editable project={p} filterPreset={preset} />
+                        <ProjectListItemConnected key={p.id} visible project={p} filterPreset={preset} />
                     ))}
                 </ListView>
 

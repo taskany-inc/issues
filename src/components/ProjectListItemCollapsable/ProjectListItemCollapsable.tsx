@@ -19,12 +19,10 @@ interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof Tre
     children?: React.ReactNode;
     onClick?: MouseEventHandler<HTMLElement>;
     titleSize?: 'm' | 'l';
-    editable?: boolean;
     actionButtonView?: 'default' | 'icons';
 }
 
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
-    editable,
     project,
     parent,
     children,
@@ -67,7 +65,6 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                 starred={project._isStarred}
                 watching={project._isWatching}
                 averageScore={project.averageScore}
-                editable={editable}
                 actionButtonView={actionButtonView}
             />
         </TableRowItem>
