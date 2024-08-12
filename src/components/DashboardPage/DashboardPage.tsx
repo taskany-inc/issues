@@ -14,13 +14,13 @@ import { Page } from '../Page/Page';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
-import { InlineCreateGoalControl } from '../InlineCreateGoalControl/InlineCreateGoalControl';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { routes } from '../../hooks/router';
 import { GoalTableList, mapToRenderProps } from '../GoalTableList/GoalTableList';
 import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { Kanban, buildKanban } from '../Kanban/Kanban';
+import { NoGoalsText } from '../NoGoalsText/NoGoalsText';
 import { safeUserData } from '../../utils/getUserName';
 
 import { tr } from './DashboardPage.i18n';
@@ -151,10 +151,11 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                             project={project}
                             href={routes.project(project.id, view ? `view=${view}` : undefined)}
                             goals={children}
-                            canCreateGoal
+                            actionButtonView="icons"
+                            editable
                         >
                             {nullable(!goals?.length, () => (
-                                <InlineCreateGoalControl project={project} />
+                                <NoGoalsText />
                             ))}
                         </ProjectListItemCollapsable>
                     );

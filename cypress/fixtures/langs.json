@@ -881,6 +881,12 @@
             "en": "Create"
         }
     },
+    "NoGoalsText": {
+        "No goals yet": {
+            "ru": "",
+            "en": ""
+        }
+    },
     "OfflineBanner": {
         "You are currently offline. Check connection.": {
             "ru": "Вы сейчас не в сети. Проверьте подключение.",
@@ -1047,12 +1053,6 @@
             "en": "Create"
         }
     },
-    "ProjectListItem": {
-        "Create Goal": {
-            "ru": "",
-            "en": ""
-        }
-    },
     "ProjectPage": {
         "title": {
             "ru": "Taskany — {project}",
@@ -1207,6 +1207,12 @@
         "Ok, got it": {
             "ru": "Хорошо, сделаю",
             "en": "Ok, got it"
+        }
+    },
+    "ProjectSubscriptionButtons": {
+        "Create goal": {
+            "ru": "Создать цель",
+            "en": ""
         }
     },
     "ProjectSwitchPublicConfirmModal": {
