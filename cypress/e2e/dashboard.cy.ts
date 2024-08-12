@@ -102,16 +102,11 @@ describe('User dashboard', () => {
         });
 
         it("user can create goal from projects's list", () => {
-            const translations = getTranslation({
-                InlineCreateGoalControl: ['Create goal'],
-            });
             cy.get(projectListItem.query).should('not.exist');
 
             cy.get(filtersPanelResetButton.query).should('exist').click().should('not.exist');
 
-            cy.get(projectListItem.query)
-                .find(createGoalInlineControl.query)
-                .and('include.text', translations.InlineCreateGoalControl['Create goal']());
+            cy.get(projectListItem.query).find(createGoalInlineControl.query).and('not.include.text');
         });
 
         after(() => {

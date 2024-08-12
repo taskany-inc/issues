@@ -7,6 +7,7 @@ import { useProjectResource } from '../../hooks/useProjectResource';
 import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { StarButton } from '../StarButton/StarButton';
 import { WatchButton } from '../WatchButton/WatchButton';
+import { createGoalInlineControl } from '../../utils/domObjects';
 
 import { tr } from './ProjectSubscriptionButtons.i18n';
 
@@ -43,9 +44,19 @@ export const ProjectSubscriptionButtons: FC<ProjectSubscriptionButtonsProps> = (
             {nullable(
                 view === 'icons',
                 () => (
-                    <Button view="clear" iconLeft={<IconAddOutline size="s" />} onClick={onAddClick} />
+                    <Button
+                        {...createGoalInlineControl.attr}
+                        view="clear"
+                        iconLeft={<IconAddOutline size="s" />}
+                        onClick={onAddClick}
+                    />
                 ),
-                <Button text={tr('Create goal')} iconLeft={<IconAddOutline size="s" />} onClick={onAddClick} />,
+                <Button
+                    {...createGoalInlineControl.attr}
+                    text={tr('Create goal')}
+                    iconLeft={<IconAddOutline size="s" />}
+                    onClick={onAddClick}
+                />,
             )}
         </>
     );
