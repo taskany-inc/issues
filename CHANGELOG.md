@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.49.2](https://github.com/taskany-inc/issues/compare/v2.49.1...v2.49.2) (2024-08-12)
+
+
+### Bug Fixes
+
+* add nothing found in global search ([81da488](https://github.com/taskany-inc/issues/commit/81da488b42e2a998b5667179e45f72aeeb8851a8))
+
 ## [2.49.1](https://github.com/taskany-inc/issues/compare/v2.49.0...v2.49.1) (2024-08-05)
 
 
