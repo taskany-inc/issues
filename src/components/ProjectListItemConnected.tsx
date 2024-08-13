@@ -123,6 +123,8 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                                     owner: safeUserData(goal.owner),
                                     participants: goal.participants?.map(safeUserData),
                                     achievedCriteriaWeight: goal._achivedCriteriaWeight,
+                                    partnershipProjects: goal.partnershipProjects,
+                                    isInPartnerProject: project.id !== goal.projectId,
                                 }))}
                                 onTagClick={setTagsFilterOutside}
                                 onGoalClick={onProjectClickHandler}

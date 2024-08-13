@@ -137,6 +137,8 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                                         owner: safeUserData(goal.owner),
                                         participants: goal.participants?.map(safeUserData),
                                         achievedCriteriaWeight: goal._achivedCriteriaWeight,
+                                        partnershipProjects: goal.partnershipProjects,
+                                        isInPartnerProject: project.id !== goal.projectId,
                                     }))}
                                 />
                             </TreeViewElement>
