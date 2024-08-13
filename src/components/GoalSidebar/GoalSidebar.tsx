@@ -25,7 +25,7 @@ import { GoalDependency } from '../GoalDependency/GoalDependency';
 import { TagsList } from '../TagsList/TagsList';
 import { dependencyKind } from '../../schema/goal';
 import { UserEditableList } from '../UserEditableList/UserEditableList';
-import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
+import { VersaCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { List } from '../List/List';
 import { GoalParentDropdown } from '../GoalParentDropdown/GoalParentDropdown';
@@ -64,10 +64,8 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
         goalOwnerUpdate,
         onGoalDependencyAdd,
         onGoalDependencyRemove,
-        validateGoalCriteriaBindings,
         onGoalTagAdd,
         onGoalTagRemove,
-        onGoalCriteriaAdd,
         onGoalCriteriaRemove,
     } = useGoalResource(
         {
@@ -89,22 +87,6 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
             [dependencyKind.relatedTo]: tr('relatedTo'),
         };
     }, []);
-
-    const handleConnectGoal = useCallback(
-        async (values: { title?: string; selected?: { id: string } | null; weight?: string }) => {
-            if (values.title && values.selected) {
-                await onGoalCriteriaAdd({
-                    title: values.title,
-                    goalId: values.selected.id,
-                    weight: values.weight,
-                    criteriaGoal: {
-                        id: goal.id,
-                    },
-                });
-            }
-        },
-        [goal.id, onGoalCriteriaAdd],
-    );
 
     const onTranfer = useCallback(
         async (project: { id: string }) => {
@@ -275,14 +257,10 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                                 />
                             )}
                         >
-                            <GoalCriteriaSuggest
-                                id={goal.id}
-                                defaultMode="goal"
+                            <VersaCriteriaSuggest
                                 items={goal._versaCriteria}
-                                onSubmit={handleConnectGoal}
-                                validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                                versa
-                                restrictedSearch
+                                goalId={goal.id}
+                                goalShortId={goal._shortId}
                             />
                         </GoalFormPopupTrigger>
                     ))}

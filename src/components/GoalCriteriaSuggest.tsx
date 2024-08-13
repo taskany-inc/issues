@@ -1,9 +1,11 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 
 import { trpc } from '../utils/trpcClient';
 import { State } from '../../trpc/inferredTypes';
+import { useGoalResource } from '../hooks/useGoalResource';
 
-import { CriteriaForm } from './CriteriaForm/CriteriaForm';
+import { CriteriaForm, useCriteriaValidityData } from './CriteriaForm/CriteriaForm';
+import { dispatchPreviewUpdateEvent } from './GoalPreview/GoalPreviewProvider';
 
 interface Goal {
     id: string;
@@ -12,7 +14,7 @@ interface Goal {
     _shortId: string;
 }
 
-interface GoalCriteriaComboBoxProps {
+interface GoalCriteriaSuggestProps {
     id: string;
     items?: {
         goal?: Goal | null;
@@ -25,9 +27,11 @@ interface GoalCriteriaComboBoxProps {
     values?: React.ComponentProps<typeof CriteriaForm>['values'];
     onSubmit: React.ComponentProps<typeof CriteriaForm>['onSubmit'];
     validateGoalCriteriaBindings: (values: { goalId: string; criteriaGoalId: string }) => Promise<null>;
+    validityData: React.ComponentProps<typeof CriteriaForm>['validityData'];
+    onGoalSelect?: (goal: { id: string }) => void;
 }
 
-export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
+export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
     id,
     items,
     withModeSwitch,
@@ -36,6 +40,8 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
     values,
     onSubmit,
     validateGoalCriteriaBindings,
+    validityData,
+    onGoalSelect,
     restrictedSearch = false,
 }) => {
     const [mode, setMode] = useState(defaultMode);
@@ -53,30 +59,14 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
         }, []);
     }, [items]);
 
-    const [{ data: goals = [] }, { data: criteriaList = [], refetch }] = trpc.useQueries((ctx) => [
-        ctx.goal.suggestions(
-            {
-                input: query as string,
-                limit: 5,
-                onlyCurrentUser: restrictedSearch,
-            },
-            { enabled: mode === 'goal', cacheTime: 0 },
-        ),
-        ctx.goal.getGoalCriteriaList(
-            {
-                id: versa ? selectedGoal?.id : id,
-            },
-            { cacheTime: 0, staleTime: 0, enabled: false },
-        ),
-    ]);
-
-    useEffect(() => {
-        const needFetch = versa ? selectedGoal?.id != null : !!id;
-
-        if (needFetch) {
-            refetch();
-        }
-    }, [refetch, selectedGoal, id, versa]);
+    const { data: goals = [] } = trpc.goal.suggestions.useQuery(
+        {
+            input: query as string,
+            limit: 5,
+            onlyCurrentUser: restrictedSearch,
+        },
+        { enabled: mode === 'goal', cacheTime: 0 },
+    );
 
     const itemsToRender = useMemo(() => {
         if (selectedGoal?.title === query || mode === 'simple') {
@@ -91,31 +81,17 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
         }));
     }, [goals, selectedGoal, query, mode]);
 
-    const validityData = useMemo(() => {
-        return criteriaList.reduce<{ sumOfCriteria: number; title: string[] }>(
-            (acc, { weight, title, id }) => {
-                if (values?.id === id) {
-                    return acc;
-                }
+    const handleGoalChange = useCallback(
+        (item: typeof selectedGoal) => {
+            setSelectedGoal(item);
 
-                acc.sumOfCriteria += weight;
-                acc.title.push(title);
-                return acc;
-            },
-            {
-                sumOfCriteria: 0,
-                title: [],
-            },
-        );
-    }, [criteriaList, values]);
-
-    const handleGoalChange = useCallback((item: typeof selectedGoal) => {
-        setSelectedGoal(item);
-
-        if (item?.title != null) {
-            setQuery(item.title);
-        }
-    }, []);
+            if (item?.title != null) {
+                setQuery(item.title);
+                onGoalSelect?.(item);
+            }
+        },
+        [onGoalSelect],
+    );
 
     const validateBindings = useCallback(
         (selectedId: string) => {
@@ -154,6 +130,69 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaComboBoxProps> = ({
             value={selectedGoals}
             validityData={validityData}
             validateBindingsFor={validateBindings}
+        />
+    );
+};
+
+interface VersaCriteriaSuggestProps {
+    goalId: string;
+    goalShortId: string;
+    items: React.ComponentProps<typeof GoalCriteriaSuggest>['items'];
+}
+
+export const VersaCriteriaSuggest: React.FC<VersaCriteriaSuggestProps> = ({ goalId, items, goalShortId }) => {
+    const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
+
+    const { data = [] } = trpc.goal.getGoalCriteriaList.useQuery(
+        {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            id: selectedGoalId!,
+        },
+        { enabled: !!selectedGoalId },
+    );
+    const { validateGoalCriteriaBindings, onGoalCriteriaAdd } = useGoalResource(
+        {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            id: selectedGoalId!,
+        },
+        {
+            invalidate: {
+                getById: goalShortId,
+                getGoalActivityFeed: { goalId },
+            },
+            afterInvalidate: dispatchPreviewUpdateEvent,
+        },
+    );
+
+    const handleConnectGoal = useCallback(
+        async (values: { title?: string; selected?: { id: string } | null; weight?: string }) => {
+            if (values.title && values.selected) {
+                await onGoalCriteriaAdd({
+                    title: values.title,
+                    goalId: values.selected.id,
+                    weight: values.weight,
+                    criteriaGoal: {
+                        id: goalId,
+                    },
+                });
+            }
+        },
+        [goalId, onGoalCriteriaAdd],
+    );
+
+    const validityData = useCriteriaValidityData(data);
+
+    return (
+        <GoalCriteriaSuggest
+            id={goalId}
+            defaultMode="goal"
+            items={items}
+            onSubmit={handleConnectGoal}
+            validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+            versa
+            restrictedSearch
+            validityData={validityData}
+            onGoalSelect={({ id }) => setSelectedGoalId(id)}
         />
     );
 };

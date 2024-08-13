@@ -38,6 +38,7 @@ import { GoalBadge } from '../GoalBadge';
 import { safeUserData } from '../../utils/getUserName';
 import { UserBadge } from '../UserBadge/UserBadge';
 import { ActivityByIdReturnType, State } from '../../../trpc/inferredTypes';
+import { useCriteriaValidityData } from '../CriteriaForm/CriteriaForm';
 
 import classes from './GoalCriteria.module.css';
 import { tr } from './GoalCriteria.i18n';
@@ -70,6 +71,7 @@ interface GoalCriteriaEditableApi<T = UnionCriteria> {
     onRemove?: (val: T) => void;
     onCheck?: (val: T) => void;
     goalId: string;
+    validityData: React.ComponentProps<typeof GoalCriteriaSuggest>['validityData'];
 }
 
 export function mapCriteria<
@@ -247,6 +249,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
     onRemove,
     onUpdate,
     onCheck,
+    validityData,
     ...props
 }) => {
     const [mode, setMode] = useState<'read' | 'edit'>('read');
@@ -380,6 +383,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
                         values={values}
                         onSubmit={handleCriteriaUpdate}
                         validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                        validityData={validityData}
                     />
                 </GoalFormPopupTrigger>
             ))}
@@ -387,7 +391,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
     );
 };
 
-interface CriteriaListProps extends GoalCriteriaEditableApi {
+interface CriteriaListProps extends Omit<GoalCriteriaEditableApi, 'validityData'> {
     list?: Array<CriteriaProps | GoalCriteriaProps>;
     className?: string;
 }
@@ -401,6 +405,7 @@ export const CriteriaList: React.FC<CriteriaListProps> = ({
     goalId,
     className,
 }) => {
+    const validityData = useCriteriaValidityData(list);
     return (
         <Table className={className}>
             {list.map((criteria) => (
@@ -412,6 +417,7 @@ export const CriteriaList: React.FC<CriteriaListProps> = ({
                     onUpdate={onUpdate}
                     onRemove={onRemove}
                     onCheck={onCheck}
+                    validityData={validityData}
                 />
             ))}
         </Table>
@@ -520,7 +526,7 @@ interface CriteriaItemValue {
     } | null;
 }
 
-interface GoalCriteriaViewProps extends GoalCriteriaEditableApi<UnionCriteria> {
+interface GoalCriteriaViewProps extends Omit<GoalCriteriaEditableApi<UnionCriteria>, 'validityData'> {
     goalId: string;
     list: Array<CriteriaProps | GoalCriteriaProps>;
     canEdit: boolean;

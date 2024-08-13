@@ -15,6 +15,7 @@ import { GoalCriteriaSuggest } from '../GoalCriteriaSuggest';
 import { GoalFormPopupTrigger } from '../GoalFormPopupTrigger/GoalFormPopupTrigger';
 import { GoalActivityWithTabs } from '../GoalActivityWithTabs/GoalActivityWithTabs';
 import { safeUserData } from '../../utils/getUserName';
+import { useCriteriaValidityData } from '../CriteriaForm/CriteriaForm';
 
 import { tr } from './GoalActivityFeed.i18n';
 import s from './GoalActivityFeed.module.css';
@@ -60,6 +61,9 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     },
                     getGoalActivityFeed: {
                         goalId: goal.id,
+                    },
+                    getGoalCriteriaList: {
+                        id: goal.id,
                     },
                 },
                 afterInvalidate: onInvalidate,
@@ -143,6 +147,8 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             [onGoalCriteriaConvert],
         );
 
+        const criteriaValidityData = useCriteriaValidityData(goal._criteria);
+
         return (
             <>
                 {nullable(goal._criteria?.length || goal._isEditable, () => (
@@ -177,6 +183,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     }))}
                                     onSubmit={handleCreateCriteria}
                                     validateGoalCriteriaBindings={validateGoalCriteriaBindings}
+                                    validityData={criteriaValidityData}
                                 />
                             </GoalFormPopupTrigger>
                         ))}
