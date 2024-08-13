@@ -70,7 +70,12 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {projectsOnScreen.map((project) => (
-                <ProjectListItemConnected key={project.id} project={project} filterPreset={filterPreset} />
+                <ProjectListItemConnected
+                    key={project.id}
+                    actionButtonView="icons"
+                    project={project}
+                    filterPreset={filterPreset}
+                />
             ))}
 
             {nullable(hasNextPage, () => (
