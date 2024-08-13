@@ -125,13 +125,32 @@ function patchZodSchema<T extends FormValues>(
 
 type CriteriaFormValues = FormValues & z.infer<ReturnType<typeof patchZodSchema>>;
 
+export function useCriteriaValidityData<T extends { title: string; weight?: number | string | null }>(
+    criteriaList: T[],
+): ValidityData {
+    return useMemo(() => {
+        return criteriaList.reduce<ValidityData>(
+            (acc, item) => {
+                acc.title.push(item.title);
+                acc.sumOfCriteria += Number(item.weight || 0);
+
+                return acc;
+            },
+            {
+                title: [],
+                sumOfCriteria: 0,
+            },
+        );
+    }, [criteriaList]);
+}
+
 interface CriteriaFormProps {
     items: SuggestItem[];
     value?: SuggestItem[];
     mode: CriteriaFormMode;
     withModeSwitch?: boolean;
     values?: CriteriaFormValues;
-    validityData: { title: string[]; sumOfCriteria: number };
+    validityData: ValidityData;
 
     setMode: (mode: CriteriaFormMode) => void;
     onSubmit: (values: CriteriaFormValues) => void;
