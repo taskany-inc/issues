@@ -78,7 +78,7 @@ export const IssueStats: React.FC<IssueStatsProps> = ({
             {achivedCriteriaWeight != null && (
                 <Separator>
                     <div className={s.IssueComponentContainer}>
-                        <CircleProgressBar value={achivedCriteriaWeight} size="l" />
+                        <CircleProgressBar value={achivedCriteriaWeight} size="m" />
                     </div>
                 </Separator>
             )}

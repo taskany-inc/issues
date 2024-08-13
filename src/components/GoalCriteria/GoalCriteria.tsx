@@ -59,6 +59,7 @@ interface GoalCriteriaProps extends CriteriaProps {
         state?: State | null;
         project?: string;
         owner?: ActivityByIdReturnType;
+        progress?: number | null;
     };
 }
 
@@ -83,6 +84,7 @@ export function mapCriteria<
         projectId: string | null;
         owner: ActivityByIdReturnType | null;
         state: State | null;
+        completedCriteriaWeight?: number | null;
     },
 >(criteria: T, connectedGoal: G | null): UnionCriteria {
     if (connectedGoal) {
@@ -94,6 +96,7 @@ export function mapCriteria<
                 shortId: connectedGoal._shortId,
                 project: connectedGoal.projectId ?? undefined,
                 owner: connectedGoal.owner ?? undefined,
+                progress: connectedGoal.completedCriteriaWeight ?? null,
             },
             title: connectedGoal.title,
             isDone: criteria.isDone,
@@ -160,12 +163,13 @@ const GoalCriteria = ({ title, goal, weight, isDone }: Omit<GoalCriteriaProps, '
 
     return (
         <>
-            <TableCell width={200}>
+            <TableCell className={classes.GoalCriteriaTitleCell} width={200}>
                 <GoalBadge
                     title={title}
                     state={goal.state ?? undefined}
                     href={routes.goal(goal.shortId)}
                     onClick={handleGoalCriteriaClick}
+                    progress={goal.progress}
                     strike={isDone}
                 />
             </TableCell>
@@ -417,7 +421,7 @@ export const CriteriaList: React.FC<CriteriaListProps> = ({
 }) => {
     const validityData = useCriteriaValidityData(list);
     return (
-        <Table className={className}>
+        <Table className={classNames(classes.GoalCriteriaTable, className)}>
             {list.map((criteria) => (
                 <Criteria
                     goalId={goalId}
