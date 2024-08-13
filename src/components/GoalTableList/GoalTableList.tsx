@@ -191,7 +191,7 @@ export const GoalTableList = <T extends GoalTableListItem>({
                             content: goal.achievedCriteriaWeight != null && goal.id != null && (
                                 <GoalCriteriaPreview achievedWeight={goal.achievedCriteriaWeight} goalId={goal.id} />
                             ),
-                            width: 24,
+                            width: 32,
                         },
                     ],
                 };

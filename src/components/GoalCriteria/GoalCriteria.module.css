@@ -12,6 +12,7 @@
 
 .GoalCriteriaTable {
     margin-top: var(--gap-sm);
+    margin-bottom: var(--gap-s);
 }
 
 .GoalCriteriaItemTitle {
@@ -87,4 +88,20 @@
 .GoalCriteriaIsolate::after {
     content: none;
     display: none;
+}
+
+.GoalCriteriaProgress {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    z-index: 0;
+}
+
+.GoalCriteriaTitleCell {
+    position: relative;
+}
+
+.GoalCriteriaTable {
+    gap: var(--gap-sm);
 }

@@ -51,6 +51,7 @@ export const criteriaQuery = (params: CriteriaParams = {}) => {
                             _shortId: sql<string>`concat(${ref('criteriaGoal.projectId')}, '-', ${ref(
                                 'criteriaGoal.scopeId',
                             )})`,
+                            completedCriteriaWeight: sql<number | null>`"criteriaGoal"."completedCriteriaWeight"`,
                             state: fn.toJson('state'),
                             owner: jsonBuildObject({
                                 id: sql<string>`activity.id`,
