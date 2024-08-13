@@ -93,6 +93,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
         () =>
             childrenProjects.map((p) => (
                 <ProjectListItemConnected
+                    actionButtonView="icons"
                     key={p.id}
                     project={p}
                     parent={project}
