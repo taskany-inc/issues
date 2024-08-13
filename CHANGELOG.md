@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.50.1](https://github.com/taskany-inc/issues/compare/v2.50.0...v2.50.1) (2024-08-13)
+
+
+### Bug Fixes
+
+* **ExploreProjectsPage:** change button view to icon ([3a65b40](https://github.com/taskany-inc/issues/commit/3a65b408be31f44cd5b916db98c55c54da8487f4))
+* **GoalTableList:** calculate partnership projects ([337644c](https://github.com/taskany-inc/issues/commit/337644ca1c0ddca0ab265a380c6da0b42ce2b4bb))
+
 ## [2.50.0](https://github.com/taskany-inc/issues/compare/v2.49.1...v2.50.0) (2024-08-13)
 
 
