@@ -11,7 +11,8 @@
     "Goal's title must be longer than 6 symbols": "Заголовок цели должен быть длиннее 6 символов",
     "Goal's description is required": "Описание цели обязательно",
     "Goal's description must be a string": "Описание может быть только строкой",
-    "Goal's project are is required": "Укажите проект",
+    "Goal's project is required": "Укажите проект",
     "Choose a dependency": "Укажите тип зависимости",
-    "Max {max} items in a single request": "Максимум {max} объектов в одном запросе"
+    "Max {max} items in a single request": "Максимум {max} объектов в одном запросе",
+    "State is required": "Выберите статус"
 }

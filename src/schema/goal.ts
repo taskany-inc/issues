@@ -41,129 +41,161 @@ export const toggleGoalArchiveSchema = z.object({
 
 export type ToggleGoalArchive = z.infer<typeof toggleGoalArchiveSchema>;
 
-export const goalCommonSchema = z.object({
-    title: z
-        .string({
-            required_error: tr('Title is required'),
-            invalid_type_error: tr("Goal's title must be a string"),
-        })
-        .min(6, {
-            message: tr("Goal's title must be longer than 6 symbols"),
+export const goalCommonSchema = z
+    .discriminatedUnion('mode', [
+        z.object({
+            mode: z.literal('personal'),
+            parent: z.object({}).optional(),
         }),
-    description: z
-        .string({
-            required_error: tr("Goal's description is required"),
-            invalid_type_error: tr("Goal's description must be a string"),
-        })
-        .optional(),
-    owner: z.object({
-        id: z.string(),
-    }),
-    parent: z
-        .object({
-            id: z.string(),
-            title: z.string(),
-            flowId: z.string(),
-        })
-        .nullable()
-        .optional(),
-    state: z.object({
-        id: z.string(),
-        hue: z.number().optional(),
-        title: z.string().optional(),
-    }),
-    priority: z.object({
-        id: z.string(),
-        title: z.string(),
-        value: z.number(),
-        default: z.boolean(),
-    }),
-    estimate: z
-        .object({
-            date: z.string(),
-            type: z.enum([DateType.Quarter, DateType.Strict, DateType.Year]),
-        })
-        .nullable()
-        .optional(),
-    tags: z
-        .array(
-            z.object({
+        z.object({
+            mode: z.literal('default'),
+            parent: z.object(
+                {
+                    id: z.string(),
+                    title: z.string(),
+                    flowId: z.string(),
+                },
+                {
+                    required_error: tr("Goal's project is required"),
+                    invalid_type_error: tr("Goal's project is required"),
+                },
+            ),
+        }),
+    ])
+    .and(
+        z.object({
+            title: z
+                .string({
+                    required_error: tr('Title is required'),
+                    invalid_type_error: tr("Goal's title must be a string"),
+                })
+                .min(6, {
+                    message: tr("Goal's title must be longer than 6 symbols"),
+                }),
+            description: z
+                .string({
+                    required_error: tr("Goal's description is required"),
+                    invalid_type_error: tr("Goal's description must be a string"),
+                })
+                .optional(),
+            owner: z.object({
+                id: z.string(),
+            }),
+            state: z.object(
+                {
+                    id: z.string(),
+                    hue: z.number().optional(),
+                    title: z.string().optional(),
+                },
+                {
+                    invalid_type_error: tr('State is required'),
+                    required_error: tr('State is required'),
+                },
+            ),
+            priority: z.object({
                 id: z.string(),
                 title: z.string(),
+                value: z.number(),
+                default: z.boolean(),
             }),
-        )
-        .optional(),
-    participants: z
-        .array(
-            z.object({
-                id: z.string(),
-            }),
-        )
-        .optional(),
-});
+            estimate: z
+                .object({
+                    date: z.string(),
+                    type: z.enum([DateType.Quarter, DateType.Strict, DateType.Year]),
+                })
+                .nullish(),
+            tags: z
+                .array(
+                    z.object({
+                        id: z.string(),
+                        title: z.string(),
+                    }),
+                )
+                .optional(),
+        }),
+    );
 
 export type GoalCommon = z.infer<typeof goalCommonSchema>;
 
-export const goalUpdateSchema = z.object({
-    id: z.string(),
-    title: z
-        .string({
-            required_error: tr('Title is required'),
-            invalid_type_error: tr("Goal's title must be a string"),
-        })
-        .min(6, {
-            message: tr("Goal's title must be longer than 6 symbols"),
+export const goalUpdateSchema = z
+    .discriminatedUnion('mode', [
+        z.object({
+            mode: z.literal('personal'),
+            parent: z.object({}).optional(),
         }),
-    description: z.string({
-        required_error: tr("Goal's description is required"),
-        invalid_type_error: tr("Goal's description must be a string"),
-    }),
-    owner: z.object({
-        id: z.string(),
-        user: z.object({
-            email: z.string(),
+        z.object({
+            mode: z.literal('default'),
+            parent: z.object(
+                {
+                    id: z.string(),
+                    title: z.string(),
+                    flowId: z.string(),
+                },
+                {
+                    required_error: 'Project is required',
+                    invalid_type_error: 'Project is required',
+                },
+            ),
         }),
-    }),
-    parent: z
-        .object({
-            id: z.string(),
-            title: z.string(),
-            flowId: z.string(),
-        })
-        .nullable()
-        .optional(),
-    state: z.object({
-        id: z.string(),
-        hue: z.number().optional(),
-        title: z.string().optional(),
-        type: z.enum([
-            StateType.Canceled,
-            StateType.Completed,
-            StateType.Failed,
-            StateType.InProgress,
-            StateType.NotStarted,
-        ]),
-    }),
-    priority: z.object({
-        id: z.string(),
-        title: z.string(),
-        value: z.number(),
-        default: z.boolean(),
-    }),
-    estimate: z
-        .object({
-            date: z.string(),
-            type: z.enum([DateType.Quarter, DateType.Strict, DateType.Year]),
-        })
-        .nullable()
-        .optional(),
-    tags: z.array(
+    ])
+    .and(
         z.object({
             id: z.string(),
-            title: z.string(),
+            title: z
+                .string({
+                    required_error: tr('Title is required'),
+                    invalid_type_error: tr("Goal's title must be a string"),
+                })
+                .min(6, {
+                    message: tr("Goal's title must be longer than 6 symbols"),
+                }),
+            description: z.string({
+                required_error: tr("Goal's description is required"),
+                invalid_type_error: tr("Goal's description must be a string"),
+            }),
+            owner: z.object({
+                id: z.string(),
+                user: z.object({
+                    email: z.string(),
+                }),
+            }),
+            state: z.object(
+                {
+                    id: z.string(),
+                    hue: z.number().optional(),
+                    title: z.string().optional(),
+                    type: z.enum([
+                        StateType.Canceled,
+                        StateType.Completed,
+                        StateType.Failed,
+                        StateType.InProgress,
+                        StateType.NotStarted,
+                    ]),
+                },
+                {
+                    invalid_type_error: 'State is requered',
+                },
+            ),
+            priority: z.object({
+                id: z.string(),
+                title: z.string(),
+                value: z.number(),
+                default: z.boolean(),
+            }),
+            estimate: z
+                .object({
+                    date: z.string(),
+                    type: z.enum([DateType.Quarter, DateType.Strict, DateType.Year]),
+                })
+                .nullish(),
+            tags: z.array(
+                z.object({
+                    id: z.string(),
+                    title: z.string(),
+                }),
+            ),
         }),
-    ),
-});
+    );
 
 export type GoalUpdate = z.infer<typeof goalUpdateSchema>;
 

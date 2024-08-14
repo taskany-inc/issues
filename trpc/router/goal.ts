@@ -395,20 +395,21 @@ export const goal = router({
 
         const { activityId, role } = ctx.session.user;
 
-        const actualProject = input.parent
-            ? await prisma.project.findUnique({
-                  where: { id: input.parent.id },
-                  include: {
-                      activity: { include: { user: true, ghost: true } },
-                      participants: { include: { user: true, ghost: true } },
-                      watchers: { include: { user: true, ghost: true } },
-                  },
-              })
-            : await createPersonalProject({
-                  ownerId: input.owner.id,
-                  activityId,
-                  role,
-              });
+        const actualProject =
+            input.parent && input.mode === 'default'
+                ? await prisma.project.findUnique({
+                      where: { id: input.parent.id },
+                      include: {
+                          activity: { include: { user: true, ghost: true } },
+                          participants: { include: { user: true, ghost: true } },
+                          watchers: { include: { user: true, ghost: true } },
+                      },
+                  })
+                : await createPersonalProject({
+                      ownerId: input.owner.id,
+                      activityId,
+                      role,
+                  });
 
         if (!actualProject) {
             return null;

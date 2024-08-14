@@ -93,7 +93,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({
         setBusy(true);
         const res = await goalCreate(
             form,
-            form.parent != null
+            form.parent != null && form.mode === 'default'
                 ? {
                       PROJECT_IS_ARCHIVED: tr
                           .raw('Cannot create goal in archived project', {
@@ -116,7 +116,7 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({
         utils.project.getUserProjectsWithGoals.invalidate();
         utils.v2.project.userProjects.invalidate();
 
-        if (form.parent) {
+        if (form.parent && form.mode === 'default') {
             utils.project.getDeepInfo.invalidate({ id: form.parent.id });
         }
 
