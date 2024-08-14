@@ -11,7 +11,7 @@
 }
 
 .TableRowItem:hover {
-    background-color: var(--gray4);
+    background-color: var(--layer-hover);
 }
 
 .TableRowItemText {
