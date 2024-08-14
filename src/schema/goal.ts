@@ -47,8 +47,8 @@ export const goalCommonSchema = z.object({
             required_error: tr('Title is required'),
             invalid_type_error: tr("Goal's title must be a string"),
         })
-        .min(10, {
-            message: tr("Goal's title must be longer than 10 symbols"),
+        .min(6, {
+            message: tr("Goal's title must be longer than 6 symbols"),
         }),
     description: z
         .string({
@@ -111,8 +111,8 @@ export const goalUpdateSchema = z.object({
             required_error: tr('Title is required'),
             invalid_type_error: tr("Goal's title must be a string"),
         })
-        .min(10, {
-            message: tr("Goal's title must be longer than 10 symbols"),
+        .min(6, {
+            message: tr("Goal's title must be longer than 6 symbols"),
         }),
     description: z.string({
         required_error: tr("Goal's description is required"),
