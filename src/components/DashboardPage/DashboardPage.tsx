@@ -155,9 +155,11 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                             goals={children}
                             actionButtonView="icons"
                         >
-                            {nullable(!goals?.length, () => (
-                                <NoGoalsText />
-                            ))}
+                            <TreeViewElement>
+                                {nullable(!goals?.length, () => (
+                                    <NoGoalsText />
+                                ))}
+                            </TreeViewElement>
                         </ProjectListItemCollapsable>
                     );
                 })}
