@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.50.2](https://github.com/taskany-inc/issues/compare/v2.50.1...v2.50.2) (2024-08-14)
+
+
+### Bug Fixes
+
+* no goals padding ([c132ee5](https://github.com/taskany-inc/issues/commit/c132ee52b9e072e63067f2670768a58e9a2e0d13))
+* project list item color ([4c51ac3](https://github.com/taskany-inc/issues/commit/4c51ac33a85351bcc542c337a564b78dbced571c))
+* **ProjectSubscriptionButtons:** change view to icons on goals and child projects on project page ([24b7f66](https://github.com/taskany-inc/issues/commit/24b7f66fa59705790849249cdf372a135852f5a6))
+
 ## [2.50.1](https://github.com/taskany-inc/issues/compare/v2.50.0...v2.50.1) (2024-08-13)
 
 
