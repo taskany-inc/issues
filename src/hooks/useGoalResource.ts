@@ -133,13 +133,10 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     );
 
     const goalUpdate = useCallback(
-        async (data: Omit<GoalUpdate, 'id'>) => {
-            if (!id) return;
+        async (data: GoalUpdate) => {
+            if (!id || id !== data.id) return;
 
-            const promise = updateGoalMutation.mutateAsync({
-                ...data,
-                id,
-            });
+            const promise = updateGoalMutation.mutateAsync(data);
 
             notifyPromise(promise, 'goalsUpdate');
 

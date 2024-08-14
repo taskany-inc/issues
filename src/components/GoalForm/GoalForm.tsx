@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useCallback, useEffect } from 'react';
+import { useForm, Controller, WatchObserver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
 import { State, Tag as TagModel } from '@prisma/client';
@@ -98,9 +98,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
     personal,
     ...attrs
 }) => {
-    const [goalType, setGoalType] = useState<keyof typeof goalTypeMap>(
-        personal ? goalTypeMap.personal : goalTypeMap.default,
-    );
     const {
         control,
         register,
@@ -108,6 +105,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         watch,
         setValue,
         formState: { errors, isSubmitted },
+        resetField,
     } = useForm<z.infer<typeof validitySchema>>({
         resolver: zodResolver(validitySchema),
         mode: 'onChange',
@@ -123,6 +121,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
             estimate,
             tags,
             id,
+            mode: personal ? goalTypeMap.personal : goalTypeMap.default,
         },
         defaultValues: {
             title: '',
@@ -134,12 +133,37 @@ export const GoalForm: React.FC<GoalFormProps> = ({
             estimate: null,
             tags: [],
             id: null,
+            mode: goalTypeMap.default,
         },
     });
 
     const parentWatcher = watch('parent');
+    const mode = watch('mode');
     const tagsWatcher: TagModel[] = watch('tags');
     const errorsResolver = errorsProvider(errors, isSubmitted);
+
+    const watchModeObserver = useCallback<WatchObserver<z.infer<typeof validitySchema>>>(
+        ({ mode }, { name }) => {
+            if (name === 'mode') {
+                if (mode === goalTypeMap.personal) {
+                    setValue('parent', null);
+                } else {
+                    setValue('parent', parent);
+                }
+                resetField('state');
+                resetField('parent');
+            }
+        },
+        [setValue, parent, resetField],
+    );
+
+    useEffect(() => {
+        const parentSubWatch = watch(watchModeObserver);
+
+        return () => {
+            parentSubWatch.unsubscribe();
+        };
+    }, [watch, watchModeObserver]);
 
     const onTagDeleteProvider = useCallback(
         (tag: Partial<TagModel>) => () => {
@@ -148,19 +172,6 @@ export const GoalForm: React.FC<GoalFormProps> = ({
         },
         [setValue, tagsWatcher],
     );
-
-    const onSwitchGoalType = useCallback(() => {
-        setValue('state', undefined);
-
-        if (goalType === goalTypeMap.default) {
-            setValue('parent', null);
-            setGoalType(goalTypeMap.personal);
-            return;
-        }
-
-        setValue('parent', parent);
-        setGoalType(goalTypeMap.default);
-    }, [setValue, goalType, parent]);
 
     const onNewProjectClick = useCallback(() => {
         dispatchModalEvent(ModalEvent.GoalCreateModal)();
@@ -209,13 +220,19 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                 {nullable(tip || !id, () => (
                     <FormActions align="left">
                         {nullable(!id, () => (
-                            <div className={s.SwitchGoalType}>
-                                <Switch value={goalType} onChange={onSwitchGoalType}>
-                                    <SwitchControl text={tr('Project goal')} value={goalTypeMap.default} />
-                                    <SwitchControl text={tr('Personal goal')} value={goalTypeMap.personal} />
-                                </Switch>
-                                <HelpButton slug="goals" />
-                            </div>
+                            <Controller
+                                name="mode"
+                                control={control}
+                                render={({ field }) => (
+                                    <div className={s.SwitchGoalType}>
+                                        <Switch {...field} onChange={(_, value) => setValue('mode', value)}>
+                                            <SwitchControl text={tr('Project goal')} value={goalTypeMap.default} />
+                                            <SwitchControl text={tr('Personal goal')} value={goalTypeMap.personal} />
+                                        </Switch>
+                                        <HelpButton slug="goals" />
+                                    </div>
+                                )}
+                            />
                         ))}
                         {nullable(tip, () => (
                             <div className={s.FormTip}>{tip}</div>
@@ -224,7 +241,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                 ))}
 
                 <FormActions className={s.FormActions} {...combobox.attr}>
-                    {nullable(!id && goalType === 'default', () => (
+                    {nullable(!id && mode === goalTypeMap.default, () => (
                         <Controller
                             name="parent"
                             control={control}
@@ -287,7 +304,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 setDefault
                                 flowId={parentWatcher?.flowId}
                                 error={errorsResolver(field.name)}
-                                disabled={(goalType === 'default' && !parentWatcher?.flowId) || busy}
+                                disabled={(mode === goalTypeMap.default && !parentWatcher?.flowId) || busy}
                                 className={s.GoalFormStateDropdown}
                                 {...stateCombobox.attr}
                                 {...field}

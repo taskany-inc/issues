@@ -394,7 +394,7 @@
         },
         "Nothing found": {
             "ru": "Ничего не найдено",
-            "en": "Nothing found"
+            "en": ""
         }
     },
     "GoalActivityFeed": {
@@ -851,12 +851,6 @@
             "en": "shows this instruction"
         }
     },
-    "InlineCreateGoalControl": {
-        "Create goal": {
-            "ru": "Создать цель",
-            "en": ""
-        }
-    },
     "LoadMoreButton": {
         "Load more...": {
             "ru": "Показать ещё...",
@@ -883,7 +877,7 @@
     },
     "NoGoalsText": {
         "No goals yet": {
-            "ru": "",
+            "ru": "Пока нет целей",
             "en": ""
         }
     },
@@ -1502,13 +1496,17 @@
             "ru": "Укажите тип зависимости",
             "en": "Choose a dependency"
         },
+        "Goal's project is required": {
+            "ru": "Укажите проект",
+            "en": "Goal's project is required"
+        },
         "Goal's title must be a string": {
             "ru": "Заголовок может быть только строкой",
             "en": "Goal's title must be a string"
         },
-        "Goal's title must be longer than 10 symbols": {
-            "ru": "Заголовок цели должен быть длиннее 10 символов",
-            "en": "Goal's title must be longer than 10 symbols"
+        "Goal's title must be longer than 6 symbols": {
+            "ru": "Заголовок цели должен быть длиннее 6 символов",
+            "en": "Goal's title must be longer than 6 symbols"
         },
         "Goal's description is required": {
             "ru": "Описание цели обязательно",
@@ -1517,6 +1515,10 @@
         "Goal's description must be a string": {
             "ru": "Описание может быть только строкой",
             "en": "Goal's description must be a string"
+        },
+        "State is required": {
+            "ru": "Выберите статус",
+            "en": "State is required"
         },
         "Title must be longer than 2 symbols": {
             "ru": "Заголовок должен быть длиннее 2 символов",

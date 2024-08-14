@@ -11,7 +11,8 @@
     "Goal's title must be longer than 6 symbols": "Goal's title must be longer than 6 symbols",
     "Goal's description is required": "Goal's description is required",
     "Goal's description must be a string": "Goal's description must be a string",
-    "Goal's project are is required": "Goal's project are is required",
+    "Goal's project is required": "Goal's project is required",
     "Choose a dependency": "Choose a dependency",
-    "Max {max} items in a single request": "Max {max} items in a single request"
+    "Max {max} items in a single request": "Max {max} items in a single request",
+    "State is required": "State is required"
 }
