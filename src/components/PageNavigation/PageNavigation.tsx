@@ -12,11 +12,11 @@ import {
 } from '@taskany/bricks/harmony';
 import { useRouter } from 'next/router';
 import { nullable } from '@taskany/bricks';
-import NextLink from 'next/link';
 
 import { NavigationSidebarActionButton } from '../NavigationSidebarActionButton/NavigationSidebarActionButton';
 import { routes } from '../../hooks/router';
 import { refreshInterval } from '../../utils/config';
+import { NextLink } from '../NextLink';
 import { trpc } from '../../utils/trpcClient';
 import { header, headerMenuExplore, headerMenuGoals } from '../../utils/domObjects';
 
@@ -30,13 +30,11 @@ interface PageNavigationItemProps {
 }
 
 const PageNavigationItem: FC<PageNavigationItemProps> = ({ href, selected, title }) => (
-    <div key={href} className={s.PageNavigationItemLink}>
-        <NextLink href={href} legacyBehavior>
-            <NavigationItem selected={selected} href={href}>
-                {title}
-            </NavigationItem>
-        </NextLink>
-    </div>
+    <NextLink href={href} className={s.PageNavigationItemLink}>
+        <NavigationItem selected={selected} value={href}>
+            {title}
+        </NavigationItem>
+    </NextLink>
 );
 
 interface AppNavigationProps {
@@ -103,7 +101,7 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
     return (
         <NavigationSidebar {...header.attr}>
             <NavigationSidebarHeader>
-                <NextLink href={routes.index()} passHref className={s.PageNavigationLogo}>
+                <NextLink href={routes.index()} className={s.PageNavigationLogo}>
                     <TaskanyLogo src={logo} size="m" />
                 </NextLink>
                 <NavigationSidebarTitle>{tr('Goals')}</NavigationSidebarTitle>

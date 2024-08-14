@@ -32,7 +32,7 @@ interface GoalActivityFeedProps {
 }
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
-    ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }) => {
+    ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }, ref) => {
         const { user } = usePageContext();
         const {
             onGoalCommentUpdate,
@@ -199,6 +199,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                 ))}
 
                 <GoalActivityWithTabs
+                    ref={ref}
                     goalId={goal.id}
                     renderCommentItem={(value) => (
                         <CommentView
