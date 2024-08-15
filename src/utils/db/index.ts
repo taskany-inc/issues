@@ -354,7 +354,12 @@ export const updateLinkedGoalsByProject = async (projectId: string, activityId: 
                     data: { deleted: true },
                 });
 
-                await Promise.all([archiveGoals, createHistoryRecords, updateCriterias]);
+                const removePartnershipGoals = ctx.$executeRaw`
+                    DELETE FROM "_partnershipProjects"
+                    WHERE "B" = ${projectId};
+                `;
+
+                await Promise.all([archiveGoals, createHistoryRecords, updateCriterias, removePartnershipGoals]);
 
                 // get all goals which current project's goals as criteria
                 const res = await ctx.goalAchieveCriteria.findMany({
