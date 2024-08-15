@@ -1,4 +1,4 @@
-import { Badge, Table, Tag, Text, User, UserGroup, ListViewItem, Tooltip } from '@taskany/bricks/harmony';
+import { Badge, Table, Tag, Text, UserGroup, ListViewItem, Tooltip } from '@taskany/bricks/harmony';
 import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 import { IconGitBranchOutline, IconMessageTextOutline } from '@taskany/icons';
@@ -14,6 +14,7 @@ import { NextLink } from '../NextLink';
 import { routes } from '../../hooks/router';
 import { TagsList } from '../TagsList/TagsList';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
+import { InlineUserBadge } from '../InlineUserBadge/InlineUserBadge';
 import { State } from '../State';
 import { GoalCriteriaPreview } from '../GoalCriteria/GoalCriteria';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
@@ -147,13 +148,13 @@ export const GoalTableList = <T extends GoalTableListItem>({
                         },
                         {
                             content: nullable(goal.owner, (user) => (
-                                <User
+                                <InlineUserBadge
                                     className={s.Owner}
                                     name={user.name}
-                                    src={user.image}
+                                    image={user.image}
                                     email={user.email}
+                                    tooltip={user.name}
                                     ellipsis
-                                    title={user.name}
                                 />
                             )),
                             width: 172,
