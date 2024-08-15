@@ -488,6 +488,13 @@ export const goal = router({
 
             if (!actualGoal || !actualProject || actualProject.personal) return null;
 
+            if (actualGoal.projectId === actualProject.id) {
+                throw new TRPCError({
+                    code: 'PRECONDITION_FAILED',
+                    message: tr('Cannot transfer goal to selected project'),
+                });
+            }
+
             const { activityId, role } = ctx.session.user;
 
             try {
@@ -824,6 +831,7 @@ export const goal = router({
                     participants: { include: { user: true, ghost: true } },
                     watchers: { include: { user: true, ghost: true } },
                     activity: { include: { user: true, ghost: true } },
+                    partnershipProjects: true,
                     owner: { include: { user: true, ghost: true } },
                     state: true,
                     project: true,
@@ -848,6 +856,9 @@ export const goal = router({
                                 activityId,
                                 nextValue: archived ? 'move to archive' : 'move from archive',
                             },
+                        },
+                        partnershipProjects: {
+                            disconnect: actualGoal.partnershipProjects.map(({ id }) => ({ id })),
                         },
                     },
                     include: {
@@ -1531,6 +1542,18 @@ export const goal = router({
         .input(togglePartnerProjectSchema)
         .use(goalEditAccessMiddleware)
         .mutation(async ({ input, ctx }) => {
+            const currentGoal = await prisma.goal.findFirst({
+                where: { id: input.id },
+                include: { partnershipProjects: true },
+            });
+
+            if (currentGoal?.partnershipProjects.find(({ id }) => id === input.projectId)) {
+                throw new TRPCError({
+                    code: 'PRECONDITION_FAILED',
+                    message: tr('Cannot link goal to selected project'),
+                });
+            }
+
             try {
                 const updatedGoal = await prisma.goal.update({
                     where: { id: input.id },

@@ -178,6 +178,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
                     {nullable(goal._isEditable, () => (
                         <GoalParentDropdown
                             mode="single"
+                            filter={goal.projectId != null ? [goal.projectId] : []}
                             placement="bottom-start"
                             placeholder={tr('Type project title')}
                             onChange={({ id }) => addPartnerProject(id)}
@@ -300,6 +301,7 @@ export const GoalSidebar: FC<GoalSidebarProps> = ({ goal, onGoalTransfer, onGoal
             {nullable(goal._isEditable, () => (
                 <IssueMeta>
                     <GoalParentDropdown
+                        filter={goal.projectId != null ? [goal.projectId] : []}
                         mode="single"
                         placement="bottom-start"
                         placeholder={tr('Type project title')}
