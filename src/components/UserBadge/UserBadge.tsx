@@ -13,10 +13,11 @@ interface UserBadgeProps {
     size?: React.ComponentProps<typeof User>['size'];
     as?: React.ComponentProps<typeof User>['as'];
     className?: string;
+    ellipsis?: boolean;
 }
 
 export const UserBadge = forwardRef<HTMLDivElement, UserBadgeProps>(
-    ({ name, image, email, children, short, size = 's', as, className }, ref) => {
+    ({ name, image, email, children, short, size = 's', as, className, ellipsis }, ref) => {
         return (
             <User
                 ref={ref}
@@ -28,6 +29,7 @@ export const UserBadge = forwardRef<HTMLDivElement, UserBadgeProps>(
                 iconRight={children}
                 action="dynamic"
                 size={size}
+                ellipsis={ellipsis}
                 as={as}
             />
         );
