@@ -502,8 +502,17 @@ export const project = router({
         .input(projectUpdateSchema)
         .use(projectEditAccessMiddleware)
         .mutation(async ({ input: { id, parent, accessUsers, ...data }, ctx }) => {
-            const project = await prisma.project.findUnique({
-                where: { id },
+            const project = await prisma.project.findFirst({
+                where: {
+                    id,
+                    AND: {
+                        children: {
+                            none: {
+                                id: { in: parent?.map(({ id }) => id) },
+                            },
+                        },
+                    },
+                },
                 include: {
                     teams: true,
                     parent: true,

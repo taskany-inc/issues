@@ -3,7 +3,7 @@ import { sql } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
 
 import { router, protectedProcedure } from '../trpcBackend';
-import { projectSuggestionsSchema, userProjectsSchema } from '../../src/schema/project';
+import { projectsChildrenIdsSchema, projectSuggestionsSchema, userProjectsSchema } from '../../src/schema/project';
 import {
     getProjectsByIds,
     getStarredProjectsIds,
@@ -11,6 +11,7 @@ import {
     getUserProjectsQuery,
     getUserProjectsWithGoals,
     getWholeGoalCountByProjectIds,
+    getChildrenProjectsId,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema } from '../../src/schema/common';
 import {
@@ -139,6 +140,10 @@ export const project = router({
         } catch (e) {
             console.log(e);
         }
+    }),
+
+    childrenIds: protectedProcedure.input(projectsChildrenIdsSchema).query(async ({ input }) => {
+        return getChildrenProjectsId(input).execute();
     }),
 
     userProjectsWithGoals: protectedProcedure
