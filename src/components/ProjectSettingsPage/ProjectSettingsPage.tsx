@@ -73,6 +73,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
     const project = trpc.project.getById.useQuery({ id });
 
     const { updateProject, deleteProject, transferOwnership } = useProjectResource(id);
+    const { data: childrenIds = [] } = trpc.v2.project.childrenIds.useQuery({ in: [{ id }] });
 
     const {
         handleSubmit,
@@ -259,7 +260,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                                         mode="single"
                                                         placement="bottom-start"
                                                         onChange={onProjectAdd}
-                                                        filter={[id]}
+                                                        filter={[id, ...childrenIds.map(({ id }) => id)]}
                                                         value={value}
                                                         renderTrigger={(props) => (
                                                             <IconPlusCircleOutline
