@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.51.0](https://github.com/taskany-inc/issues/compare/v2.50.2...v2.51.0) (2024-08-19)
+
+
+### Features
+
+* **GoalForm:** decrease title length upto 6 symbols ([5749b65](https://github.com/taskany-inc/issues/commit/5749b6514c4cff1201e03e83f469e276e45d79b9))
+* tooltip to user ([ba9dc1d](https://github.com/taskany-inc/issues/commit/ba9dc1d3cefd791cdbfa589da72856354b8a65c7))
+
+
+### Bug Fixes
+
+* **GoalCriteriaSuggest:** weight validation ([778a0c7](https://github.com/taskany-inc/issues/commit/778a0c7416ba33798d058b21dbba5e083ee4068a))
+* **PartnershipProjects:** disallow works with current project as partnership ([2ea3bc2](https://github.com/taskany-inc/issues/commit/2ea3bc2ae61fbdcf70be52c5abd3fe3bcc0ce8ec))
+* warnings & sidebar navigation ([3494c91](https://github.com/taskany-inc/issues/commit/3494c9185212268aa5bf29f8d19e376347944d7e))
+
 ## [2.50.2](https://github.com/taskany-inc/issues/compare/v2.50.1...v2.50.2) (2024-08-14)
 
 
