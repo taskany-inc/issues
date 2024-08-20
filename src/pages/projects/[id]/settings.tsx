@@ -8,7 +8,7 @@ export const getServerSideProps = declareSsrProps(
     async ({ ssrHelpers, params: { id } }) => {
         try {
             const project = await ssrHelpers.project.getById.fetch({ id });
-            await ssrHelpers.v2.project.childrenIds.fetch({ in: [{ id }] });
+            await ssrHelpers.v2.project.deepChildrenIds.fetch({ in: [{ id }] });
 
             if (!project) {
                 throw new TRPCError({ code: 'NOT_FOUND' });

@@ -11,7 +11,7 @@ import {
     getUserProjectsQuery,
     getUserProjectsWithGoals,
     getWholeGoalCountByProjectIds,
-    getChildrenProjectsId,
+    getDeepChildrenProjectsId,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema } from '../../src/schema/common';
 import {
@@ -142,8 +142,8 @@ export const project = router({
         }
     }),
 
-    childrenIds: protectedProcedure.input(projectsChildrenIdsSchema).query(async ({ input }) => {
-        return getChildrenProjectsId(input).execute();
+    deepChildrenIds: protectedProcedure.input(projectsChildrenIdsSchema).query(async ({ input }) => {
+        return getDeepChildrenProjectsId(input).execute();
     }),
 
     userProjectsWithGoals: protectedProcedure
