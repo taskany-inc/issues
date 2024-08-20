@@ -24,6 +24,7 @@ import { projectAccessMiddleware, projectEditAccessMiddleware } from '../access/
 import { getProjectAccessFilter } from '../queries/access';
 import { prepareRecipients } from '../../src/utils/prepareRecipients';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
+import { getDeepChildrenProjectsId } from '../queries/projectV2';
 
 const getUserItemsWhereSchema = ({ type, activityId }: { type: 'goal' | 'project'; activityId: string }) => {
     return [
@@ -503,16 +504,7 @@ export const project = router({
         .use(projectEditAccessMiddleware)
         .mutation(async ({ input: { id, parent, accessUsers, ...data }, ctx }) => {
             const project = await prisma.project.findFirst({
-                where: {
-                    id,
-                    AND: {
-                        children: {
-                            none: {
-                                id: { in: parent?.map(({ id }) => id) },
-                            },
-                        },
-                    },
-                },
+                where: { id },
                 include: {
                     teams: true,
                     parent: true,
@@ -527,6 +519,12 @@ export const project = router({
 
             const parentsToConnect = parent?.filter((pr) => !project.parent.some((p) => p.id === pr.id));
             const parentsToDisconnect = project.parent.filter((p) => !parent?.some((pr) => p.id === pr.id));
+
+            const childrenIds = await getDeepChildrenProjectsId({ in: [{ id }] }).execute();
+
+            if (parentsToConnect?.some(({ id }) => childrenIds.map(({ id }) => id).includes(id))) {
+                throw new TRPCError({ code: 'BAD_REQUEST', message: 'Child project cannot be a parent project' });
+            }
 
             const accessUsersToConnect =
                 accessUsers?.filter((pr) => !project.accessUsers.some((p) => p.id === pr.id)) ?? [];

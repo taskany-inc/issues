@@ -73,7 +73,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
     const project = trpc.project.getById.useQuery({ id });
 
     const { updateProject, deleteProject, transferOwnership } = useProjectResource(id);
-    const { data: childrenIds = [] } = trpc.v2.project.childrenIds.useQuery({ in: [{ id }] });
+    const { data: childrenIds = [] } = trpc.v2.project.deepChildrenIds.useQuery({ in: [{ id }] });
 
     const {
         handleSubmit,

@@ -103,6 +103,30 @@ export const getChildrenProjectsId = (params: { in: Array<{ id: string }> }) => 
         );
 };
 
+export const getDeepChildrenProjectsId = (params: { in: Array<{ id: string }> }) => {
+    return db
+        .withRecursive('childrenTree', (qb) =>
+            qb
+                .selectFrom('_parentChildren')
+                .select('_parentChildren.B as id')
+                .$if(params.in.length > 0, (qb) =>
+                    qb.where(
+                        '_parentChildren.A',
+                        'in',
+                        params.in.map(({ id }) => id),
+                    ),
+                )
+                .union((qb) =>
+                    qb
+                        .selectFrom('_parentChildren')
+                        .select('_parentChildren.B as id')
+                        .innerJoin('childrenTree', 'childrenTree.id', 'A'),
+                ),
+        )
+        .selectFrom('childrenTree')
+        .selectAll();
+};
+
 interface GetUserProjectsQueryParams {
     activityId: string;
     role: Role;
