@@ -352,6 +352,16 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
         [onUpdate, props.id, props.isDone],
     );
 
+    const currentValidityData = useMemo(() => {
+        const { title, sumOfCriteria } = validityData;
+
+        // need exclude current criterion from validity data
+        return {
+            sumOfCriteria: sumOfCriteria - (props.weight ?? 0),
+            title: title.filter((t) => t !== props.title),
+        };
+    }, [validityData, props.title, props.weight]);
+
     return (
         <TableRow className={classes.GoalCriteriaTableRow}>
             {criteriaAsGoal(props) ? (
@@ -383,7 +393,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
                         values={values}
                         onSubmit={handleCriteriaUpdate}
                         validateGoalCriteriaBindings={validateGoalCriteriaBindings}
-                        validityData={validityData}
+                        validityData={currentValidityData}
                     />
                 </GoalFormPopupTrigger>
             ))}
