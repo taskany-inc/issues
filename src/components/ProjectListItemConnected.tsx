@@ -137,8 +137,10 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
             >
                 <TreeViewElement>
                     {nullable(
-                        !projectDeepInfo?.goals.length && (!childrenProjects.length || view === 'kanban'),
-                        () => !isLoading && <NoGoalsText />,
+                        !projectDeepInfo?.goals.length && (!childrenProjects.length || view === 'kanban') && !isLoading,
+                        () => (
+                            <NoGoalsText />
+                        ),
                     )}
                 </TreeViewElement>
                 {nullable(view !== 'kanban', () => subNodes)}
