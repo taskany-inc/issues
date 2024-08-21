@@ -1311,6 +1311,7 @@ export const goal = router({
 
                 await recalculateCriteriaScore(currentCriteria.goalId)
                     .recalcCurrentGoalScore()
+                    .recalcLinkedGoalsScores()
                     .recalcAverageProjectScore()
                     .run();
             } catch (error: any) {

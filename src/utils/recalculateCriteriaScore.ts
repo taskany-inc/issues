@@ -1,4 +1,6 @@
-import { Goal, GoalAchieveCriteria, Prisma, PrismaClient, State, StateType } from '@prisma/client';
+import type { Goal, GoalAchieveCriteria, PrismaClient, State } from '@prisma/client';
+import { Prisma, StateType } from '@prisma/client';
+import type { ITXClientDenyList } from '@prisma/client/runtime';
 
 import { prisma } from './prisma';
 
@@ -7,7 +9,9 @@ export const goalIncludeCriteriaParams = {
         criteriaGoal: {
             include: { state: true },
         },
-        goal: true,
+        goal: {
+            include: { state: true },
+        },
     },
 } as const;
 
@@ -19,7 +23,7 @@ interface GoalCriteria extends GoalAchieveCriteria {
 }
 
 export const baseCalcCriteriaWeight = <
-    G extends { state: { type: StateType } | null },
+    G extends { state: { type: StateType } | null; completedCriteriaWeight: number | null },
     T extends { deleted: boolean | null; weight: number; isDone: boolean; criteriaGoal: G | null },
 >(
     criteriaList: T[],
@@ -37,11 +41,16 @@ export const baseCalcCriteriaWeight = <
             if (!weight) {
                 anyWithoutWeight += 1;
             }
+
             if (isDone || criteriaGoal?.state?.type === StateType.Completed) {
                 achivedWithWeight += weight;
 
                 if (!weight) {
                     comletedWithoutWeight += 1;
+                }
+            } else if (criteriaGoal != null && criteriaGoal.completedCriteriaWeight != null) {
+                if (criteriaGoal.completedCriteriaWeight > 0) {
+                    achivedWithWeight += Math.floor((weight / 100) * criteriaGoal.completedCriteriaWeight);
                 }
             }
         }
@@ -62,7 +71,7 @@ export const calcAchievedWeight = (criteriaList: GoalCriteria[]): number => {
 };
 
 type GoalCalculateScore = Goal & {
-    goalInCriteria?: Array<GoalCriteria> | null;
+    goalInCriteria: Array<GoalCriteria> | null;
     goalAchiveCriteria?: Array<GoalCriteria> | null;
 };
 
@@ -82,10 +91,12 @@ type GoalCalculateScore = Goal & {
  */
 
 export const recalculateCriteriaScore = (goalId: string) => {
-    let currentGoal: GoalCalculateScore | null;
+    let currentGoal: GoalCalculateScore;
+    let countsToUpdate: number;
+    let count = 0;
     const getCurrentGoal = async () => {
-        if (!currentGoal) {
-            currentGoal = await prisma.goal.findUnique({
+        if (!currentGoal || countsToUpdate > count++) {
+            currentGoal = await prisma.goal.findUniqueOrThrow({
                 where: { id: goalId },
                 include: {
                     goalInCriteria: goalIncludeCriteriaParams,
@@ -97,20 +108,15 @@ export const recalculateCriteriaScore = (goalId: string) => {
         return currentGoal;
     };
 
-    let prismaCtx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>;
+    let prismaCtx: Omit<PrismaClient, ITXClientDenyList>;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promisesChain: (() => Promise<any>)[] = [];
 
-    const updateGoalScore = ({ id, score }: { id: string; score: number | null }, includeParams = false) => {
+    const updateGoalScore = ({ id, score }: { id: string; score: number | null }) => {
         return prismaCtx.goal.update({
             where: { id },
             data: { completedCriteriaWeight: score },
-            include: includeParams
-                ? {
-                      goalInCriteria: goalIncludeCriteriaParams,
-                  }
-                : null,
         });
     };
 
@@ -119,17 +125,14 @@ export const recalculateCriteriaScore = (goalId: string) => {
             promisesChain.push(async () => {
                 const goal = await getCurrentGoal();
 
-                if (goal) {
-                    const { goalAchiveCriteria: list, id: goalId } = goal;
-                    let score: number | null = null;
-                    if (list?.length && list.some(({ deleted }) => !deleted)) {
-                        score = calcAchievedWeight(list);
-                    }
+                const { goalAchiveCriteria: list, id: goalId } = goal;
+                let score: number | null = null;
 
-                    currentGoal = await updateGoalScore({ id: goalId, score }, true);
-
-                    return currentGoal;
+                if (list?.length && list.some(({ deleted }) => !deleted)) {
+                    score = calcAchievedWeight(list);
                 }
+
+                await updateGoalScore({ id: goalId, score });
             });
 
             return methods;
@@ -137,51 +140,46 @@ export const recalculateCriteriaScore = (goalId: string) => {
         recalcAverageProjectScore: () => {
             promisesChain.push(async () => {
                 const goal = await getCurrentGoal();
+                const projectIds = new Set<string>();
 
-                if (goal) {
-                    const projectIds = new Set<string>();
-
-                    if (goal.projectId) {
-                        projectIds.add(goal.projectId);
-                    }
-
-                    if (goal.goalInCriteria?.length) {
-                        goal.goalInCriteria.forEach(({ goal }) => {
-                            if (goal?.projectId) {
-                                projectIds.add(goal.projectId);
-                            }
-                        });
-                    }
-
-                    if (!projectIds.size) {
-                        return;
-                    }
-
-                    const countsRequests = Prisma.sql`
-                        select
-                            goal."projectId",
-                            avg(case
-                                when goal."completedCriteriaWeight" is not null and goal."completedCriteriaWeight" > 0 then goal."completedCriteriaWeight"
-                                when state.type = '${Prisma.raw(
-                                    StateType.Completed,
-                                )}' and goal."completedCriteriaWeight" is null then 100
-                                else 0
-                            end)::int
-                        from "Goal" as goal
-                            inner join "State" as state on goal."stateId" = state.id
-                            where goal."projectId" in (${Prisma.join(
-                                Array.from(projectIds),
-                            )}) and goal."archived" is not true
-                            group by 1
-                    `;
-
-                    return prismaCtx.$executeRaw`
-                        update "Project" as project
-                        set "averageScore" = scoreByProject.score
-                        from (${countsRequests}) as scoreByProject(projectId, score)
-                        where project.id = scoreByProject.projectId
-                `;
+                if (goal.projectId) {
+                    projectIds.add(goal.projectId);
                 }
+
+                if (goal.goalInCriteria?.length) {
+                    goal.goalInCriteria.forEach(({ goal }) => {
+                        if (goal?.projectId) {
+                            projectIds.add(goal.projectId);
+                        }
+                    });
+                }
+
+                if (!projectIds.size) {
+                    return;
+                }
+
+                const countsRequests = Prisma.sql`
+                    select
+                        goal."projectId",
+                        avg(case
+                            when goal."completedCriteriaWeight" is not null and goal."completedCriteriaWeight" > 0 then goal."completedCriteriaWeight"
+                            when state.type = '${Prisma.raw(
+                                StateType.Completed,
+                            )}' and goal."completedCriteriaWeight" is null then 100
+                            else 0
+                        end)::int
+                    from "Goal" as goal
+                    inner join "State" as state on goal."stateId" = state.id
+                    where goal."projectId" in (${Prisma.join(Array.from(projectIds))}) and goal."archived" is not true
+                    group by 1
+                `;
+
+                return prismaCtx.$executeRaw`
+                    update "Project" as project
+                    set "averageScore" = scoreByProject.score
+                    from (${countsRequests}) as scoreByProject(projectId, score)
+                    where project.id = scoreByProject.projectId
+                `;
             });
 
             return methods;
@@ -190,56 +188,58 @@ export const recalculateCriteriaScore = (goalId: string) => {
             promisesChain.push(async () => {
                 const goal = await getCurrentGoal();
 
-                if (goal) {
-                    const { goalInCriteria } = goal;
+                const { goalInCriteria = [] } = goal;
 
-                    const goalIdsToUpdate = goalInCriteria?.reduce<string[]>((acc, { goalId }) => {
-                        acc.push(goalId);
+                const goalIdsToUpdate = goalInCriteria?.reduce<string[]>((acc, { goalId }) => {
+                    acc.push(goalId);
+
+                    return acc;
+                }, []);
+
+                if (goalIdsToUpdate?.length) {
+                    const criteriaList = await prismaCtx.goalAchieveCriteria.findMany({
+                        where: {
+                            goalId: { in: goalIdsToUpdate },
+                            AND: {
+                                OR: [{ deleted: false }, { deleted: null }],
+                            },
+                        },
+                        include: {
+                            criteriaGoal: {
+                                include: { state: true },
+                            },
+                            goal: {
+                                include: { state: true },
+                            },
+                        },
+                    });
+
+                    const groupedCriteriaListByGoals = criteriaList.reduce<
+                        Record<string, Array<(typeof criteriaList)[number]>>
+                    >((acc, criteria) => {
+                        if (!acc[criteria.goalId]) {
+                            acc[criteria.goalId] = [];
+                        }
+
+                        acc[criteria.goalId].push(criteria);
 
                         return acc;
-                    }, []);
+                    }, {});
 
-                    if (goalIdsToUpdate?.length) {
-                        const criteriaList = await prisma.goalAchieveCriteria.findMany({
-                            where: {
-                                goalId: { in: goalIdsToUpdate },
-                                AND: {
-                                    OR: [{ deleted: false }, { deleted: null }],
-                                },
-                            },
-                            include: {
-                                criteriaGoal: {
-                                    include: { state: true },
-                                },
-                                goal: {
-                                    include: { state: true },
-                                },
-                            },
-                        });
+                    const values = Prisma.join(
+                        Object.entries(groupedCriteriaListByGoals).map(([id, list]) =>
+                            Prisma.join([id, calcAchievedWeight(list)], ',', '(', ')'),
+                        ),
+                    );
 
-                        const groupedCriteriaListByGoals = criteriaList.reduce<
-                            Record<string, Array<(typeof criteriaList)[number]>>
-                        >((acc, criteria) => {
-                            if (!acc[criteria.goalId]) {
-                                acc[criteria.goalId] = [];
-                            }
+                    const tempTableValues = Prisma.sql`(VALUES${values}) AS criteria(goalId, score)`;
 
-                            acc[criteria.goalId].push(criteria);
-
-                            return acc;
-                        }, {});
-
-                        return Promise.all(
-                            Object.entries(groupedCriteriaListByGoals).map(([goalId, list]) => {
-                                let score: number | null = null;
-                                if (list.length && list.some(({ deleted }) => deleted == null || deleted === false)) {
-                                    score = calcAchievedWeight(list);
-                                }
-
-                                return updateGoalScore({ id: goalId, score });
-                            }),
-                        );
-                    }
+                    await prismaCtx.$executeRaw`
+                        UPDATE "Goal" AS goal
+                            SET "completedCriteriaWeight" = criteria.score
+                            FROM ${tempTableValues}
+                        WHERE goal.id = criteria.goalId;
+                    `;
                 }
             });
 
@@ -248,6 +248,7 @@ export const recalculateCriteriaScore = (goalId: string) => {
         async run() {
             return prisma.$transaction((ctx) => {
                 prismaCtx = ctx;
+                countsToUpdate = promisesChain.length;
 
                 return promisesChain.reduce((promise, getter) => promise.then(getter), Promise.resolve());
             });
