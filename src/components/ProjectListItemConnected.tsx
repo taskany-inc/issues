@@ -136,7 +136,10 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                 {...props}
             >
                 <TreeViewElement>
-                    {nullable(!projectDeepInfo?.goals.length, () => !isLoading && <NoGoalsText />)}
+                    {nullable(
+                        !projectDeepInfo?.goals.length && (!childrenProjects.length || view === 'kanban'),
+                        () => !isLoading && <NoGoalsText />,
+                    )}
                 </TreeViewElement>
                 {nullable(view !== 'kanban', () => subNodes)}
             </ProjectListItemCollapsable>
