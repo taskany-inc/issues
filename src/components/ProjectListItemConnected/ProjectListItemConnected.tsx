@@ -129,6 +129,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     parent={project}
                     filterPreset={filterPreset}
                     titleSize={isKanbanView ? 'l' : 'm'}
+                    actionButtonView={isKanbanView ? 'default' : 'icons'}
                 />
             )),
         [childrenProjects, isKanbanView, filterPreset, project],
