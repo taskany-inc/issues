@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.52.0](https://github.com/taskany-inc/issues/compare/v2.51.0...v2.52.0) (2024-08-22)
+
+
+### Features
+
+* **Criteria:** show linked goal progress instead of state ([2ebfb48](https://github.com/taskany-inc/issues/commit/2ebfb48ca94541f2da1ab0c492eaed706bd36680))
+* **GoalCriteria:** recalc with partial goal score ([b25c47f](https://github.com/taskany-inc/issues/commit/b25c47f31f6ff4c8cc1558f45a2e0640945eee2d))
+* **GroupedGoalView,ProjectListItem:** rewrite goals project getter with kysely ([d049ff9](https://github.com/taskany-inc/issues/commit/d049ff9e71e90efa62b08ff7d2465e9ae3f6b03a))
+* **GrouppedGoals:** rewrite prisma with kysely for get project list ([2aa9771](https://github.com/taskany-inc/issues/commit/2aa977162cf05a3308bfdf4933f1ed4cef228f81))
+* **GrouppedGoals:** rewrite project children getter from prisma to kysely ([860adfc](https://github.com/taskany-inc/issues/commit/860adfc9ee5393130d66ca46ece288552d03d7c4))
+* **telemetry:** use middleware for pageviews ([797cadd](https://github.com/taskany-inc/issues/commit/797caddd5dce979b36a46542976b81c0dc0b9fe5))
+
+
+### Bug Fixes
+
+* **GoalCriteria:** exclude current criterion from validity data ([26d987e](https://github.com/taskany-inc/issues/commit/26d987e71b2e4b5b76b0f16362f88753e74e616d))
+* hide "no goals yet" if the project has child projects ([3ec057e](https://github.com/taskany-inc/issues/commit/3ec057e88bcf408f94f86bf45b2c371afe833241))
+* **ProjectSettingsPage:** forbidden to set a project as a parent if it is in a children ([93c4004](https://github.com/taskany-inc/issues/commit/93c4004dd50aab483c6d2f2c4dd7cb46aa096682))
+
 ## [2.51.0](https://github.com/taskany-inc/issues/compare/v2.50.2...v2.51.0) (2024-08-19)
 
 
