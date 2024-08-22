@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.52.0](https://github.com/taskany-inc/issues/compare/v2.51.0...v2.52.0) (2024-08-22)
+
+
+### Features
+
+* **telemetry:** use middleware for pageviews ([797cadd](https://github.com/taskany-inc/issues/commit/797caddd5dce979b36a46542976b81c0dc0b9fe5))
+
+
+### Bug Fixes
+
+* **GoalCriteria:** exclude current criterion from validity data ([26d987e](https://github.com/taskany-inc/issues/commit/26d987e71b2e4b5b76b0f16362f88753e74e616d))
+* hide "no goals yet" if the project has child projects ([3ec057e](https://github.com/taskany-inc/issues/commit/3ec057e88bcf408f94f86bf45b2c371afe833241))
+
 ## [2.51.0](https://github.com/taskany-inc/issues/compare/v2.50.2...v2.51.0) (2024-08-19)
 
 
