@@ -91,8 +91,9 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                             .selectAll('GoalAchieveCriteria')
                             .select([sql`"criteriaGoal"`.as('criteriaGoal')])
                             .where('GoalAchieveCriteria.deleted', 'is not', true)
+                            .whereRef('GoalAchieveCriteria.goalId', '=', 'Goal.id')
                             .as('criteria'),
-                    (join) => join.onRef('criteria.goalId', '=', 'Goal.id'),
+                    (join) => join.onTrue(),
                 )
                 .leftJoin('Project as partnershipProject', (join) =>
                     join.onRef('partnershipProject.id', 'in', ({ selectFrom }) =>

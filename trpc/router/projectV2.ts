@@ -311,7 +311,7 @@ export const project = router({
             const goals = await goalsByProjectQuery.$castTo<ProjectGoal>().execute();
 
             for (const goal of goals) {
-                goal._achivedCriteriaWeight = null;
+                goal._achivedCriteriaWeight = goal.completedCriteriaWeight;
 
                 if (goal.criteria != null) {
                     const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<
