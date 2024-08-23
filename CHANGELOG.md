@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.53.0](https://github.com/taskany-inc/issues/compare/v2.52.0...v2.53.0) (2024-08-23)
+
+
+### Features
+
+* **GoalCriteria:** support accounting partial criteria score w/o weight ([d69a4a3](https://github.com/taskany-inc/issues/commit/d69a4a3fe1d223db78358a21a68c5fc58633dac4))
+
+
+### Bug Fixes
+
+* change subscribe buttons view ([2cbdaa2](https://github.com/taskany-inc/issues/commit/2cbdaa2b09f11fac30cfe6f7032a207e1b96d2ac))
+
 ## [2.52.0](https://github.com/taskany-inc/issues/compare/v2.51.0...v2.52.0) (2024-08-22)
 
 
