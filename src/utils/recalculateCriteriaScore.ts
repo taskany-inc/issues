@@ -33,31 +33,38 @@ export const baseCalcCriteriaWeight = <
     let anyWithoutWeight = 0;
     let allWeight = 0;
 
-    for (const { deleted, weight, isDone, criteriaGoal } of criteriaList) {
-        // `where` filter by `deleted` field doesn't work in *Many queries
-        if (!deleted) {
-            allWeight += weight;
+    // `where` filter by `deleted` field doesn't work in *Many queries
+    const existingCriteriaList = criteriaList.filter(({ deleted }) => !deleted);
+
+    for (const { weight, isDone, criteriaGoal } of existingCriteriaList) {
+        allWeight += weight;
+
+        if (!weight) {
+            anyWithoutWeight += 1;
+        }
+
+        if (isDone || criteriaGoal?.state?.type === StateType.Completed) {
+            achivedWithWeight += weight;
 
             if (!weight) {
-                anyWithoutWeight += 1;
-            }
-
-            if (isDone || criteriaGoal?.state?.type === StateType.Completed) {
-                achivedWithWeight += weight;
-
-                if (!weight) {
-                    comletedWithoutWeight += 1;
-                }
-            } else if (criteriaGoal != null && criteriaGoal.completedCriteriaWeight != null) {
-                if (criteriaGoal.completedCriteriaWeight > 0) {
-                    achivedWithWeight += Math.floor((weight / 100) * criteriaGoal.completedCriteriaWeight);
-                }
+                comletedWithoutWeight += 1;
             }
         }
     }
 
     const remainingtWeight = maxPossibleCriteriaWeight - allWeight;
     const quantityByWeightlessCriteria = anyWithoutWeight > 0 ? remainingtWeight / anyWithoutWeight : 0;
+
+    // accounting partial criteria goal score
+    for (const { weight, isDone, criteriaGoal } of existingCriteriaList) {
+        if (!isDone && criteriaGoal != null && criteriaGoal.completedCriteriaWeight != null) {
+            const targetWeight = weight || quantityByWeightlessCriteria;
+
+            if (criteriaGoal.completedCriteriaWeight > 0) {
+                achivedWithWeight += Math.floor((targetWeight / 100) * criteriaGoal.completedCriteriaWeight);
+            }
+        }
+    }
 
     return Math.min(
         achivedWithWeight + Math.ceil(quantityByWeightlessCriteria * comletedWithoutWeight),
