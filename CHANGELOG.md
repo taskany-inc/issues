@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.53.1](https://github.com/taskany-inc/issues/compare/v2.53.0...v2.53.1) (2024-08-26)
+
+
+### Bug Fixes
+
+* **Goals:** faster query for project's goal ([a50e37f](https://github.com/taskany-inc/issues/commit/a50e37f2eff64f83ce58fcb243ab37edcf4f53f9))
+
 ## [2.53.0](https://github.com/taskany-inc/issues/compare/v2.52.0...v2.53.0) (2024-08-23)
 
 
