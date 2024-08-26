@@ -62,13 +62,14 @@ import { commentsByGoalIdQuery, reactionsForGoalComments } from '../queries/comm
 import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
+import { getDeepParentGoalIds } from '../queries/goalV2';
 
 import { tr } from './router.i18n';
 
 export const goal = router({
     suggestions: protectedProcedure
         .input(suggestionsQuerySchema)
-        .query(async ({ ctx, input: { input, limit = 5, onlyCurrentUser = false } }) => {
+        .query(async ({ ctx, input: { input, limit = 5, onlyCurrentUser = false, filter } }) => {
             const { activityId, role } = ctx.session.user || {};
 
             const splittedInput = input.split('-');
@@ -118,6 +119,7 @@ export const goal = router({
                         project: {
                             ...getProjectAccessFilter(activityId, role),
                         },
+                        id: { not: { in: filter } },
                     },
                 },
                 include: getGoalDeepQuery({
@@ -1099,6 +1101,16 @@ export const goal = router({
                     // replace by default if have connected goal
                     criteriaTitle = connectedGoal.title;
                 }
+            }
+
+            const parentIds = await getDeepParentGoalIds([input.goalId]).execute();
+
+            if (
+                input.criteriaGoal?.id &&
+                (parentIds?.map(({ id }) => id).includes(input.criteriaGoal.id) ||
+                    input.goalId === input.criteriaGoal.id)
+            ) {
+                throw new TRPCError({ code: 'BAD_REQUEST', message: tr("Goal cannot be it's own criteria") });
             }
 
             try {

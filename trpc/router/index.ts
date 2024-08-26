@@ -15,6 +15,7 @@ import { whatsnew } from './whatsnew';
 import { crew } from './crew';
 import { appConfig } from './appConfig';
 import { project as projectV2 } from './projectV2';
+import { goal as goalV2 } from './goalV2';
 
 export const trpcRouter = router({
     filter,
@@ -33,6 +34,7 @@ export const trpcRouter = router({
     appConfig,
     v2: router({
         project: projectV2,
+        goal: goalV2,
     }),
 });
 

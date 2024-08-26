@@ -2,6 +2,7 @@ import { nullable } from '@taskany/bricks';
 import { forwardRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
+import { trpc } from '../../utils/trpcClient';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { editGoalKeys } from '../../utils/hotkeys';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -147,6 +148,8 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             [onGoalCriteriaConvert],
         );
 
+        const { data: parentGoalIds = [] } = trpc.v2.goal.getParentIds.useQuery([goal.id]);
+
         const criteriaValidityData = useCriteriaValidityData(goal._criteria);
 
         return (
@@ -184,6 +187,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     onSubmit={handleCreateCriteria}
                                     validateGoalCriteriaBindings={validateGoalCriteriaBindings}
                                     validityData={criteriaValidityData}
+                                    filter={[goal.id, ...parentGoalIds.map((id) => id.id)]}
                                 />
                             </GoalFormPopupTrigger>
                         ))}

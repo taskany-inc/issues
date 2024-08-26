@@ -19,6 +19,7 @@ interface GoalCriteriaSuggestProps {
     items?: {
         goal?: Goal | null;
     }[];
+    filter?: string[];
     versa?: boolean;
     /** Value allows restrict search results by current user */
     restrictedSearch?: boolean;
@@ -34,6 +35,7 @@ interface GoalCriteriaSuggestProps {
 export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
     id,
     items,
+    filter,
     withModeSwitch,
     defaultMode = 'simple',
     versa,
@@ -64,6 +66,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
             input: query as string,
             limit: 5,
             onlyCurrentUser: restrictedSearch,
+            filter,
         },
         { enabled: mode === 'goal', cacheTime: 0 },
     );
@@ -182,6 +185,8 @@ export const VersaCriteriaSuggest: React.FC<VersaCriteriaSuggestProps> = ({ goal
 
     const validityData = useCriteriaValidityData(data);
 
+    const { data: childrenIds = [] } = trpc.v2.goal.getChildrenIds.useQuery([goalId]);
+
     return (
         <GoalCriteriaSuggest
             id={goalId}
@@ -191,6 +196,7 @@ export const VersaCriteriaSuggest: React.FC<VersaCriteriaSuggestProps> = ({ goal
             validateGoalCriteriaBindings={validateGoalCriteriaBindings}
             versa
             restrictedSearch
+            filter={[goalId, ...childrenIds.map(({ id }) => id).filter(Boolean)]}
             validityData={validityData}
             onGoalSelect={({ id }) => setSelectedGoalId(id)}
         />
