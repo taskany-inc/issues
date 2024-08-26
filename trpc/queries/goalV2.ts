@@ -282,3 +282,47 @@ export const goalBaseQuery = () => {
             sql`to_json("State")`.as('state'),
         ]);
 };
+
+export const getDeepParentGoalIds = (ids: string[]) => {
+    return db
+        .withRecursive('parentsTree', (qb) =>
+            qb
+                .selectFrom('GoalAchieveCriteria')
+                .select('GoalAchieveCriteria.goalId as id')
+                .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
+                .where('GoalAchieveCriteria.criteriaGoalId', 'in', ids)
+                .where('GoalAchieveCriteria.deleted', 'is not', true)
+                .union((qb) =>
+                    qb
+                        .selectFrom('GoalAchieveCriteria')
+                        .select('GoalAchieveCriteria.goalId as id')
+                        .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
+                        .where('GoalAchieveCriteria.deleted', 'is not', true)
+                        .innerJoin('parentsTree', 'parentsTree.id', 'GoalAchieveCriteria.criteriaGoalId'),
+                ),
+        )
+        .selectFrom('parentsTree')
+        .selectAll();
+};
+
+export const getDeepChildrenGoalIds = (ids: string[]) => {
+    return db
+        .withRecursive('parentsTree', (qb) =>
+            qb
+                .selectFrom('GoalAchieveCriteria')
+                .select('GoalAchieveCriteria.criteriaGoalId as id')
+                .where('GoalAchieveCriteria.goalId', 'in', ids)
+                .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
+                .where('GoalAchieveCriteria.deleted', 'is not', true)
+                .union((qb) =>
+                    qb
+                        .selectFrom('GoalAchieveCriteria')
+                        .select('GoalAchieveCriteria.criteriaGoalId as id')
+                        .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
+                        .where('GoalAchieveCriteria.deleted', 'is not', true)
+                        .innerJoin('parentsTree', 'parentsTree.id', 'GoalAchieveCriteria.goalId'),
+                ),
+        )
+        .selectFrom('parentsTree')
+        .selectAll();
+};

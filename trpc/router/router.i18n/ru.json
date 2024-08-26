@@ -3,5 +3,6 @@
     "These bindings is already exist": "Такая связь уже сущевует",
     "No filter with id": "Нет фильтра с id `{id}`",
     "Cannot link goal to selected project": "Невозможно связать текущую цель с выбранным проектом",
-    "Cannot transfer goal to selected project": "Невозможно перенести цель в выбранный проект"
+    "Cannot transfer goal to selected project": "Невозможно перенести цель в выбранный проект",
+    "Goal cannot be it's own criteria": "Цель не может быть своим критерием"
 }
