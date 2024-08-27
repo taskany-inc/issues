@@ -36,6 +36,7 @@ export async function middleware(request: NextRequest) {
                 locale,
                 host,
                 path,
+                appHost: process.env.NEXTAUTH_URL,
             },
             device_type: ua.device.type,
             device_brand: ua.device.vendor,
