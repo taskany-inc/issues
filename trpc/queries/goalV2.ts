@@ -289,14 +289,12 @@ export const getDeepParentGoalIds = (ids: string[]) => {
             qb
                 .selectFrom('GoalAchieveCriteria')
                 .select('GoalAchieveCriteria.goalId as id')
-                .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
                 .where('GoalAchieveCriteria.criteriaGoalId', 'in', ids)
                 .where('GoalAchieveCriteria.deleted', 'is not', true)
                 .union((qb) =>
                     qb
                         .selectFrom('GoalAchieveCriteria')
                         .select('GoalAchieveCriteria.goalId as id')
-                        .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
                         .where('GoalAchieveCriteria.deleted', 'is not', true)
                         .innerJoin('parentsTree', 'parentsTree.id', 'GoalAchieveCriteria.criteriaGoalId'),
                 ),
@@ -307,7 +305,7 @@ export const getDeepParentGoalIds = (ids: string[]) => {
 
 export const getDeepChildrenGoalIds = (ids: string[]) => {
     return db
-        .withRecursive('parentsTree', (qb) =>
+        .withRecursive('childrenTree', (qb) =>
             qb
                 .selectFrom('GoalAchieveCriteria')
                 .select('GoalAchieveCriteria.criteriaGoalId as id')
@@ -320,9 +318,9 @@ export const getDeepChildrenGoalIds = (ids: string[]) => {
                         .select('GoalAchieveCriteria.criteriaGoalId as id')
                         .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
                         .where('GoalAchieveCriteria.deleted', 'is not', true)
-                        .innerJoin('parentsTree', 'parentsTree.id', 'GoalAchieveCriteria.goalId'),
+                        .innerJoin('childrenTree', 'childrenTree.id', 'GoalAchieveCriteria.goalId'),
                 ),
         )
-        .selectFrom('parentsTree')
+        .selectFrom('childrenTree')
         .selectAll();
 };

@@ -1110,7 +1110,7 @@ export const goal = router({
                 (parentIds?.map(({ id }) => id).includes(input.criteriaGoal.id) ||
                     input.goalId === input.criteriaGoal.id)
             ) {
-                throw new TRPCError({ code: 'BAD_REQUEST', message: tr("Goal cannot be it's own criteria") });
+                throw new TRPCError({ code: 'PRECONDITION_FAILED', message: tr("Goal cannot be it's own criteria") });
             }
 
             try {
