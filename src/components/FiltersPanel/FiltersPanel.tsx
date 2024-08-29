@@ -1,5 +1,12 @@
 import { FC, useCallback, memo, useState, useEffect, ReactNode, useMemo } from 'react';
-import { Button } from '@taskany/bricks/harmony';
+import {
+    Button,
+    FiltersBar,
+    FiltersBarControlGroup,
+    FiltersBarCounter,
+    FiltersBarItem,
+    FiltersBarTitle,
+} from '@taskany/bricks/harmony';
 import { nullable, useLatest } from '@taskany/bricks';
 
 import { FilterQueryState, QueryState, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
@@ -13,15 +20,10 @@ import {
     appliedFiltersPanelState,
 } from '../../utils/domObjects';
 import {
-    FilterBarCounter,
-    FiltersBarLayoutSwitch,
-    FiltersBarControlGroup,
     FiltersBarViewDropdown,
-    FiltersBar,
-    FiltersBarItem,
-    FiltersBarTitle,
     FiltersBarDropdownTitle,
     FiltersBarDropdownContent,
+    FiltersBarLayoutSwitch,
     AddFilterDropdown,
 } from '../FiltersBar/FiltersBar';
 import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
@@ -194,7 +196,7 @@ export const FiltersPanel: FC<{
                                 {...filtersPanelResetButton.attr}
                             />,
                         )}
-                        <FilterBarCounter total={total} counter={counter} />
+                        <FiltersBarCounter total={total} counter={counter} />
                     </FiltersBarControlGroup>
                 </FiltersBarItem>
                 {nullable(enableLayoutToggle && user?.settings?.beta, () => (

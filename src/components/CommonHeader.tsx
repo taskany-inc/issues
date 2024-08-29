@@ -1,8 +1,8 @@
 import { nullable } from '@taskany/bricks';
+import { FiltersBar, FiltersBarItem, FiltersBarTitle } from '@taskany/bricks/harmony';
 
 import { pageHeader, pageTitle } from '../utils/domObjects';
 
-import { FiltersBar, FiltersBarItem, FiltersBarTitle } from './FiltersBar/FiltersBar';
 import { GlobalSearch } from './GlobalSearch/GlobalSearch';
 import { Separator } from './Separator/Separator';
 import { PageUserMenu } from './PageUserMenu';

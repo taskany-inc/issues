@@ -1,6 +1,5 @@
-import { TagCleanButton } from '@taskany/bricks/harmony';
+import { TagCleanButton, AppliedFilter } from '@taskany/bricks/harmony';
 
-import { AppliedFilter } from '../AppliedFilter/AppliedFilter';
 import { UserDropdown } from '../UserDropdown/UserDropdown';
 import { trpc } from '../../utils/trpcClient';
 

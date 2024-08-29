@@ -1,7 +1,6 @@
 import { ComponentProps, useCallback, useMemo } from 'react';
-import { TagCleanButton } from '@taskany/bricks/harmony';
+import { AppliedFilter, TagCleanButton } from '@taskany/bricks/harmony';
 
-import { AppliedFilter } from '../AppliedFilter/AppliedFilter';
 import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';
 import { decodeEstimateFromUrl, encodeUrlDateRange } from '../../utils/dateTime';
 import { appliedFiltersPanelEstimate } from '../../utils/domObjects';
