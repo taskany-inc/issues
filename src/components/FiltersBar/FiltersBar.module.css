@@ -1,50 +1,5 @@
-.FiltersBar {
-    background: var(--layer);
-    border-bottom: 1px solid var(--gray-900);
-    padding: var(--gap-sm) var(--gap-s);
-    display: flex;
-    align-items: center;
-    height: 2rem;
-}
-
-.FiltersBarTitle {
-    max-width: 20rem;
-}
-
-.FiltersBarItem {
-    position: relative;
-    padding: 0 var(--gap-sm);
-    color: var(--gray-300);
-}
-
-.FiltersBarItemCenter {
-    display: flex;
-    justify-content: space-between;
-    flex: 1;
-}
-
-.FiltersBarItem:last-of-type:after {
-    display: none;
-}
-
 .FiltersBarButton {
     color: var(--gray-300);
-}
-
-.FiltersBarTitle {
-    color: var(--text-primary);
-}
-
-.FiltersBarControlGroup {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-s);
-}
-
-.FiltersBarCounter {
-    display: flex;
-    align-items: center;
-    color: var(--text-secondary);
 }
 
 .FiltersBarViewDropdownDrigger {
@@ -65,9 +20,11 @@
     padding-bottom: var(--gap-s);
     border-bottom: 1px solid var(--gray-900);
 }
+
 .FiltersBarDropdownPanel {
     padding: var(--gap-sm);
 }
+
 .FiltersBarDropdownContent {
     display: flex;
     flex-wrap: wrap;

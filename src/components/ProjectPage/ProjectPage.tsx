@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import NextLink from 'next/link';
 import { nullable } from '@taskany/bricks';
-import { ListView, Breadcrumb, Breadcrumbs, Link } from '@taskany/bricks/harmony';
+import { ListView, Breadcrumb, Breadcrumbs, Link, FiltersBarItem } from '@taskany/bricks/harmony';
 
 import { Page } from '../Page/Page';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
@@ -14,7 +14,6 @@ import { useFiltersPreset } from '../../hooks/useFiltersPreset';
 import { ProjectListItemConnected } from '../ProjectListItemConnected/ProjectListItemConnected';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { ProjectPageTabs } from '../ProjectPageTabs/ProjectPageTabs';
-import { FiltersBarItem } from '../FiltersBar/FiltersBar';
 import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { ProjectContext } from '../ProjectContext/ProjectContext';
