@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.54.1](https://github.com/taskany-inc/issues/compare/v2.54.0...v2.54.1) (2024-09-02)
+
+
+### Bug Fixes
+
+* add recursive check on goal parent and children criteria ([9df8cca](https://github.com/taskany-inc/issues/commit/9df8cca09910cab9d26ac5296cb1a053a6b72615))
+
 ## [2.54.0](https://github.com/taskany-inc/issues/compare/v2.53.1...v2.54.0) (2024-08-27)
 
 
