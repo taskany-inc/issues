@@ -21,6 +21,11 @@ export const criteriaSchema = z.object({
             id: z.string(),
         })
         .optional(),
+    externalTask: z
+        .object({
+            externalKey: z.string(),
+        })
+        .optional(),
 });
 
 export const updateCriteriaSchema = criteriaSchema.merge(

@@ -1,6 +1,6 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
-import { GoalHistory, Prisma, StateType } from '@prisma/client';
+import { ExternalTask, GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { getGoalActivityFilterIdsQuery, getDeepParentGoalIds } from '../queries/goalV2';
 import { prisma } from '../../src/utils/prisma';
@@ -63,6 +63,7 @@ import { commentsByGoalIdQuery, reactionsForGoalComments } from '../queries/comm
 import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
+import { getOrCreateExternalTask } from '../queries/external';
 
 import { tr } from './router.i18n';
 
@@ -304,6 +305,7 @@ export const goal = router({
                                         state: true,
                                     },
                                 },
+                                externalTask: true,
                             },
                             orderBy: [{ isDone: 'desc' }, { updatedAt: 'desc' }],
                             where: {
@@ -392,13 +394,20 @@ export const goal = router({
                         },
                     })),
 
-                    _criteria: goal.goalAchiveCriteria.map(({ criteriaGoal, ...criteria }) => ({
+                    _criteria: goal.goalAchiveCriteria.map(({ criteriaGoal, externalTask, ...criteria }) => ({
                         ...criteria,
                         criteriaGoal:
                             criteriaGoal != null
                                 ? {
                                       ...criteriaGoal,
                                       _shortId: getShortId(criteriaGoal),
+                                  }
+                                : null,
+                        externalTask:
+                            externalTask != null
+                                ? {
+                                      ...externalTask,
+                                      _shortId: externalTask.externalKey,
                                   }
                                 : null,
                     })),
@@ -1103,6 +1112,7 @@ export const goal = router({
 
             let isDoneByConnect = false;
             let criteriaTitle = input.title;
+            let externalTask: ExternalTask | null = null;
 
             if (input.criteriaGoal?.id) {
                 const connectedGoal = await prisma.goal.findUnique({
@@ -1116,6 +1126,12 @@ export const goal = router({
                     // replace by default if have connected goal
                     criteriaTitle = connectedGoal.title;
                 }
+            } else if (input.externalTask?.externalKey) {
+                externalTask = await getOrCreateExternalTask({
+                    id: input.externalTask.externalKey,
+                });
+
+                criteriaTitle = externalTask?.title;
             }
 
             const parentIds = await getDeepParentGoalIds([input.goalId]).execute();
@@ -1147,6 +1163,14 @@ export const goal = router({
                                   connect: { id: input.criteriaGoal.id },
                               }
                             : undefined,
+                        externalTask:
+                            input.externalTask?.externalKey && externalTask != null
+                                ? {
+                                      connect: {
+                                          id: externalTask.id,
+                                      },
+                                  }
+                                : undefined,
                     },
                 });
 
@@ -1178,6 +1202,7 @@ export const goal = router({
                                 criteriaGoal: {
                                     include: { state: true },
                                 },
+                                externalTask: true,
                             },
                             where: goalAchiveCriteriaFilter(activityId, role),
                         },
@@ -1228,6 +1253,18 @@ export const goal = router({
                     }
                 }
 
+                if (input.externalTask?.externalKey) {
+                    const existTask = await getOrCreateExternalTask({ id: input.externalTask?.externalKey });
+
+                    if (existTask) {
+                        // replace by default if have connected goal
+                        criteriaTitle = existTask.title;
+
+                        // override from db data for next connect between criteria and task
+                        input.externalTask.externalKey = existTask.id;
+                    }
+                }
+
                 const [updatedCriteria] = await prisma.$transaction([
                     prisma.goalAchieveCriteria.create({
                         data: {
@@ -1245,6 +1282,11 @@ export const goal = router({
                             criteriaGoal: input.criteriaGoal?.id
                                 ? {
                                       connect: { id: input.criteriaGoal.id },
+                                  }
+                                : undefined,
+                            externalTask: input.externalTask?.externalKey
+                                ? {
+                                      connect: { id: input.externalTask.externalKey },
                                   }
                                 : undefined,
                             createdAt: currentCriteria.createdAt,
@@ -1286,6 +1328,7 @@ export const goal = router({
                                     criteriaGoal: {
                                         include: { state: true },
                                     },
+                                    externalTask: true,
                                 },
                                 where: goalAchiveCriteriaFilter(activityId, role),
                             },
