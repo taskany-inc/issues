@@ -1,9 +1,10 @@
-import { jsonBuildObject } from 'kysely/helpers/postgres';
 import { sql } from 'kysely';
 
 import { db } from '../connection/kysely';
-import { Activity, Ghost, Goal, State, User } from '../../generated/kysely/types';
+import { Activity, ExternalTask, Ghost, Goal, State, User } from '../../generated/kysely/types';
 import { ExtractTypeFromGenerated } from '../utils';
+
+import { getUserActivity } from './activity';
 
 interface CriteriaParams {
     id?: string;
@@ -26,6 +27,7 @@ interface Criteria {
               _shortId: string;
           })
         | null;
+    externalTask: ExtractTypeFromGenerated<ExternalTask> | null;
 }
 
 export const criteriaQuery = (params: CriteriaParams = {}) => {
@@ -33,41 +35,27 @@ export const criteriaQuery = (params: CriteriaParams = {}) => {
         db
             .selectFrom('GoalAchieveCriteria as criteria')
             .innerJoin('Goal as linkedGoal', 'criteria.goalId', 'linkedGoal.id')
-            .leftJoin('Goal as criteriaGoal', 'criteriaGoal.id', 'criteria.criteriaGoalId')
-            .leftJoin('State as state', 'state.id', 'criteriaGoal.stateId')
-            .leftJoin('Activity as activity', 'criteriaGoal.activityId', 'activity.id')
-            .leftJoin('User as user', 'activity.id', 'user.activityId')
-            .leftJoin('Ghost as ghost', 'activity.ghostId', 'ghost.id')
+            .leftJoinLateral(
+                ({ selectFrom }) =>
+                    selectFrom('Goal')
+                        .innerJoin(
+                            () => getUserActivity().as('activity'),
+                            (join) => join.onRef('activity.id', '=', 'Goal.activityId'),
+                        )
+                        .innerJoin('State as state', 'state.id', 'Goal.stateId')
+                        .selectAll('Goal')
+                        .select(({ ref }) => [
+                            sql`"activity"`.as('owner'),
+                            sql`"state"`.as('state'),
+                            sql<string>`concat(${ref('Goal.projectId')}, '-', ${ref('Goal.scopeId')})`.as('_shortId'),
+                        ])
+                        .whereRef('Goal.id', '=', 'criteria.criteriaGoalId')
+                        .as('criteriaGoal'),
+                (join) => join.onTrue(),
+            )
+            .leftJoin('ExternalTask as task', 'task.id', 'criteria.externalTaskId')
             .selectAll('criteria')
-            .select(({ ref, fn, eb }) => [
-                eb
-                    .case()
-                    .when('criteria.criteriaGoalId', '=', ref('criteriaGoal.id'))
-                    .then(
-                        jsonBuildObject({
-                            id: sql<string>`"criteriaGoal".id`,
-                            title: sql<string>`"criteriaGoal".title`,
-                            projectId: sql<string>`"criteriaGoal"."projectId"`,
-                            _shortId: sql<string>`concat(${ref('criteriaGoal.projectId')}, '-', ${ref(
-                                'criteriaGoal.scopeId',
-                            )})`,
-                            completedCriteriaWeight: sql<number | null>`"criteriaGoal"."completedCriteriaWeight"`,
-                            state: fn.toJson('state'),
-                            owner: jsonBuildObject({
-                                id: sql<string>`activity.id`,
-                                createdAt: ref('activity.createdAt'),
-                                updatedAt: ref('activity.updatedAt'),
-                                ghostId: ref('activity.ghostId'),
-                                settingsId: ref('activity.settingsId'),
-                                user: fn.toJson('user'),
-                                ghost: fn.toJson('ghost'),
-                            }),
-                        }),
-                    )
-                    .else(null)
-                    .end()
-                    .as('criteriaGoal'),
-            ])
+            .select(({ fn }) => [fn.toJson('criteriaGoal').as('criteriaGoal'), fn.toJson('task').as('externalTask')])
             .where('criteria.deleted', 'is not', true)
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             .$if(params.id != null, (qb) => qb.where('criteria.id', '=', params!.id as string))
