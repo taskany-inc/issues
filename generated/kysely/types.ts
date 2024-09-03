@@ -76,6 +76,26 @@ export type dependsOn = {
     A: string;
     B: string;
 };
+export type ExternalTask = {
+    id: Generated<string>;
+    title: string;
+    externalId: string;
+    externalKey: string;
+    project: string;
+    projectId: string;
+    type: string;
+    typeId: string;
+    typeIconUrl: string;
+    state: string;
+    stateId: string;
+    stateIconUrl: string;
+    stateColor: string | null;
+    ownerEmail: string;
+    ownerName: string;
+    ownerId: string;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Generated<Timestamp>;
+};
 export type Filter = {
     id: string;
     mode: FilterMode;
@@ -141,6 +161,7 @@ export type GoalAchieveCriteria = {
     activityId: string;
     deleted: boolean | null;
     criteriaGoalId: string | null;
+    externalTaskId: string | null;
     createdAt: Generated<Timestamp>;
     updatedAt: Generated<Timestamp>;
 };
@@ -342,6 +363,7 @@ export type DB = {
     Activity: Activity;
     AppConfig: AppConfig;
     Comment: Comment;
+    ExternalTask: ExternalTask;
     Filter: Filter;
     Flow: Flow;
     Ghost: Ghost;

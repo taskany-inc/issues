@@ -1,0 +1,49 @@
+import { searchIssue } from '../../src/utils/integration/jira';
+import { db } from '../connection/kysely';
+import { ExternalTask } from '../../generated/kysely/types';
+
+export const getExternalTask = (params: { externalTaskId: string }) => {
+    return db
+        .selectFrom('ExternalTask')
+        .selectAll()
+        .where(({ eb, or }) => {
+            return or([
+                eb('ExternalTask.externalId', '=', params.externalTaskId),
+                eb('ExternalTask.externalKey', '=', params.externalTaskId),
+            ]);
+        });
+};
+
+export const insertExternalTask = (value: Omit<ExternalTask, 'id' | 'createdAt' | 'updatedAt'>) => {
+    return db.insertInto('ExternalTask').values(value).returningAll();
+};
+
+export const getOrCreateExternalTask = async ({ id }: { id: string }) => {
+    const task = await getExternalTask({ externalTaskId: id }).executeTakeFirst();
+
+    if (task != null) {
+        return task;
+    }
+
+    const [externalIssue] = await searchIssue({ value: id, limit: 1 });
+
+    const { summary: title, id: externalId, key, issuetype, status: state, project, reporter } = externalIssue;
+
+    return insertExternalTask({
+        title,
+        externalId,
+        externalKey: key,
+        type: issuetype.name,
+        typeIconUrl: issuetype.iconUrl,
+        typeId: issuetype.id,
+        state: state.statusCategory?.name || state.name,
+        stateId: String(state.statusCategory?.id) || state.id,
+        stateColor: state.statusCategory?.colorName || null,
+        stateIconUrl: state.iconUrl,
+        project: project.name,
+        projectId: project.key,
+        ownerName: reporter.displayName,
+        ownerEmail: reporter.emailAddress,
+        ownerId: reporter.key,
+    }).executeTakeFirstOrThrow();
+};

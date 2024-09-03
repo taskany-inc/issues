@@ -4,7 +4,7 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["native", "linux-musl", "debian-openssl-1.1.x"]
-  previewFeatures = ["fullTextSearch"]
+  previewFeatures = ["fullTextSearch", "postgresqlExtensions"]
 }
 
 generator kysely {
@@ -14,8 +14,9 @@ generator kysely {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgcrypto]
 }
 
 enum Role {
@@ -379,17 +380,19 @@ model GoalHistory {
 }
 
 model GoalAchieveCriteria {
-  id             String   @id @default(cuid())
-  goal           Goal     @relation("GoalCriterion", fields: [goalId], references: [id], onDelete: Cascade)
+  id             String       @id @default(cuid())
+  goal           Goal         @relation("GoalCriterion", fields: [goalId], references: [id], onDelete: Cascade)
   goalId         String
   title          String
   weight         Int
-  isDone         Boolean  @default(false)
-  activity       Activity @relation(fields: [activityId], references: [id])
+  isDone         Boolean      @default(false)
+  activity       Activity     @relation(fields: [activityId], references: [id])
   activityId     String
   deleted        Boolean?
   criteriaGoalId String?
-  criteriaGoal   Goal?    @relation("GoalInCriteria", fields: [criteriaGoalId], references: [id], onDelete: Cascade)
+  criteriaGoal   Goal?        @relation("GoalInCriteria", fields: [criteriaGoalId], references: [id], onDelete: Cascade)
+  externalTaskId String?
+  externalTask   ExternalTask? @relation("taskToCriteria", fields: [externalTaskId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
@@ -418,4 +421,30 @@ model AppConfig {
   id      String  @id @default(cuid())
   favicon String?
   logo    String?
+}
+
+model ExternalTask {
+  id           String                @id @default(dbgenerated("gen_random_uuid()"))
+  title        String
+  externalId   String
+  externalKey  String
+  project      String
+  projectId    String
+  type         String
+  typeId       String
+  typeIconUrl  String
+  state        String
+  stateId      String
+  stateIconUrl String
+  stateColor   String?
+  ownerEmail   String
+  ownerName    String
+  ownerId      String
+  criteria     GoalAchieveCriteria[] @relation("taskToCriteria")
+
+  createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
+
+  @@index([externalId])
+  @@index([title])
 }
