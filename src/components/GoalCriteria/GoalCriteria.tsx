@@ -35,16 +35,21 @@ import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { Circle } from '../Circle/Circle';
 import { routes } from '../../hooks/router';
 import { GoalBadge } from '../GoalBadge';
+import { TaskBadge } from '../TaskBadge/TaskBadge';
 import { safeUserData } from '../../utils/getUserName';
 import { UserBadge } from '../UserBadge/UserBadge';
-import { ActivityByIdReturnType, State } from '../../../trpc/inferredTypes';
+import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { useCriteriaValidityData } from '../CriteriaForm/CriteriaForm';
+import { InlineUserBadge } from '../InlineUserBadge/InlineUserBadge';
 
 import classes from './GoalCriteria.module.css';
 import { tr } from './GoalCriteria.i18n';
 
 type GoalCriteriaSuggestProps = React.ComponentProps<typeof GoalCriteriaSuggest>;
 
+type GoalStateProps = NonNullable<React.ComponentProps<typeof GoalBadge>['state']>;
+type ExternalTaskTypeProps = React.ComponentProps<typeof TaskBadge>['type'];
+type CriteriaUpdateDataMode = NonNullable<GoalCriteriaSuggestProps['defaultMode']>;
 interface CriteriaProps {
     title: string;
     weight?: number;
@@ -56,24 +61,47 @@ interface GoalCriteriaProps extends CriteriaProps {
     goal: {
         goalId: string;
         shortId: string;
-        state?: State | null;
+        state: GoalStateProps | null;
         project?: string;
         owner?: ActivityByIdReturnType;
         progress?: number | null;
     };
 }
 
-type UnionCriteria = CriteriaProps | GoalCriteriaProps;
+interface ExternalTaskCriteriaProps extends CriteriaProps {
+    externalTask: {
+        title: string;
+        externalKey: string;
+        project: string;
+        type?: ExternalTaskTypeProps;
+        state?: {
+            color: string | null;
+            title: string;
+        };
+        ownerEmail: string;
+        ownerName: string;
+    };
+}
 
-interface GoalCriteriaEditableApi<T = UnionCriteria> {
+type UnionCriteria = CriteriaProps | GoalCriteriaProps | ExternalTaskCriteriaProps;
+
+type CanBeNullableValue<T extends { [key: string]: any }> = {
+    [K in keyof T]: T[K] | null;
+};
+
+interface GoalCriteriaEditableApi<T extends UnionCriteria> {
     onCreate?: (val: T) => void;
-    onUpdate?: (val: T) => void;
+    onUpdate?: (val: T & { mode: CriteriaUpdateDataMode }) => void;
     onConvert?: (val: T) => void;
     onRemove?: (val: T) => void;
     onCheck?: (val: T) => void;
     goalId: string;
     validityData: React.ComponentProps<typeof GoalCriteriaSuggest>['validityData'];
 }
+
+const goalStateIsExists = (state?: CanBeNullableValue<GoalStateProps> | null): state is GoalStateProps => {
+    return state != null && state.lightForeground != null && state.darkForeground != null;
+};
 
 export function mapCriteria<
     T extends CriteriaProps,
@@ -83,22 +111,58 @@ export function mapCriteria<
         title: string;
         projectId: string | null;
         owner: ActivityByIdReturnType | null;
-        state: State | null;
+        state: CanBeNullableValue<GoalStateProps> | null;
         completedCriteriaWeight?: number | null;
     },
->(criteria: T, connectedGoal: G | null): UnionCriteria {
+    Et extends {
+        title: string;
+        type: string;
+        typeIconUrl: string;
+        state: string;
+        stateColor: string | null;
+        id: string;
+        project: string;
+        projectId: string;
+        ownerEmail: string;
+        externalKey: string;
+        ownerName: string;
+    },
+>(criteria: T, connectedGoal: G | null, task: Et | null): UnionCriteria {
     if (connectedGoal) {
+        const { state } = connectedGoal;
+
         return {
             id: criteria.id,
             goal: {
                 goalId: connectedGoal.id,
-                state: connectedGoal.state,
+                state: goalStateIsExists(state) ? state : null,
                 shortId: connectedGoal._shortId,
                 project: connectedGoal.projectId ?? undefined,
                 owner: connectedGoal.owner ?? undefined,
                 progress: connectedGoal.completedCriteriaWeight ?? null,
             },
             title: connectedGoal.title,
+            isDone: criteria.isDone,
+            weight: criteria.weight,
+        };
+    }
+
+    if (task) {
+        return {
+            id: criteria.id,
+            externalTask: {
+                ...task,
+                project: task.projectId,
+                type: {
+                    src: task.typeIconUrl,
+                    title: task.type,
+                },
+                state: {
+                    title: task.state,
+                    color: task.stateColor,
+                },
+            },
+            title: task.title,
             isDone: criteria.isDone,
             weight: criteria.weight,
         };
@@ -148,6 +212,53 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
     </TableRow>
 );
 
+const ExternalTaskCriteria = ({ title, externalTask, weight, isDone }: Omit<ExternalTaskCriteriaProps, 'id'>) => {
+    const ownerData = safeUserData({
+        user: {
+            email: externalTask.ownerEmail,
+            name: externalTask.ownerName,
+        },
+        ghost: null,
+    });
+
+    return (
+        <>
+            <TableCell className={classes.GoalCriteriaTitleCell} width={200}>
+                <TaskBadge
+                    title={title}
+                    state={
+                        externalTask.state
+                            ? {
+                                  title: externalTask.state.title,
+                                  color: externalTask.state.color,
+                              }
+                            : null
+                    }
+                    href={routes.jiraTask(externalTask.externalKey)}
+                    strike={isDone}
+                />
+            </TableCell>
+            <TableCell width="10ch">
+                <Text className={classes.CriteriaGoalProject} size="s">
+                    {externalTask.project}
+                </Text>
+            </TableCell>
+            <TableCell width={16}>
+                {nullable(ownerData, (owner) => (
+                    <InlineUserBadge {...owner} size="xs" tooltip={owner.name} short />
+                ))}
+            </TableCell>
+            <TableCell width="3ch" className={classes.GoalCriteriaWeightColumn}>
+                {nullable((weight ?? 0) > 0, () => (
+                    <Text as="span" size="s" weight="regular" className={classes.GoalCriteriaItemWeight}>
+                        {weight}
+                    </Text>
+                ))}
+            </TableCell>
+        </>
+    );
+};
+
 const GoalCriteria = ({ title, goal, weight, isDone }: Omit<GoalCriteriaProps, 'id'>) => {
     const { setPreview } = useGoalPreview();
     const ownerData = safeUserData(goal.owner);
@@ -161,12 +272,31 @@ const GoalCriteria = ({ title, goal, weight, isDone }: Omit<GoalCriteriaProps, '
         [setPreview, title, goal],
     );
 
+    const goalState = useMemo(() => {
+        if (goal.state == null) {
+            return null;
+        }
+
+        const {
+            state: { lightForeground, darkForeground },
+        } = goal;
+
+        if (lightForeground && darkForeground) {
+            return {
+                lightForeground,
+                darkForeground,
+            };
+        }
+
+        return null;
+    }, [goal]);
+
     return (
         <>
             <TableCell className={classes.GoalCriteriaTitleCell} width={200}>
                 <GoalBadge
                     title={title}
-                    state={goal.state ?? undefined}
+                    state={goalState}
                     href={routes.goal(goal.shortId)}
                     onClick={handleGoalCriteriaClick}
                     progress={goal.progress}
@@ -248,14 +378,13 @@ function criteriaAsGoal(props: UnionCriteria): props is GoalCriteriaProps {
     return 'goal' in props && props.goal != null;
 }
 
-export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
-    onConvert,
-    onRemove,
-    onUpdate,
-    onCheck,
-    validityData,
-    ...props
-}) => {
+function criteriaAsExternalTask(props: UnionCriteria): props is ExternalTaskCriteriaProps {
+    return 'externalTask' in props && props.externalTask != null;
+}
+
+export const Criteria: React.FC<
+    UnionCriteria & GoalCriteriaEditableApi<UnionCriteria & { mode: CriteriaUpdateDataMode }>
+> = ({ onConvert, onRemove, onUpdate, onCheck, validityData, ...props }) => {
     const [mode, setMode] = useState<'read' | 'edit'>('read');
     const { validateGoalCriteriaBindings } = useGoalResource({});
 
@@ -270,11 +399,11 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
             });
         }
 
-        if (!criteriaAsGoal(props) && onConvert) {
+        if (!(criteriaAsGoal(props) || criteriaAsExternalTask(props)) && onConvert) {
             actions.push({
                 label: tr('Create as goal'),
                 icon: <IconTargetOutline size="xs" />,
-                handler: () => onConvert(props),
+                handler: () => onConvert({ ...props, mode: 'simple' }),
             });
         }
 
@@ -283,7 +412,7 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
                 label: tr('Delete'),
                 icon: <IconBinOutline size="xs" />,
                 className: classes.GoalCriteriaActionDelete,
-                handler: () => onRemove(props),
+                handler: () => onRemove({ ...props, mode: 'simple' }),
             });
         }
 
@@ -293,60 +422,90 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
     const handleCriteriaCheck = useCallback(() => {
         if (onCheck) {
             return () => {
-                onCheck({ ...props, isDone: !props.isDone });
+                onCheck({ ...props, isDone: !props.isDone, mode: 'simple' });
             };
         }
 
         return undefined;
     }, [props, onCheck]);
 
-    const [defaultMode, values]: ['simple' | 'goal', React.ComponentProps<typeof GoalCriteriaSuggest>['values']] =
-        useMemo(() => {
-            if (criteriaAsGoal(props)) {
-                return [
-                    'goal',
-                    {
-                        id: props.id,
-                        mode: 'goal',
-                        title: props.title,
-                        weight: props.weight ? `${props.weight}` : '',
-                        selected: {
-                            id: props.goal.goalId,
-                            title: props.title,
-                            state: props.goal.state,
-                            _shortId: props.goal.shortId,
-                        },
-                    },
-                ];
-            }
-
+    const [defaultMode, values]: [
+        'simple' | 'goal' | 'task',
+        React.ComponentProps<typeof GoalCriteriaSuggest>['values'],
+    ] = useMemo(() => {
+        if (criteriaAsGoal(props)) {
             return [
-                'simple',
+                'goal',
                 {
                     id: props.id,
-                    mode: 'simple',
+                    mode: 'goal',
                     title: props.title,
                     weight: props.weight ? `${props.weight}` : '',
+                    selected: {
+                        id: props.goal.goalId,
+                        title: props.title,
+                        state: props.goal.state,
+                        _shortId: props.goal.shortId,
+                    },
                 },
             ];
-        }, [props]);
+        }
+
+        if (criteriaAsExternalTask(props)) {
+            return [
+                'task',
+                {
+                    id: props.id,
+                    mode: 'task',
+                    title: props.title,
+                    weight: props.weight ? `${props.weight}` : '',
+                    selected: {
+                        id: props.externalTask.externalKey,
+                        _shortId: props.externalTask.externalKey,
+                        title: props.externalTask.title,
+                        state: props.externalTask.state,
+                        externalKey: props.externalTask.externalKey,
+                    },
+                },
+            ];
+        }
+
+        return [
+            'simple',
+            {
+                id: props.id,
+                mode: 'simple',
+                title: props.title,
+                weight: props.weight ? `${props.weight}` : '',
+            },
+        ];
+    }, [props]);
 
     const handleCriteriaUpdate = useCallback<GoalCriteriaSuggestProps['onSubmit']>(
         (values) => {
-            const valuesToUpdate: UnionCriteria = {
+            const valuesToUpdate: CriteriaProps & {
+                mode: CriteriaUpdateDataMode;
+                selected: { id?: string; externalKey?: string };
+            } = {
                 id: props.id,
                 title: values.title,
                 weight: Number(values.weight),
                 isDone: props.isDone,
+                mode: values.mode,
+                selected: {
+                    id: undefined,
+                    externalKey: undefined,
+                },
             };
 
-            if (values.selected?.id != null) {
-                (valuesToUpdate as GoalCriteriaProps).goal = {
-                    goalId: values.selected.id,
-                    shortId: values.selected._shortId,
-                    state: values.selected.state,
-                };
-                valuesToUpdate.title = values.selected.title;
+            switch (values.mode) {
+                case 'goal':
+                    valuesToUpdate.selected.id = values.selected.id;
+                    break;
+                case 'task':
+                    valuesToUpdate.selected.externalKey = values.selected.externalKey;
+                    break;
+                default:
             }
 
             if (onUpdate) {
@@ -366,11 +525,22 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
         };
     }, [validityData, props.title, props.weight]);
 
+    const isSimpleCriteria = !criteriaAsExternalTask(props) && !criteriaAsGoal(props);
+
     return (
         <TableRow className={classes.GoalCriteriaTableRow}>
-            {criteriaAsGoal(props) ? (
+            {criteriaAsGoal(props) && (
                 <GoalCriteria title={props.title} weight={props.weight} isDone={props.isDone} goal={props.goal} />
-            ) : (
+            )}
+            {criteriaAsExternalTask(props) && (
+                <ExternalTaskCriteria
+                    title={props.title}
+                    weight={props.weight}
+                    isDone={props.isDone}
+                    externalTask={props.externalTask}
+                />
+            )}
+            {isSimpleCriteria && (
                 <SimpleCriteria
                     title={props.title}
                     isDone={props.isDone}
@@ -405,8 +575,9 @@ export const Criteria: React.FC<UnionCriteria & GoalCriteriaEditableApi> = ({
     );
 };
 
-interface CriteriaListProps extends Omit<GoalCriteriaEditableApi, 'validityData'> {
-    list?: Array<CriteriaProps | GoalCriteriaProps>;
+interface CriteriaListProps
+    extends Omit<GoalCriteriaEditableApi<UnionCriteria & { mode: CriteriaUpdateDataMode }>, 'validityData'> {
+    list?: Array<CriteriaProps | GoalCriteriaProps | ExternalTaskCriteriaProps>;
     className?: string;
 }
 
@@ -513,7 +684,9 @@ export const GoalCriteriaPreview: React.FC<GoalCriteriaPreviewProps> = ({
                         <CriteriaList
                             className={classes.GoalCriteriaTable}
                             goalId={goalId}
-                            list={data?.map((criteria) => mapCriteria(criteria, criteria.criteriaGoal))}
+                            list={data?.map((criteria) =>
+                                mapCriteria(criteria, criteria.criteriaGoal, criteria.externalTask),
+                            )}
                         />
                     ))}
                     {nullable(status === 'loading', () => (
@@ -527,22 +700,10 @@ export const GoalCriteriaPreview: React.FC<GoalCriteriaPreviewProps> = ({
     );
 };
 
-interface CriteriaItemValue {
-    id: string;
-    title: string;
-    weight: number;
-    isDone: boolean;
-    criteriaGoal: {
-        id: string;
-        title: string;
-        _shortId: string;
-        state?: State | null;
-    } | null;
-}
-
-interface GoalCriteriaViewProps extends Omit<GoalCriteriaEditableApi<UnionCriteria>, 'validityData'> {
+interface GoalCriteriaViewProps
+    extends Omit<GoalCriteriaEditableApi<UnionCriteria & { mode: CriteriaUpdateDataMode }>, 'validityData'> {
     goalId: string;
-    list: Array<CriteriaProps | GoalCriteriaProps>;
+    list: Array<CriteriaProps | GoalCriteriaProps | ExternalTaskCriteriaProps>;
     canEdit: boolean;
 }
 
@@ -556,42 +717,17 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
     children,
     canEdit,
 }) => {
-    const mapCriteriaValueWrapper = useCallback((fn?: (val: CriteriaItemValue) => void | Promise<void>) => {
-        if (fn) {
-            return (data: UnionCriteria) => {
-                const returnedItem: CriteriaItemValue = {
-                    id: data.id,
-                    title: data.title,
-                    weight: Number(data.weight),
-                    isDone: data.isDone,
-                    criteriaGoal: null,
-                };
-
-                if (criteriaAsGoal(data)) {
-                    returnedItem.criteriaGoal = {
-                        id: data.goal.goalId,
-                        title: data.title,
-                        _shortId: data.goal.shortId,
-                        state: data.goal.state,
-                    };
-                }
-
-                return fn(returnedItem);
-            };
-        }
-    }, []);
-
     const editableProps = useMemo(
         () =>
             canEdit
                 ? {
-                      onConvert: mapCriteriaValueWrapper(onConvert),
-                      onRemove: mapCriteriaValueWrapper(onRemove),
-                      onUpdate: mapCriteriaValueWrapper(onUpdate),
-                      onCheck: mapCriteriaValueWrapper(onCheck),
+                      onConvert,
+                      onRemove,
+                      onUpdate,
+                      onCheck,
                   }
                 : {},
-        [onConvert, onRemove, onUpdate, onCheck, canEdit, mapCriteriaValueWrapper],
+        [onConvert, onRemove, onUpdate, onCheck, canEdit],
     );
 
     return (

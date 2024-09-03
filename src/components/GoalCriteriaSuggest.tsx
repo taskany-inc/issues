@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 
 import { trpc } from '../utils/trpcClient';
-import { State } from '../../trpc/inferredTypes';
 import { useGoalResource } from '../hooks/useGoalResource';
 
 import { CriteriaForm, useCriteriaValidityData } from './CriteriaForm/CriteriaForm';
@@ -10,14 +9,22 @@ import { dispatchPreviewUpdateEvent } from './GoalPreview/GoalPreviewProvider';
 interface Goal {
     id: string;
     title: string;
-    state?: State | null;
+    state?: Record<string, unknown> | null;
     _shortId: string;
+}
+
+interface Task {
+    id: string;
+    title: string;
+    type: Record<string, unknown> | null;
+    project: string;
 }
 
 interface GoalCriteriaSuggestProps {
     id: string;
     items?: {
         goal?: Goal | null;
+        task?: Task | null;
     }[];
     filter?: string[];
     versa?: boolean;
@@ -34,8 +41,8 @@ interface GoalCriteriaSuggestProps {
 
 export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
     id,
-    items,
     filter,
+    items: _,
     withModeSwitch,
     defaultMode = 'simple',
     versa,
@@ -52,14 +59,16 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
         values?.selected,
     );
 
-    const selectedGoals = useMemo(() => {
-        return items?.reduce<Goal[]>((acc, { goal }) => {
-            if (goal) {
-                acc.push(goal);
-            }
-            return acc;
-        }, []);
-    }, [items]);
+    const shouldEnabledQuery = query != null && query.length > 0 && selectedGoal?.title !== query;
+
+    // const selectedGoals = useMemo(() => {
+    //     return items?.reduce<Goal[]>((acc, { goal }) => {
+    //         if (goal) {
+    //             acc.push(goal);
+    //         }
+    //         return acc;
+    //     }, []);
+    // }, [items]);
 
     const { data: goals = [] } = trpc.goal.suggestions.useQuery(
         {
@@ -68,7 +77,18 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
             onlyCurrentUser: restrictedSearch,
             filter,
         },
-        { enabled: mode === 'goal', cacheTime: 0 },
+        { enabled: mode === 'goal' && shouldEnabledQuery, cacheTime: 0 },
+    );
+
+    const { data: issues = [] } = trpc.external.search.useQuery(
+        {
+            value: query as string,
+            limit: 5,
+        },
+        {
+            enabled: mode === 'task' && shouldEnabledQuery,
+            keepPreviousData: true,
+        },
     );
 
     const itemsToRender = useMemo(() => {
@@ -76,13 +96,33 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
             return [];
         }
 
-        return goals.map(({ id, title, state, _shortId }) => ({
-            id,
-            title,
-            state,
-            _shortId,
+        if (mode === 'goal') {
+            return goals.map(({ id, title, state, _shortId }) => ({
+                id,
+                title,
+                state:
+                    state?.lightForeground != null && state?.darkForeground != null
+                        ? {
+                              lightForeground: state.lightForeground,
+                              darkForeground: state.darkForeground,
+                          }
+                        : null,
+                _shortId,
+            }));
+        }
+
+        return issues.map((issue) => ({
+            ...issue,
+            _shortId: issue.externalKey,
+            state: null,
+            id: issue.externalId,
+            title: issue.title,
+            type: {
+                title: issue.type,
+                src: issue.typeIconUrl,
+            },
         }));
-    }, [goals, selectedGoal, query, mode]);
+    }, [goals, selectedGoal, query, mode, issues]);
 
     const handleGoalChange = useCallback(
         (item: typeof selectedGoal) => {
@@ -130,7 +170,6 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
             onSubmit={onSubmit}
             onReset={handleReset}
             items={itemsToRender}
-            value={selectedGoals}
             validityData={validityData}
             validateBindingsFor={validateBindings}
         />
