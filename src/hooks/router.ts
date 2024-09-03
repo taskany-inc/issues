@@ -29,6 +29,8 @@ export const routes = {
     crewTeam: (id: string) => `${process.env.NEXT_PUBLIC_CREW_URL}teams/${id}`,
     crewUserByEmail: (email: string) => `${process.env.NEXT_PUBLIC_CREW_URL}users/email/${email}`,
     crewUser: (login: string) => `${process.env.NEXT_PUBLIC_CREW_URL}${login}`,
+
+    jiraTask: (id: string) => `${process.env.NEXT_PIBLIC_JIRA_URL}browse/${id}`,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
