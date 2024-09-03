@@ -33,6 +33,8 @@ interface GoalActivityFeedProps {
     onInvalidate?: () => void;
 }
 
+type AddCriteriaMode = NonNullable<React.ComponentProps<typeof GoalCriteriaSuggest>['defaultMode']>;
+
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
     ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }, ref) => {
         const { user } = usePageContext();
@@ -84,23 +86,41 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
         );
 
         const handleCreateCriteria = useCallback(
-            async (data: { title: string; weight: string; selected?: { id?: string } }) => {
+            async (data: {
+                title: string;
+                weight: string;
+                selected?: { id?: string; externalKey?: string };
+                mode: AddCriteriaMode;
+            }) => {
                 await onGoalCriteriaAdd({
                     title: data.title,
                     weight: String(data.weight),
                     goalId: goal.id,
-                    criteriaGoal: data.selected?.id
-                        ? {
-                              id: data.selected.id,
-                          }
-                        : undefined,
+                    criteriaGoal:
+                        data.mode === 'goal' && data.selected?.id
+                            ? {
+                                  id: data.selected.id,
+                              }
+                            : undefined,
+                    externalTask:
+                        data.mode === 'task' && data.selected?.externalKey
+                            ? {
+                                  externalKey: data.selected.externalKey,
+                              }
+                            : undefined,
                 });
             },
             [goal.id, onGoalCriteriaAdd],
         );
 
         const handleUpdateCriteria = useCallback(
-            async (data: { id?: string; title: string; weight?: number; criteriaGoal?: { id?: string } }) => {
+            async (data: {
+                id?: string;
+                title: string;
+                weight?: number;
+                selected?: { id?: string; externalKey?: string };
+                mode: AddCriteriaMode;
+            }) => {
                 if (!data.id) return;
 
                 await onGoalCriteriaUpdate({
@@ -108,11 +128,18 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                     title: data.title,
                     weight: String(data.weight),
                     goalId: goal.id,
-                    criteriaGoal: data.criteriaGoal?.id
-                        ? {
-                              id: data.criteriaGoal.id,
-                          }
-                        : undefined,
+                    criteriaGoal:
+                        data.mode === 'goal' && data.selected?.id
+                            ? {
+                                  id: data.selected.id,
+                              }
+                            : undefined,
+                    externalTask:
+                        data.mode === 'task' && data.selected?.externalKey
+                            ? {
+                                  externalKey: data.selected.externalKey,
+                              }
+                            : undefined,
                 });
             },
             [goal.id, onGoalCriteriaUpdate],
@@ -162,7 +189,9 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                         onCheck={handleUpdateCriteriaState}
                         onConvert={handleConvertCriteriaToGoal}
                         onRemove={handleRemoveCriteria}
-                        list={goal._criteria?.map((criteria) => mapCriteria(criteria, criteria.criteriaGoal))}
+                        list={goal._criteria?.map((criteria) =>
+                            mapCriteria(criteria, criteria.criteriaGoal, criteria.externalTask),
+                        )}
                     >
                         {nullable(goal._isEditable, () => (
                             <GoalFormPopupTrigger

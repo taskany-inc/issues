@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { nullable } from '@taskany/bricks';
-import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { IconDatabaseOutline, IconTargetOutline } from '@taskany/icons';
+import React, { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import {
@@ -18,23 +19,35 @@ import { GoalBadge } from '../GoalBadge';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { StateDot } from '../StateDot/StateDot';
+import { TaskBadge, TaskBadgeIcon } from '../TaskBadge/TaskBadge';
 
 import { tr } from './CriteriaForm.i18n';
 import s from './CriteriaForm.module.css';
 
+type GoalStateProps = ComponentProps<typeof StateDot>['state'];
+type TaskTypeProps = NonNullable<ComponentProps<typeof TaskBadge>['type']>;
+type TaskStateProps = NonNullable<ComponentProps<typeof TaskBadge>['state']>;
+
 interface SuggestItem {
     id: string;
     title: string;
-    state?: ComponentProps<typeof StateDot>['state'] | null;
+    state?: GoalStateProps | TaskStateProps | null;
+    type?: TaskTypeProps | null;
     _shortId: string;
 }
+
+const isGoalStateProps = (props: unknown): props is GoalStateProps =>
+    typeof props === 'object' && props != null && 'lightForeground' in props && 'darkForeground' in props;
+
+const isTaskStateProps = (props: unknown): props is TaskStateProps =>
+    typeof props === 'object' && props != null && 'src' in props && 'title' in props;
 
 interface ValidityData {
     title: string[];
     sumOfCriteria: number;
 }
 
-type CriteriaFormMode = 'simple' | 'goal';
+type CriteriaFormMode = 'simple' | 'goal' | 'task';
 
 export const maxPossibleWeight = 100;
 export const minPossibleWeight = 1;
@@ -82,6 +95,13 @@ function patchZodSchema<T extends FormValues>(
                         .string()
                         .refine((val) => !data.title.includes(val), { message: tr('Title must be unique') }),
                     stateColor: z.number().optional(),
+                }),
+            }),
+            z.object({
+                mode: z.literal('task'),
+                id: z.string(),
+                selected: z.object({
+                    externalKey: z.string(),
                 }),
             }),
         ])
@@ -221,10 +241,23 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
     const { selected, title } = errors;
 
     const icon = useMemo(() => {
-        if (mode === 'simple') return false;
-        if (!selectedItem || !selectedItem?.state) return;
+        if (mode === 'goal') {
+            if (isGoalStateProps(selectedItem?.state)) {
+                return <StateDot size="s" state={selectedItem.state} view="stroke" />;
+            }
 
-        return <StateDot size="s" state={selectedItem.state} view="stroke" />;
+            return <IconTargetOutline size="s" />;
+        }
+
+        if (mode === 'task') {
+            if (isTaskStateProps(selectedItem?.type)) {
+                return <TaskBadgeIcon src={selectedItem.type.src} />;
+            }
+
+            return <IconDatabaseOutline size="s" />;
+        }
+
+        return null;
     }, [mode, selectedItem]);
 
     const error = useMemo(() => {
@@ -245,6 +278,14 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
         return undefined;
     }, [mode, selected, title]);
 
+    const placeholder = useMemo(() => {
+        if (mode === 'goal') {
+            return undefined;
+        }
+
+        return mode === 'simple' ? tr('Criteria title') : tr('Place link here');
+    }, [mode]);
+
     return (
         <FilterAutoCompleteInput
             name={name}
@@ -252,10 +293,18 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
             value={value}
             error={error}
             onChange={onChange}
-            placeholder={mode === 'simple' ? tr('Criteria title') : undefined}
+            placeholder={placeholder}
             autoFocus
         />
     );
+};
+
+const isGoalProps = (props: unknown): props is React.ComponentProps<typeof GoalBadge> => {
+    return typeof props === 'object' && props != null && '_shortId' in props;
+};
+
+const isTaskProps = (props: unknown): props is React.ComponentProps<typeof TaskBadge> => {
+    return typeof props === 'object' && props != null && 'type' in props;
 };
 
 export const CriteriaForm = ({
@@ -268,7 +317,7 @@ export const CriteriaForm = ({
     validityData,
     validateBindingsFor,
     values,
-    value,
+    value: _,
     mode: defaultMode,
     setMode,
 }: CriteriaFormProps) => {
@@ -293,6 +342,7 @@ export const CriteriaForm = ({
     const radios: Array<{ value: CriteriaFormMode; title: string }> = [
         { title: tr('Simple'), value: 'simple' },
         { title: tr('Goal'), value: 'goal' },
+        { title: tr('Task'), value: 'task' },
     ];
 
     const title = watch('title');
@@ -316,7 +366,7 @@ export const CriteriaForm = ({
             { selected: undefined },
         );
         const subSelected = watch(({ selected, mode }, { name }) => {
-            if (mode === 'goal' && (name === 'selected' || name === 'selected.id' || name === 'selected.title')) {
+            if (mode !== 'simple' && (name === 'selected' || name === 'selected.id' || name === 'selected.title')) {
                 onItemChange?.(selected as Required<SuggestItem>);
 
                 trigger('selected');
@@ -360,11 +410,7 @@ export const CriteriaForm = ({
             return !!title;
         }
 
-        if (mode === 'goal') {
-            return !!(title && selected?.id);
-        }
-
-        return false;
+        return !!(title && selected?.id);
     }, [mode, title, selected?.id]);
 
     const resetHandler = useCallback(() => {
@@ -389,11 +435,25 @@ export const CriteriaForm = ({
             <GoalSelect
                 mode="single"
                 items={items}
-                value={value}
                 onClick={handleSelectItem}
-                renderItem={(props) => (
-                    <GoalBadge title={props.item.title} state={props.item.state ?? undefined} className={s.GoalBadge} />
-                )}
+                renderItem={(props) => {
+                    const renderData = props.item;
+
+                    if (mode === 'goal' && isGoalProps(renderData)) {
+                        return (
+                            <GoalBadge
+                                title={renderData.title}
+                                // @ts-ignore
+                                state={renderData.state ?? undefined}
+                                className={s.GoalBadge}
+                            />
+                        );
+                    }
+
+                    if (mode === 'task' && isTaskProps(renderData)) {
+                        return <TaskBadge {...renderData} />;
+                    }
+                }}
             >
                 <>
                     {nullable(withModeSwitch, () => (

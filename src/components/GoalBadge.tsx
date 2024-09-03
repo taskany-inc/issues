@@ -8,7 +8,7 @@ import { StateDot } from './StateDot/StateDot';
 interface GoalBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'color' | 'title'> {
     title: React.ReactNode;
     href?: string;
-    state?: ComponentProps<typeof StateDot>['state'];
+    state: ComponentProps<typeof StateDot>['state'];
     strike?: boolean;
     children?: React.ReactNode;
     className?: string;
