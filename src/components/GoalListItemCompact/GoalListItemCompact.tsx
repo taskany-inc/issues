@@ -14,6 +14,7 @@ import { Priority } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { TableRowItemText, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import { StateDot } from '../StateDot/StateDot';
+import { getStateProps } from '../GoalBadge';
 
 import s from './GoalListItemCompact.module.css';
 
@@ -126,7 +127,7 @@ const Column: ColumnRender = ({ col, componentProps }) => {
             content = <TableRowItemTitle size="s">{title}</TableRowItemTitle>;
             break;
         case 'state':
-            content = nullable(state, (s) => <StateDot state={s} size="l" title={s?.title} />);
+            content = nullable(state, (s) => <StateDot state={getStateProps(s)} size="l" title={s?.title} />);
             break;
         case 'priority':
             content = nullable(priority, (p) => <TableRowItemText>{getPriorityText(p.title)}</TableRowItemText>);

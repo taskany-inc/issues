@@ -417,6 +417,7 @@ export const getGoalDeepQuery = (user?: { activityId: string; role: Role }) => {
                         state: true,
                     },
                 },
+                externalTask: true,
             },
             orderBy: {
                 createdAt: 'asc',

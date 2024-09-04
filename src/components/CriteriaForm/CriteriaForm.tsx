@@ -15,7 +15,7 @@ import {
 } from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect/GoalSelect';
-import { GoalBadge } from '../GoalBadge';
+import { getStateProps, GoalBadge } from '../GoalBadge';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { StateDot } from '../StateDot/StateDot';
@@ -241,8 +241,12 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
     const { selected, title } = errors;
 
     const icon = useMemo(() => {
+        if (selectedItem == null) {
+            return null;
+        }
+
         if (mode === 'goal') {
-            if (isGoalStateProps(selectedItem?.state)) {
+            if (isGoalStateProps(selectedItem.state)) {
                 return <StateDot size="s" state={selectedItem.state} view="stroke" />;
             }
 
@@ -250,7 +254,7 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
         }
 
         if (mode === 'task') {
-            if (isTaskStateProps(selectedItem?.type)) {
+            if (isTaskStateProps(selectedItem.type)) {
                 return <TaskBadgeIcon src={selectedItem.type.src} />;
             }
 
@@ -317,7 +321,7 @@ export const CriteriaForm = ({
     validityData,
     validateBindingsFor,
     values,
-    value: _,
+    value,
     mode: defaultMode,
     setMode,
 }: CriteriaFormProps) => {
@@ -435,6 +439,7 @@ export const CriteriaForm = ({
             <GoalSelect
                 mode="single"
                 items={items}
+                value={value}
                 onClick={handleSelectItem}
                 renderItem={(props) => {
                     const renderData = props.item;
@@ -443,8 +448,7 @@ export const CriteriaForm = ({
                         return (
                             <GoalBadge
                                 title={renderData.title}
-                                // @ts-ignore
-                                state={renderData.state ?? undefined}
+                                state={getStateProps(renderData?.state)}
                                 className={s.GoalBadge}
                             />
                         );
