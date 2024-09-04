@@ -30,7 +30,7 @@ export const routes = {
     crewUserByEmail: (email: string) => `${process.env.NEXT_PUBLIC_CREW_URL}users/email/${email}`,
     crewUser: (login: string) => `${process.env.NEXT_PUBLIC_CREW_URL}${login}`,
 
-    jiraTask: (id: string) => `${process.env.NEXT_PIBLIC_JIRA_URL}browse/${id}`,
+    jiraTask: (id: string) => `${process.env.NEXT_PUBLIC_JIRA_URL}browse/${id}`,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

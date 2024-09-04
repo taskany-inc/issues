@@ -5,7 +5,7 @@ import { nullable } from '@taskany/bricks';
 
 import { routes } from '../../hooks/router';
 import { State } from '../../../trpc/inferredTypes';
-import { GoalBadge } from '../GoalBadge';
+import { getStateProps, GoalBadge } from '../GoalBadge';
 import { List } from '../List/List';
 
 import s from './GoalList.module.css';
@@ -46,7 +46,7 @@ export const GoalList = <T extends Goal & { state?: State | null; _shortId: stri
             renderItem={(goal) => (
                 <GoalBadge
                     title={goal.title}
-                    state={goal.state ?? undefined}
+                    state={getStateProps(goal.state)}
                     href={routes.goal(goal._shortId)}
                     onClick={onClickHandler(goal)}
                     {...attrs}

@@ -16,6 +16,34 @@ interface GoalBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'co
     onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
+export const getStateProps = (s?: Record<string, unknown> | null): GoalBadgeProps['state'] => {
+    if (s == null) {
+        return null;
+    }
+
+    const neededProps: (keyof NonNullable<GoalBadgeProps['state']>)[] = ['lightForeground', 'darkForeground'];
+
+    let res: GoalBadgeProps['state'] = {
+        lightForeground: '',
+        darkForeground: '',
+    };
+
+    for (const k of neededProps) {
+        if (s[k] == null) {
+            return null;
+        }
+
+        if (typeof s[k] === 'string') {
+            res = {
+                ...res,
+                [k]: s[k],
+            };
+        }
+    }
+
+    return res;
+};
+
 export const GoalBadge: React.FC<GoalBadgeProps> = ({
     href,
     title,

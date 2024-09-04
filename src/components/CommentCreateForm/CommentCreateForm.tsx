@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { State as StateType } from '@prisma/client';
+import { State as StateDataType } from '@prisma/client';
 import { nullable, useLatest } from '@taskany/bricks';
 import { IconDownSmallSolid, IconUpSmallSolid } from '@taskany/icons';
 import { Avatar, Button } from '@taskany/bricks/harmony';
@@ -13,12 +13,13 @@ import { StateDot } from '../StateDot/StateDot';
 import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 import { State } from '../State';
+import { getStateProps } from '../GoalBadge';
 
 import { tr } from './CommentCreateForm.i18n';
 import s from './CommentCreateForm.module.css';
 
 interface CommentCreateFormProps extends Omit<React.ComponentProps<typeof CommentForm>, 'actionButton'> {
-    states?: StateType[];
+    states?: StateDataType[];
     stateId?: string | null;
 
     onSubmit: (comment: GoalCommentFormSchema) => void;
@@ -37,7 +38,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     const statesMap = useMemo(() => {
         if (!states) return {};
 
-        return states.reduce<Record<string, StateType>>((acc, cur) => {
+        return states.reduce<Record<string, StateDataType>>((acc, cur) => {
             acc[cur.id] = cur;
             return acc;
         }, {});
@@ -96,7 +97,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     }, [onCancel, stateId, statesMap]);
 
     const onStateSelect = useCallback(
-        (state: StateType) => {
+        (state: StateDataType) => {
             setPushState((prev) => {
                 const newState = state.id === prev?.id ? undefined : state;
                 onChange?.({ description: descriptionRef.current, stateId: newState?.id });
@@ -149,7 +150,9 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                                     type="submit"
                                     brick="right"
                                     text={tr('Update state')}
-                                    iconLeft={pushState ? <StateDot state={pushState} size="l" /> : undefined}
+                                    iconLeft={
+                                        pushState ? <StateDot state={getStateProps(pushState)} size="l" /> : undefined
+                                    }
                                     {...commentFormSubmitButton.attr}
                                 />
                                 <Dropdown>

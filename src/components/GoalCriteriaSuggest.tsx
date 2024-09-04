@@ -6,6 +6,8 @@ import { useGoalResource } from '../hooks/useGoalResource';
 import { CriteriaForm, useCriteriaValidityData } from './CriteriaForm/CriteriaForm';
 import { dispatchPreviewUpdateEvent } from './GoalPreview/GoalPreviewProvider';
 
+type SuggestItems = React.ComponentProps<typeof CriteriaForm>['items'];
+
 interface Goal {
     id: string;
     title: string;
@@ -16,7 +18,8 @@ interface Goal {
 interface Task {
     id: string;
     title: string;
-    type: Record<string, unknown> | null;
+    type?: Record<string, unknown> | null;
+    state?: Record<string, unknown> | null;
     project: string;
 }
 
@@ -42,7 +45,7 @@ interface GoalCriteriaSuggestProps {
 export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
     id,
     filter,
-    items: _,
+    items,
     withModeSwitch,
     defaultMode = 'simple',
     versa,
@@ -61,14 +64,14 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
 
     const shouldEnabledQuery = query != null && query.length > 0 && selectedGoal?.title !== query;
 
-    // const selectedGoals = useMemo(() => {
-    //     return items?.reduce<Goal[]>((acc, { goal }) => {
-    //         if (goal) {
-    //             acc.push(goal);
-    //         }
-    //         return acc;
-    //     }, []);
-    // }, [items]);
+    const selectedGoals = useMemo(() => {
+        return items?.reduce<Goal[]>((acc, { goal }) => {
+            if (goal) {
+                acc.push(goal);
+            }
+            return acc;
+        }, []);
+    }, [items]);
 
     const { data: goals = [] } = trpc.goal.suggestions.useQuery(
         {
@@ -163,6 +166,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
         <CriteriaForm
             mode={mode}
             setMode={setMode}
+            value={selectedGoals as SuggestItems}
             values={values}
             withModeSwitch={withModeSwitch}
             onInputChange={setQuery}

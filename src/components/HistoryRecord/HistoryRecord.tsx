@@ -30,7 +30,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { getUserName, prepareUserDataFromActivity, safeUserData } from '../../utils/getUserName';
 import { UserBadge } from '../UserBadge/UserBadge';
 import { ProjectBadge } from '../ProjectBadge';
-import { GoalBadge } from '../GoalBadge';
+import { getStateProps, GoalBadge } from '../GoalBadge';
 import { routes } from '../../hooks/router';
 import { State } from '../State';
 
@@ -201,7 +201,7 @@ const HistoryRecordDependency: React.FC<
                     key={issue.id}
                     className={s.HistoryBadge}
                     title={issue.title}
-                    state={issue.state}
+                    state={getStateProps(issue.state)}
                     href={routes.goal(issue._shortId)}
                 />
             ))}
@@ -412,7 +412,7 @@ const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title
                 <GoalBadge
                     className={cn(s.HistoryBadge, s.HistoryRecordTextPrimary)}
                     title={criteriaGoal.title}
-                    state={criteriaGoal.state}
+                    state={getStateProps(criteriaGoal.state)}
                     href={routes.goal(`${criteriaGoal.projectId}-${criteriaGoal.scopeId}`)}
                     strike={strike}
                 />
