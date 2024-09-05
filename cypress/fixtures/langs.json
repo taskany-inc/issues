@@ -357,6 +357,14 @@
         "Sort": {
             "ru": "Сортировка",
             "en": "Sort"
+        },
+        "Visibility": {
+            "ru": "Видимость",
+            "en": "Visibility"
+        },
+        "Criteria": {
+            "ru": "Критерии",
+            "en": "Criteria"
         }
     },
     "FlowDropdown": {
@@ -1049,8 +1057,8 @@
     },
     "ProjectListItemConnected": {
         "Loading ...": {
-            "ru": "",
-            "en": ""
+            "ru": "Загрузка ...",
+            "en": "Loading ..."
         }
     },
     "ProjectPage": {

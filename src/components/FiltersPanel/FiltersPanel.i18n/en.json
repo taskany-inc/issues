@@ -12,5 +12,7 @@
     "Participant": "Participant",
     "Filter": "Filter",
     "Reset": "Reset",
-    "Grouping": "Grouping"
+    "Grouping": "Grouping",
+    "Visibility": "Visibility",
+    "Criteria": "Criteria"
 }

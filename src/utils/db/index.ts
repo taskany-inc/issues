@@ -91,7 +91,7 @@ export const createPersonalProject = async ({
         watchers: { include: { user: true, ghost: true } },
     };
 
-    const { include, where } = getProjectSchema({
+    const { include, where } = await getProjectSchema({
         role,
         activityId,
         whereQuery: {

@@ -101,9 +101,9 @@ export const project = router({
                 },
             });
             const projectIdsArray = projectIds.map(({ id }) => id);
-            const goalsFilters = goalsQuery ? { ...goalsFilter(goalsQuery, activityId, role) } : undefined;
+            const goalsFilters = goalsQuery ? { ...(await goalsFilter(goalsQuery, activityId, role)) } : undefined;
 
-            const { where: projectWhere } = getProjectSchema({
+            const { where: projectWhere } = await getProjectSchema({
                 role,
                 activityId,
                 goalsQuery,
@@ -307,20 +307,20 @@ export const project = router({
                               in: projectIds,
                           }
                         : {},
-                    goals: goalsQuery ? { some: goalsFilter(goalsQuery, activityId, role).where } : {},
+                    goals: goalsQuery ? { some: (await goalsFilter(goalsQuery, activityId, role)).where } : {},
                 };
 
                 const projects = await prisma.project
                     .findMany({
                         ...projectPagination,
                         orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
-                        ...getProjectSchema({
+                        ...(await getProjectSchema({
                             role,
                             activityId,
                             goalsQuery,
                             firstLevel,
                             whereQuery,
-                        }),
+                        })),
                     })
                     .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
 
@@ -351,12 +351,12 @@ export const project = router({
                     orderBy: {
                         createdAt: 'asc',
                     },
-                    ...getProjectSchema({
+                    ...(await getProjectSchema({
                         role,
                         activityId,
                         goalsQuery,
                         firstLevel,
-                    }),
+                    })),
                 })
                 .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
         }),
@@ -371,7 +371,7 @@ export const project = router({
         .query(async ({ ctx, input: { id, goalsQuery } }) => {
             const { activityId, role } = ctx.session.user;
 
-            const { include } = getProjectSchema({
+            const { include } = await getProjectSchema({
                 role,
                 activityId,
                 goalsQuery,
@@ -399,7 +399,7 @@ export const project = router({
             const { activityId, role } = ctx.session.user;
 
             const projects = await prisma.project.findMany({
-                ...getProjectSchema({
+                ...(await getProjectSchema({
                     role,
                     activityId,
                     goalsQuery,
@@ -412,17 +412,17 @@ export const project = router({
                                   OR: [
                                       {
                                           goals: {
-                                              some: goalsFilter(goalsQuery, activityId, role).where,
+                                              some: (await goalsFilter(goalsQuery, activityId, role)).where,
                                           },
                                       },
                                       {
                                           goals: {
-                                              none: goalsFilter(goalsQuery, activityId, role).where,
+                                              none: (await goalsFilter(goalsQuery, activityId, role)).where,
                                           },
                                           children: {
                                               some: {
                                                   goals: {
-                                                      some: goalsFilter(goalsQuery, activityId, role).where,
+                                                      some: (await goalsFilter(goalsQuery, activityId, role)).where,
                                                   },
                                               },
                                           },
@@ -431,7 +431,7 @@ export const project = router({
                               }
                             : {}),
                     },
-                }),
+                })),
             });
 
             return projects.map((project) => addCalculatedProjectFields(project, activityId, role));
@@ -455,7 +455,7 @@ export const project = router({
                     where: goalsWhere,
                 }),
                 prisma.goal.findMany({
-                    ...goalsFilter(goalsQuery, activityId, role, goalsWhere),
+                    ...(await goalsFilter(goalsQuery, activityId, role, goalsWhere)),
                     include: getGoalDeepQuery({
                         activityId,
                         role,

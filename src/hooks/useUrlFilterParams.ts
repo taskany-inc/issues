@@ -32,6 +32,7 @@ export interface FilterQueryState {
     project: string[];
     query: string;
     sort: Array<{ key: SortableProps; dir: SortDirection }>;
+    hideCriteria?: boolean;
 }
 
 const groupByValue = {
@@ -111,6 +112,7 @@ export const buildURLSearchParams = ({
     groupBy,
     view,
     limit,
+    hideCriteria,
 }: Partial<QueryState>): URLSearchParams => {
     const urlParams = new URLSearchParams();
 
@@ -148,6 +150,8 @@ export const buildURLSearchParams = ({
 
     view && valueIsViewParam(view) ? urlParams.set('view', view) : urlParams.delete('view');
 
+    hideCriteria ? urlParams.set('hideCriteria', '1') : urlParams.delete('hideCriteria');
+
     return urlParams;
 };
 
@@ -177,6 +181,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
     if (query.sort) {
         queryMap.sort = parseSortQueryParam(query.sort?.toString());
     }
+    if (query.hideCriteria) queryMap.hideCriteria = Boolean(query.hideCriteria) || undefined;
 
     return queryMap;
 };
@@ -197,7 +202,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
-    const { queryState, queryFilterState, groupBy, view } = useMemo(() => {
+    const { queryState, queryFilterState, groupBy, hideCriteria, view } = useMemo(() => {
         const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { groupBy, view, id, ...queries } = query;
@@ -211,6 +216,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             queryState,
             groupBy: groupBy as GroupByParam | undefined,
             view: view as PageView | undefined,
+            hideCriteria: queryState?.hideCriteria,
         };
     }, [router.query, currentPreset]);
 
@@ -294,6 +300,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             sort: [],
             groupBy: undefined,
             view: undefined,
+            hideCriteria: undefined,
         });
     }, [pushStateToRouter]);
 
@@ -349,6 +356,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setLimitFilter: pushStateProvider.key('limit'),
             setGroupBy: pushStateProvider.key('groupBy'),
             setView: pushStateProvider.key('view'),
+            setHideCriteria: pushStateProvider.key('hideCriteria'),
             batchQueryState: pushStateProvider.batch(),
         }),
         [pushStateProvider],
@@ -360,6 +368,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         queryString,
         currentPreset,
         groupBy,
+        hideCriteria,
         setTagsFilterOutside,
         resetQueryState,
         setPreset,

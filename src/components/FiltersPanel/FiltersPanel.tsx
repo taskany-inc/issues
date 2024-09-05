@@ -6,6 +6,7 @@ import {
     FiltersBarCounter,
     FiltersBarItem,
     FiltersBarTitle,
+    Checkbox,
 } from '@taskany/bricks/harmony';
 import { nullable, useLatest } from '@taskany/bricks';
 
@@ -67,6 +68,8 @@ export const FiltersPanel: FC<{
         groupBy,
         view,
         setGroupBy,
+        hideCriteria,
+        setHideCriteria,
         setView,
     } = useUrlFilterParams({
         preset: filterPreset,
@@ -108,7 +111,7 @@ export const FiltersPanel: FC<{
     }, [currentPreset, toggleFilterStar]);
 
     const onApplyClick = useCallback(
-        (key?: keyof Omit<FilterQueryState, 'query' | 'sort'>) => {
+        (key?: keyof Omit<FilterQueryState, 'query' | 'sort' | 'hideCriteria'>) => {
             if (!filterQueryRef.current) return;
 
             if (key) {
@@ -141,7 +144,7 @@ export const FiltersPanel: FC<{
     );
 
     const onClearFilter = useCallback(
-        (key: keyof Omit<FilterQueryState, 'query' | 'sort'>) => () => {
+        (key: keyof Omit<FilterQueryState, 'query' | 'sort' | 'hideCriteria'>) => () => {
             setPartialQueryByKey(key)();
             onApplyClick(key);
         },
@@ -244,6 +247,14 @@ export const FiltersPanel: FC<{
 
                                     setSortFilter(sortParams);
                                 }}
+                            />
+                        </FiltersBarDropdownContent>
+                        <FiltersBarDropdownTitle>{tr('Visibility')}</FiltersBarDropdownTitle>
+                        <FiltersBarDropdownContent>
+                            <Checkbox
+                                label={tr('Criteria')}
+                                checked={!hideCriteria}
+                                onChange={() => setHideCriteria(!hideCriteria)}
                             />
                         </FiltersBarDropdownContent>
                     </FiltersBarViewDropdown>
