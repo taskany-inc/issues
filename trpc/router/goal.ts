@@ -150,7 +150,7 @@ export const goal = router({
             const projectAccessFilter = getProjectAccessFilter(activityId, role);
             const baseWhere = {
                 ...nonArchivedPartialQuery,
-                ...goalsFilter(baseQuery, activityId, role).where,
+                ...(await goalsFilter(baseQuery, activityId, role)).where,
                 project: {
                     ...projectAccessFilter,
                 },
@@ -161,7 +161,7 @@ export const goal = router({
                     where: baseWhere,
                 }),
                 prisma.goal.count({
-                    where: query ? goalsFilter(query, activityId, role).where : baseWhere,
+                    where: query ? (await goalsFilter(query, activityId, role)).where : baseWhere,
                 }),
             ]);
             return {
@@ -182,7 +182,7 @@ export const goal = router({
                     orderBy: {
                         id: 'asc',
                     },
-                    ...(query ? goalsFilter(query, activityId, role) : {}),
+                    ...(query ? await goalsFilter(query, activityId, role) : {}),
                     include: getGoalDeepQuery({
                         activityId,
                         role,

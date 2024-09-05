@@ -1,5 +1,6 @@
 import { Prisma, Role, StateType } from '@prisma/client';
 
+import { prisma } from '../../src/utils/prisma';
 import { QueryWithFilters } from '../../src/schema/common';
 import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
@@ -83,15 +84,15 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
     return state;
 };
 
-export const goalsFilter = (
+export const goalsFilter = async (
     data: QueryWithFilters,
     activityId: string,
     role: Role,
     extra: Prisma.GoalFindManyArgs['where'] = {},
-): {
+): Promise<{
     where: Prisma.GoalFindManyArgs['where'];
     orderBy: Prisma.GoalFindManyArgs['orderBy'];
-} => {
+}> => {
     const priorityFilter = data.priority?.length
         ? {
               priority: {
@@ -179,6 +180,21 @@ export const goalsFilter = (
                   ...projectAccessFilter,
               },
           };
+
+    const criteriaGoalIds = await prisma.goalAchieveCriteria.findMany({
+        where: {
+            criteriaGoalId: { not: null },
+        },
+        select: {
+            criteriaGoalId: true,
+        },
+    });
+
+    const criteriaFilter: Prisma.GoalFindManyArgs['where'] = data.hideCriteria
+        ? {
+              id: { not: { in: criteriaGoalIds.map(({ criteriaGoalId }) => criteriaGoalId) as string[] } },
+          }
+        : {};
 
     const orderBy: any = [];
 
@@ -281,6 +297,7 @@ export const goalsFilter = (
             ...ownerFilter,
             ...participantFilter,
             ...projectFilter,
+            ...criteriaFilter,
             ...extra,
         },
         orderBy: orderBy.length ? orderBy : defaultOrderBy,

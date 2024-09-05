@@ -215,6 +215,11 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                                     ),
                             ),
                         ]),
+                        hideCriteria: eb('Goal.id', 'not in', ({ selectFrom }) =>
+                            selectFrom('GoalAchieveCriteria')
+                                .select('GoalAchieveCriteria.criteriaGoalId')
+                                .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null),
+                        ),
                         sort: null,
                         starred: null,
                         watching: null,

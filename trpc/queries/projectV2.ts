@@ -475,6 +475,11 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                                     ),
                             ),
                         ]),
+                        hideCriteria: eb('Goal.id', 'not in', ({ selectFrom }) =>
+                            selectFrom('GoalAchieveCriteria')
+                                .select('GoalAchieveCriteria.criteriaGoalId')
+                                .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null),
+                        ),
                         sort: null,
                         starred: null,
                         watching: null,
