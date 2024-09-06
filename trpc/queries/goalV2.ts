@@ -330,3 +330,9 @@ export const getDeepChildrenGoalIds = (ids: string[]) => {
         .selectFrom('childrenTree')
         .selectAll();
 };
+
+export const getGoalActivityFilterIdsQuery = db
+    .selectFrom('GoalAchieveCriteria')
+    .select(['GoalAchieveCriteria.criteriaGoalId'])
+    .where('GoalAchieveCriteria.deleted', 'is not', true)
+    .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null);

@@ -294,14 +294,6 @@ export const goalsFilter = (
     };
 };
 
-export const getGoalActivityFilterIdsQuery = (): Prisma.GoalAchieveCriteriaFindManyArgs => ({
-    where: {
-        criteriaGoalId: { not: null },
-        deleted: { not: true },
-    },
-    select: { id: true },
-});
-
 export const getGoalDeepQuery = (user?: { activityId: string; role: Role }) => {
     const depsWhere = {
         ...(user
