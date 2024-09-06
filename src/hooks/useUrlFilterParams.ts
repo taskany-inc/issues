@@ -30,6 +30,7 @@ export interface FilterQueryState {
     owner: string[];
     participant: string[];
     project: string[];
+    partnershipProject: string[];
     query: string;
     sort: Array<{ key: SortableProps; dir: SortDirection }>;
     hideCriteria?: boolean;
@@ -106,6 +107,7 @@ export const buildURLSearchParams = ({
     issuer = [],
     participant = [],
     project = [],
+    partnershipProject = [],
     query = '',
     starred,
     watching,
@@ -137,6 +139,10 @@ export const buildURLSearchParams = ({
         : urlParams.delete('participant');
 
     project.length > 0 ? urlParams.set('project', Array.from(project).toString()) : urlParams.delete('project');
+
+    partnershipProject.length > 0
+        ? urlParams.set('partnershipProject', Array.from(project).toString())
+        : urlParams.delete('partnershipProject');
 
     sort.length > 0 ? urlParams.set('sort', stringifySortQueryParam(sort)) : urlParams.delete('sort');
 
@@ -181,6 +187,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
     if (query.owner) queryMap.owner = parseQueryParam(query.owner?.toString());
     if (query.participant) queryMap.participant = parseQueryParam(query.participant?.toString());
     if (query.project) queryMap.project = parseQueryParam(query.project?.toString());
+    if (query.partnershipProject) queryMap.partnershipProject = parseQueryParam(query.partnershipProject?.toString());
     if (query.query) queryMap.query = parseQueryParam(query.query?.toString()).toString();
     if (query.sort) {
         queryMap.sort = parseSortQueryParam(query.sort?.toString());
@@ -298,6 +305,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             owner: [],
             participant: [],
             project: [],
+            partnershipProject: [],
             tag: [],
             estimate: [],
             starred: false,
@@ -356,6 +364,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setOwnerFilter: pushStateProvider.key('owner'),
             setParticipantFilter: pushStateProvider.key('participant'),
             setProjectFilter: pushStateProvider.key('project'),
+            setPartnershipProjectFilter: pushStateProvider.key('partnershipProject'),
             setStarredFilter: pushStateProvider.key('starred'),
             setWatchingFilter: pushStateProvider.key('watching'),
             setSortFilter: pushStateProvider.key('sort'),

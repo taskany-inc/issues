@@ -191,6 +191,13 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
 
                     const filters: Record<keyof NonNullable<typeof goalsQuery>, null | ReturnType<typeof eb>> = {
                         project: null,
+                        partnershipProject: goalsQuery?.partnershipProject?.length
+                            ? eb('Goal.id', 'in', ({ selectFrom }) =>
+                                  selectFrom('_partnershipProjects')
+                                      .where('B', 'in', goalsQuery.partnershipProject || [])
+                                      .select('A'),
+                              )
+                            : null,
                         owner: eb('Goal.ownerId', 'in', goalsQuery?.owner || []),
                         issuer: eb('Goal.activityId', 'in', goalsQuery?.issuer || []),
                         participant: eb('participant.id', 'in', goalsQuery?.participant || []),

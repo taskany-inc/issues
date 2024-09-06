@@ -40,7 +40,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         { enabled: Boolean(id) },
     );
 
-    const { data: projectDeepInfo, isLoading: isLoadingDeepInfoProject } = trpc.project.getDeepInfo.useQuery(
+    const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
         {
             id,
             goalsQuery: queryState,
@@ -95,7 +95,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                         total={projectDeepInfo?.meta?.count}
                         counter={projectDeepInfo?.goals?.length}
                         filterPreset={preset}
-                        loading={isLoadingDeepInfoProject}
                         enableLayoutToggle
                     >
                         <FiltersBarItem>
