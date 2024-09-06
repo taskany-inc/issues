@@ -1,26 +1,21 @@
-import { FC, useEffect, ComponentProps, MouseEventHandler, useReducer, useMemo } from 'react';
+import { FC, ComponentProps, useReducer, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
-import { TreeViewElement, Badge, Spinner } from '@taskany/bricks/harmony';
+import { TreeViewElement } from '@taskany/bricks/harmony';
 
-import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
+import { FilterById } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
-import { refreshInterval } from '../../utils/config';
 import { routes } from '../../hooks/router';
-import { GoalTableList, mapToRenderProps } from '../GoalTableList/GoalTableList';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
-import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { Kanban, buildKanban } from '../Kanban/Kanban';
-import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
-import { NoGoalsText } from '../NoGoalsText/NoGoalsText';
-import { safeUserData } from '../../utils/getUserName';
-
-import { tr } from './ProjectListItemConnected.i18n';
+import { ProjectGoalList } from '../ProjectGoalList/ProjectGoalList';
+import { Kanban } from '../Kanban/Kanban';
+import { Loader } from '../Loader/Loader';
 
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     parent?: ComponentProps<typeof ProjectListItemCollapsable>['project'];
+    partnershipProject?: string[];
     filterPreset?: FilterById;
-    onClickProvider?: (g: Partial<GoalByIdReturnType>) => MouseEventHandler<HTMLElement>;
+    firstLevel?: boolean;
 }
 
 const onProjectClickHandler = (e: React.MouseEvent) => {
@@ -32,90 +27,26 @@ const onProjectClickHandler = (e: React.MouseEvent) => {
 };
 
 export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
+    partnershipProject,
     filterPreset,
     parent,
     project,
+    firstLevel,
     ...props
 }) => {
-    const { queryState, setTagsFilterOutside, view } = useUrlFilterParams({
+    const { view } = useUrlFilterParams({
         preset: filterPreset,
     });
-    const { on } = useGoalPreview();
-    const utils = trpc.useContext();
 
     const [isOpen, setIsOpen] = useReducer((isOpen) => !isOpen, !!props.visible);
-
-    const {
-        data: projectGoals,
-        isLoading: isGoalsLoading,
-        isFetching: isGoalsFetch,
-        fetchNextPage: fetchNextGoals,
-        hasNextPage,
-    } = trpc.v2.project.getProjectGoalsById.useInfiniteQuery(
-        {
-            id: project.id,
-            goalsQuery: queryState,
-        },
-        {
-            keepPreviousData: true,
-            staleTime: refreshInterval,
-            enabled: isOpen,
-            getNextPageParam: ({ pagination }) => pagination.offset,
-        },
-    );
 
     const { data: childrenProjects = [], isLoading: isChildrenLoading } = trpc.v2.project.getProjectChildren.useQuery(
         {
             id: project.id,
         },
         {
-            enabled: isOpen,
+            enabled: isOpen && !firstLevel,
         },
-    );
-
-    const goals = useMemo(() => {
-        if (projectGoals == null) {
-            return [];
-        }
-
-        return projectGoals.pages.reduce<(typeof projectGoals)['pages'][number]['goals']>((acc, cur) => {
-            acc.push(...cur.goals);
-            return acc;
-        }, []);
-    }, [projectGoals]);
-
-    useEffect(() => {
-        const unsubUpdate = on('on:goal:update', (updatedId) => {
-            const idInList = goals.find(({ _shortId }) => _shortId === updatedId);
-            if (idInList?.projectId != null) {
-                utils.project.getDeepInfo.invalidate({ id: idInList.projectId });
-                utils.project.getByIds.invalidate({ ids: [idInList.projectId] });
-            }
-        });
-
-        const unsubDelete = on('on:goal:delete', (updatedId) => {
-            const idInList = goals.find(({ _shortId }) => _shortId === updatedId);
-            if (idInList?.projectId != null) {
-                utils.project.getDeepInfo.invalidate({ id: idInList.projectId });
-            }
-        });
-
-        return () => {
-            unsubDelete();
-            unsubUpdate();
-        };
-    }, [on, goals, utils.project.getByIds, utils.project.getDeepInfo]);
-
-    const kanban = useMemo(
-        () =>
-            buildKanban(goals ?? [], (goal) => ({
-                ...goal,
-                shortId: goal._shortId,
-                id: goal.id,
-                commentsCount: goal._count.comments ?? 0,
-                progress: goal._achivedCriteriaWeight,
-            })),
-        [goals],
     );
 
     const isKanbanView = view === 'kanban';
@@ -128,14 +59,16 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     project={p}
                     parent={project}
                     filterPreset={filterPreset}
+                    partnershipProject={partnershipProject}
                     titleSize={isKanbanView ? 'l' : 'm'}
                     actionButtonView={isKanbanView ? 'default' : 'icons'}
                 />
             )),
-        [childrenProjects, isKanbanView, filterPreset, project],
+        [childrenProjects, isKanbanView, filterPreset, project, partnershipProject],
     );
 
-    const isLoading = isChildrenLoading && isGoalsLoading;
+    const isLoading = isChildrenLoading && !firstLevel;
+    const showNoGoals = firstLevel || (!isChildrenLoading && !childrenProjects.length);
 
     return (
         <>
@@ -144,50 +77,35 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                 onClick={onProjectClickHandler}
                 project={project}
                 parent={isKanbanView ? parent : undefined}
-                goals={nullable(
-                    !isLoading,
-                    () =>
-                        nullable(goals, (g) =>
-                            isKanbanView ? (
-                                <Kanban value={kanban} filterPreset={filterPreset} />
-                            ) : (
-                                <>
-                                    <TreeViewElement>
-                                        <GoalTableList
-                                            goals={mapToRenderProps(g, (goal) => ({
-                                                ...goal,
-                                                shortId: goal._shortId,
-                                                commentsCount: goal._count.comments,
-                                                owner: safeUserData(goal.owner),
-                                                participants: goal.participants?.map(safeUserData),
-                                                achievedCriteriaWeight: goal._achivedCriteriaWeight,
-                                                partnershipProjects: goal.partnershipProjects,
-                                                isInPartnerProject: project.id !== goal.projectId,
-                                            }))}
-                                            onTagClick={setTagsFilterOutside}
-                                            onGoalClick={onProjectClickHandler}
+                goals={
+                    <TreeViewElement>
+                        {nullable(
+                            !isLoading,
+                            () =>
+                                nullable(
+                                    isKanbanView,
+                                    () => (
+                                        <Kanban
+                                            id={project.id}
+                                            filterPreset={filterPreset}
+                                            partnershipProject={partnershipProject}
                                         />
-                                    </TreeViewElement>
-                                    {nullable(hasNextPage, () => (
-                                        <LoadMoreButton
-                                            disabled={isGoalsFetch}
-                                            onClick={fetchNextGoals as () => void}
-                                        />
-                                    ))}
-                                </>
-                            ),
-                        ),
-                    <Badge iconLeft={<Spinner size="s" />} text={tr('Loading ...')} />,
-                )}
+                                    ),
+                                    <ProjectGoalList
+                                        id={project.id}
+                                        filterPreset={filterPreset}
+                                        partnershipProject={partnershipProject}
+                                        showNoGoals={showNoGoals}
+                                    />,
+                                ),
+                            <Loader />,
+                        )}
+                    </TreeViewElement>
+                }
                 onShow={setIsOpen}
                 onHide={setIsOpen}
                 {...props}
             >
-                <TreeViewElement>
-                    {nullable(!goals.length && (!childrenProjects.length || view === 'kanban') && !isLoading, () => (
-                        <NoGoalsText />
-                    ))}
-                </TreeViewElement>
                 {nullable(!isKanbanView, () => subNodes)}
             </ProjectListItemCollapsable>
             {nullable(isKanbanView, () => subNodes)}

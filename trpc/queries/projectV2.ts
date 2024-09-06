@@ -223,7 +223,7 @@ export const getUserProjectsQuery = ({
         .orderBy('Project.updatedAt desc');
 };
 
-interface GetProjectsWithGoalsByIdsParams extends GetUserProjectsQueryParams {
+interface GetUserDashboardProjectsParams extends GetUserProjectsQueryParams {
     in?: Array<{ id: string }>;
     goalsQuery?: QueryWithFilters;
     limit?: number;
@@ -233,7 +233,7 @@ interface GetProjectsWithGoalsByIdsParams extends GetUserProjectsQueryParams {
 /** Limit for subquery goals by project */
 const dashboardGoalByProjectLimit = 30;
 
-export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams) => {
+export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams) => {
     return db
         .with('subs_projects', (db) =>
             db
@@ -294,63 +294,6 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                             .as('tag'),
                     (join) => join.onTrue(),
                 )
-                .leftJoinLateral(
-                    ({ selectFrom }) =>
-                        selectFrom('GoalAchieveCriteria')
-                            .leftJoin('Goal as criteriaGoal', 'GoalAchieveCriteria.criteriaGoalId', 'Goal.id')
-                            .selectAll('GoalAchieveCriteria')
-                            .select([sql`"criteriaGoal"`.as('criteriaGoal')])
-                            .whereRef('GoalAchieveCriteria.goalId', '=', 'Goal.id')
-                            .where('GoalAchieveCriteria.deleted', 'is not', true)
-                            .as('criteria'),
-                    (join) => join.onTrue(),
-                )
-                .leftJoinLateral(
-                    ({ selectFrom }) =>
-                        selectFrom('_partnershipProjects')
-                            .innerJoin('Project', 'Project.id', 'B')
-                            .selectAll('Project')
-                            .whereRef('A', '=', 'Goal.id')
-                            .as('partnershipProject'),
-                    (join) => join.onTrue(),
-                )
-                .select((eb) => [
-                    sql<string>`concat("Goal"."projectId", '-', "Goal"."scopeId")::text`.as('_shortId'),
-                    jsonBuildObject({
-                        comments: eb
-                            .selectFrom('Comment')
-                            .select(({ fn }) => [fn.count('Comment.id').as('count')])
-                            .whereRef('Comment.goalId', '=', 'Goal.id'),
-                    }).as('_count'),
-                    eb
-                        .case()
-                        .when(eb.fn.count('criteria.id'), '>', 0)
-                        .then(eb.fn.agg('array_agg', [sql`"criteria"`]).distinct())
-                        .else(null)
-                        .end()
-                        .as('criteria'),
-                    eb
-                        .case()
-                        .when(eb.fn.count('tag.id'), '>', 0)
-                        .then(eb.fn.agg('array_agg', [sql`"tag"`]).distinct())
-                        .else(null)
-                        .end()
-                        .as('tags'),
-                    eb
-                        .case()
-                        .when(eb.fn.count('participant.id'), '>', 0)
-                        .then(eb.fn.agg('array_agg', [sql`"participant"`]).distinct())
-                        .else(null)
-                        .end()
-                        .as('participants'),
-                    eb
-                        .case()
-                        .when(eb.fn.count('partnershipProject.id'), '>', 0)
-                        .then(eb.fn.agg('array_agg', [sql`"partnershipProject"`]).distinct())
-                        .else(null)
-                        .end()
-                        .as('partnershipProjects'),
-                ])
                 .where(({ or, eb }) =>
                     or([
                         eb('Goal.id', 'in', ({ selectFrom }) => selectFrom('subs_goals').select('B')),
@@ -383,6 +326,13 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
 
                     const filters: Record<keyof NonNullable<typeof goalsQuery>, null | ReturnType<typeof eb>> = {
                         project: eb('Goal.projectId', 'in', goalsQuery?.project || []),
+                        partnershipProject: goalsQuery?.partnershipProject?.length
+                            ? eb('Goal.id', 'in', ({ selectFrom }) =>
+                                  selectFrom('_partnershipProjects')
+                                      .where('B', 'in', goalsQuery.partnershipProject || [])
+                                      .select('A'),
+                              )
+                            : null,
                         owner: eb('Goal.ownerId', 'in', goalsQuery?.owner || []),
                         issuer: eb('Goal.activityId', 'in', goalsQuery?.issuer || []),
                         participant: eb('participant.id', 'in', goalsQuery?.participant || []),
@@ -454,28 +404,6 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
             ({ selectFrom }) =>
                 selectFrom('goals')
                     .selectAll('goals')
-                    .innerJoin(
-                        () => getUserActivity().as('owner'),
-                        (join) => join.onRef('owner.id', '=', 'goals.ownerId'),
-                    )
-                    .innerJoin(
-                        () => getUserActivity().as('activityUser'),
-                        (join) => join.onRef('activityUser.id', '=', 'goals.activityId'),
-                    )
-                    .innerJoin('User as activity', 'activity.activityId', 'goals.activityId')
-                    .innerJoin('State as state', 'state.id', 'goals.stateId')
-                    .innerJoin('Priority as priority', 'priority.id', 'goals.priorityId')
-                    .leftJoinLateral(
-                        ({ selectFrom }) => selectFrom('Project').selectAll('Project').as('project'),
-                        (join) => join.on('goals.personal', 'is not', true).onRef('goals.projectId', '=', 'project.id'),
-                    )
-                    .select([
-                        sql`"owner"`.as('owner'),
-                        sql`"activityUser"`.as('activity'),
-                        sql`"state"`.as('state'),
-                        sql`"priority"`.as('priority'),
-                        sql`"project"`.as('project'),
-                    ])
                     .where((eb) =>
                         eb.or([
                             eb('goals.id', 'in', () =>
@@ -488,15 +416,26 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                     .as('goal'),
             (join) => join.onTrue(),
         )
+        .leftJoinLateral(
+            ({ selectFrom }) =>
+                selectFrom('_partnershipProjects')
+                    .select('B')
+                    .whereRef('A', 'in', ({ selectFrom }) =>
+                        selectFrom('Goal').select('Goal.id').whereRef('Goal.projectId', '=', 'Project.id'),
+                    )
+                    .as('partnerProjectIds'),
+            (join) => join.on('Project.id', 'not in', ({ selectFrom }) => selectFrom('project_ids').select('pid')),
+        )
         .select(({ fn, eb }) => [
             'Project.id',
             eb
                 .case()
-                .when(fn.count('goal.id'), '>', 0)
-                .then(fn.agg('array_agg', [fn.toJson('goal')]))
+                .when(fn.count('partnerProjectIds.B'), '>', 0)
+                .then(fn.agg('array_agg', ['partnerProjectIds.B']).distinct())
                 .else(null)
                 .end()
-                .as('goals'),
+                .as('partnerProjectIds'),
+
             jsonBuildObject({
                 stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
                 watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,

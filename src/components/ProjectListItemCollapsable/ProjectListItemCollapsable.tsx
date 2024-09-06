@@ -10,10 +10,12 @@ import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 
 import s from './ProjectListItemCollapsable.module.css';
 
+type Project = NonNullable<Omit<DashboardProjectV2, 'children' | 'goals' | '_partnerProjectIds'>>;
+
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
-    project: NonNullable<Omit<DashboardProjectV2, 'children' | 'goals'>>;
-    parent?: NonNullable<Omit<DashboardProjectV2, 'children' | 'goals'>>;
+    project: Project;
+    parent?: Project;
     goals?: ReactNode;
     children?: React.ReactNode;
     onClick?: MouseEventHandler<HTMLElement>;

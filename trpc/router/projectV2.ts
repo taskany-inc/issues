@@ -9,7 +9,7 @@ import {
     getStarredProjectsIds,
     getProjectSuggestions,
     getUserProjectsQuery,
-    getUserProjectsWithGoals,
+    getUserDashboardProjects,
     getWholeGoalCountByProjectIds,
     getDeepChildrenProjectsId,
     getAllProjectsQuery,
@@ -47,31 +47,8 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
     children: ExtractTypeFromGenerated<Project>[] | null;
 };
 
-interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
-    goals: (ExtractTypeFromGenerated<Goal> & {
-        _shortId: string;
-        participants: ProjectActivity[];
-        tags: ExtractTypeFromGenerated<Tag>[];
-        owner: ProjectActivity;
-        _achivedCriteriaWeight: number | null;
-        state: ExtractTypeFromGenerated<State>;
-        priority: ExtractTypeFromGenerated<Priority>;
-        project: ExtractTypeFromGenerated<Project> & { parent: ExtractTypeFromGenerated<Project>[] };
-        partnershipProjects: Array<ExtractTypeFromGenerated<Project>>;
-        criteria?: Array<
-            ExtractTypeFromGenerated<
-                GoalAchieveCriteria & {
-                    criteriaGoal: ExtractTypeFromGenerated<Goal> & { state: ExtractTypeFromGenerated<State> | null };
-                }
-            >
-        >;
-        _count: {
-            comments: number;
-            stargizers: number;
-            watchers: number;
-            participants: number;
-        };
-    })[];
+interface DashboardProject extends Pick<ProjectResponse, 'id'> {
+    partnerProjectIds?: string[];
     _count: {
         children: number;
         stargizers: number;
@@ -81,7 +58,29 @@ interface ProjectsWithGoals extends Pick<ProjectResponse, 'id'> {
     };
 }
 
-type ProjectGoal = ProjectsWithGoals['goals'][number] & {
+type ProjectGoal = ExtractTypeFromGenerated<Goal> & {
+    _shortId: string;
+    participants: ProjectActivity[];
+    tags: ExtractTypeFromGenerated<Tag>[];
+    owner: ProjectActivity;
+    _achivedCriteriaWeight: number | null;
+    state: ExtractTypeFromGenerated<State>;
+    priority: ExtractTypeFromGenerated<Priority>;
+    project: ExtractTypeFromGenerated<Project> & { parent: ExtractTypeFromGenerated<Project>[] };
+    partnershipProjects: Array<ExtractTypeFromGenerated<Project>>;
+    criteria?: Array<
+        ExtractTypeFromGenerated<
+            GoalAchieveCriteria & {
+                criteriaGoal: ExtractTypeFromGenerated<Goal> & { state: ExtractTypeFromGenerated<State> | null };
+            }
+        >
+    >;
+    _count: {
+        comments: number;
+        stargizers: number;
+        watchers: number;
+        participants: number;
+    };
     _isWatching: boolean;
     _isStarred: boolean;
     _isOwner: boolean;
@@ -153,7 +152,7 @@ export const project = router({
                         participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
                     }).as('_count'),
                 ])
-                .$castTo<ProjectResponse & Pick<ProjectsWithGoals, '_count'>>()
+                .$castTo<ProjectResponse & Pick<DashboardProject, '_count'>>()
                 .execute();
         } catch (e) {
             console.log(e);
@@ -164,7 +163,7 @@ export const project = router({
         return getDeepChildrenProjectsId(input).execute();
     }),
 
-    userProjectsWithGoals: protectedProcedure
+    getUserDashboardProjects: protectedProcedure
         .input(
             z.object({
                 limit: z.number().optional(),
@@ -178,16 +177,16 @@ export const project = router({
                 session: { user },
             } = ctx;
 
-            const goalsByProject = await getUserProjectsWithGoals({
+            const dashboardProjects = await getUserDashboardProjects({
                 ...user,
                 goalsQuery,
                 limit: limit + 1,
                 offset,
             })
-                .$castTo<ProjectsWithGoals>()
+                .$castTo<DashboardProject>()
                 .execute();
 
-            const projectIds = goalsByProject.map(({ id }) => ({ id }));
+            const projectIds = dashboardProjects.map(({ id }) => ({ id }));
 
             const [extendedProjects, goalsCountsByProjects] = await Promise.all([
                 getProjectsByIds({
@@ -201,43 +200,25 @@ export const project = router({
 
             const projectsExtendedDataMap = new Map(extendedProjects.map((project) => [project.id, project]));
 
-            const resultProjects: (Omit<ProjectResponse, 'goals'> & ProjectsWithGoals)[] = [];
+            const resultProjects: (ProjectResponse & Pick<DashboardProject, '_count' | 'partnerProjectIds'>)[] = [];
 
-            for (const { id, goals, _count } of goalsByProject.slice(0, limit)) {
+            for (const { id, _count, partnerProjectIds } of dashboardProjects.slice(0, limit)) {
                 const currentProject = projectsExtendedDataMap.get(id) as
-                    | (Omit<ProjectResponse, 'goals'> & ProjectsWithGoals)
+                    | (ProjectResponse & Pick<DashboardProject, '_count' | 'partnerProjectIds'>)
                     | undefined;
+
                 if (currentProject == null) {
                     throw new Error(`Missing project by id: ${id}`);
                 }
 
-                if (goals) {
-                    for (const goal of goals) {
-                        goal.participants = pickUniqueValues(goal.participants, 'id') || [];
-                        goal.tags = pickUniqueValues(goal.tags, 'id') ?? [];
-
-                        goal._achivedCriteriaWeight = null;
-
-                        if (goal.criteria != null) {
-                            const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<
-                                ProjectsWithGoals['goals'][number]['criteria']
-                            >;
-                            // FIX: maybe try calculate in sql
-                            goal._achivedCriteriaWeight = baseCalcCriteriaWeight(uniqCriteria);
-                            delete goal.criteria;
-                        }
-                    }
-                    currentProject.goals = goals;
-                }
-
-                resultProjects.push({ ...currentProject, _count });
+                resultProjects.push({ ...currentProject, _count, partnerProjectIds });
             }
 
             return {
                 groups: resultProjects,
                 pagination: {
                     limit,
-                    offset: goalsByProject.length < limit + 1 ? undefined : offset + (limit ?? 0),
+                    offset: dashboardProjects.length < limit + 1 ? undefined : offset + (limit ?? 0),
                 },
                 totalGoalsCount: goalsCountsByProjects?.wholeGoalsCount ?? 0,
             };
@@ -262,7 +243,7 @@ export const project = router({
                 cursor,
                 ids: goalsQuery?.project,
             })
-                .$castTo<Omit<ProjectResponse, 'children'> & Pick<ProjectsWithGoals, '_count'>>()
+                .$castTo<Omit<ProjectResponse, 'children'> & Pick<DashboardProject, '_count'>>()
                 .execute();
 
             return {
@@ -281,7 +262,7 @@ export const project = router({
         )
         .query(async ({ input, ctx }) => {
             const childrenQuery = getChildrenProjectQuery({ ...ctx.session.user, id: input.id }).$castTo<
-                Omit<ProjectResponse, 'goals'> & Pick<ProjectsWithGoals, '_count'>
+                Omit<ProjectResponse, 'goals'> & Pick<DashboardProject, '_count'>
             >();
 
             const res = await childrenQuery.execute();
@@ -314,9 +295,7 @@ export const project = router({
                 goal._achivedCriteriaWeight = goal.completedCriteriaWeight;
 
                 if (goal.criteria != null) {
-                    const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<
-                        ProjectsWithGoals['goals'][number]['criteria']
-                    >;
+                    const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<ProjectGoal['criteria']>;
                     goal._achivedCriteriaWeight = baseCalcCriteriaWeight(uniqCriteria);
                     delete goal.criteria;
                 }

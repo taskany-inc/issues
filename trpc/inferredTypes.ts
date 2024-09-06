@@ -24,10 +24,8 @@ export type PriorityReturnType = RouterOutputs['priority']['getAll'][number];
 export type TeamSuggetionsReturnType = RouterOutputs['crew']['teamSuggetions'][number];
 export type State = RouterOutputs['state']['all'][number];
 export type StateType = State['type'];
-export type DashboardProject = RouterOutputs['project']['getUserProjectsWithGoals']['groups'][number]['project'];
-export type DashboardGoal = RouterOutputs['project']['getUserProjectsWithGoals']['groups'][number]['goals'][number];
 
-export type DashboardProjectV2 = RouterOutputs['v2']['project']['userProjectsWithGoals']['groups'][number];
+export type DashboardProjectV2 = RouterOutputs['v2']['project']['getUserDashboardProjects']['groups'][number];
 export type DashboardGoalV2 = NonNullable<DashboardProjectV2['goals']>[number];
 
 export type GoalActivityHistory = RouterOutputs['goal']['getGoalActivityFeed'];

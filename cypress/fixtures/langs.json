@@ -859,6 +859,12 @@
             "en": "shows this instruction"
         }
     },
+    "Loader": {
+        "Loading ...": {
+            "ru": "",
+            "en": ""
+        }
+    },
     "LoadMoreButton": {
         "Load more...": {
             "ru": "Показать ещё...",
@@ -1053,6 +1059,12 @@
         "Create": {
             "ru": "Создать",
             "en": "Create"
+        }
+    },
+    "ProjectGoalList": {
+        "Loading ...": {
+            "ru": "Загрузка...",
+            "en": "Loading ..."
         }
     },
     "ProjectListItemConnected": {

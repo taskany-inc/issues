@@ -49,7 +49,6 @@ export const FiltersPanel: FC<{
     title: string;
     total?: number;
     counter?: number;
-    loading?: boolean;
     filterPreset?: FilterById;
     enableViewToggle?: boolean;
     enableLayoutToggle?: boolean;

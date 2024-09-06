@@ -148,6 +148,18 @@ export const goalsFilter = (
           }
         : {};
 
+    const partnershipProjectFilter: Prisma.GoalFindManyArgs['where'] = data.partnershipProject?.length
+        ? {
+              partnershipProjects: {
+                  some: {
+                      id: {
+                          in: data.partnershipProject,
+                      },
+                  },
+              },
+          }
+        : {};
+
     const projectAccessFilter = getProjectAccessFilter(activityId, role);
     const projectFilter: Prisma.GoalFindManyArgs['where'] = data.project?.length
         ? {
@@ -277,6 +289,7 @@ export const goalsFilter = (
                     },
                 },
             ],
+            ...partnershipProjectFilter,
             ...starredFilter,
             ...watchingFilter,
             ...priorityFilter,

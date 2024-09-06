@@ -53,7 +53,6 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
 
         utils.project.getAll.invalidate();
         utils.goal.getBatch.invalidate();
-        utils.project.getUserProjectsWithGoals.invalidate();
 
         if (!updatedGoal) {
             return;

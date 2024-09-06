@@ -1,6 +1,7 @@
 import { DashboardPage } from '../components/DashboardPage/DashboardPage';
 import { declareSsrProps } from '../utils/declareSsrProps';
 import { filtersPanelSsrInit } from '../utils/filters';
+import { projectCollapsableItemInit } from '../utils/projectCollapsableItemInit';
 
 export const getServerSideProps = declareSsrProps(
     async (params) => {
@@ -8,9 +9,22 @@ export const getServerSideProps = declareSsrProps(
 
         const { ssrHelpers } = params;
 
-        await ssrHelpers.v2.project.userProjectsWithGoals.fetchInfinite({
-            goalsQuery: queryState,
+        const data = await ssrHelpers.v2.project.getUserDashboardProjects.fetchInfinite({
+            goalsQuery: {
+                ...queryState,
+                limit: 10,
+            },
         });
+
+        const project = data.pages[0].groups[0];
+
+        if (project) {
+            await projectCollapsableItemInit({
+                project,
+                queryState,
+                params,
+            });
+        }
 
         return {
             defaultPresetFallback,
