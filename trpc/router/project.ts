@@ -12,7 +12,12 @@ import {
     participantsToProjectSchema,
     teamsToProjectSchema,
 } from '../../src/schema/project';
-import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
+import {
+    getGoalActivityFilterIdsQuery,
+    getGoalDeepQuery,
+    goalsFilter,
+    nonArchievedGoalsPartialQuery,
+} from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
@@ -101,12 +106,22 @@ export const project = router({
                 },
             });
             const projectIdsArray = projectIds.map(({ id }) => id);
-            const goalsFilters = goalsQuery ? { ...(await goalsFilter(goalsQuery, activityId, role)) } : undefined;
+            let hideCriteriaFilterIds: string[] = [];
 
-            const { where: projectWhere } = await getProjectSchema({
+            if (goalsQuery?.hideCriteria) {
+                hideCriteriaFilterIds = (
+                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
+                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+            }
+
+            const goalsFilters = goalsQuery
+                ? { ...goalsFilter({ ...goalsQuery, hideCriteriaFilterIds }, activityId, role) }
+                : undefined;
+
+            const { where: projectWhere } = getProjectSchema({
                 role,
                 activityId,
-                goalsQuery,
+                goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
                 whereQuery: {
                     // all projects where the user is a participant / watcher / issuer / stargizer
                     OR: [
@@ -300,6 +315,13 @@ export const project = router({
                     ? { take: limit + 1, skip, cursor: cursor ? { id: cursor } : undefined }
                     : undefined;
 
+                let hideCriteriaFilterIds: string[] = [];
+                if (goalsQuery?.hideCriteria) {
+                    hideCriteriaFilterIds = (
+                        await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
+                    ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                }
+
                 const whereQuery = {
                     personal: includePersonal ? {} : false,
                     id: projectIds.length
@@ -307,20 +329,24 @@ export const project = router({
                               in: projectIds,
                           }
                         : {},
-                    goals: goalsQuery ? { some: (await goalsFilter(goalsQuery, activityId, role)).where } : {},
+                    goals: goalsQuery
+                        ? {
+                              some: goalsFilter({ ...goalsQuery, hideCriteriaFilterIds }, activityId, role).where,
+                          }
+                        : {},
                 };
 
                 const projects = await prisma.project
                     .findMany({
                         ...projectPagination,
                         orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
-                        ...(await getProjectSchema({
+                        ...getProjectSchema({
                             role,
                             activityId,
-                            goalsQuery,
+                            goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
                             firstLevel,
                             whereQuery,
-                        })),
+                        }),
                     })
                     .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
 
@@ -345,18 +371,24 @@ export const project = router({
         )
         .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
             const { activityId, role } = ctx.session.user;
+            let hideCriteriaFilterIds: string[] = [];
+            if (goalsQuery?.hideCriteria) {
+                hideCriteriaFilterIds = (
+                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
+                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+            }
 
             return prisma.project
                 .findMany({
                     orderBy: {
                         createdAt: 'asc',
                     },
-                    ...(await getProjectSchema({
+                    ...getProjectSchema({
                         role,
                         activityId,
-                        goalsQuery,
+                        goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
                         firstLevel,
-                    })),
+                    }),
                 })
                 .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
         }),
@@ -371,10 +403,17 @@ export const project = router({
         .query(async ({ ctx, input: { id, goalsQuery } }) => {
             const { activityId, role } = ctx.session.user;
 
-            const { include } = await getProjectSchema({
+            let hideCriteriaFilterIds: string[] = [];
+            if (goalsQuery?.hideCriteria) {
+                hideCriteriaFilterIds = (
+                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
+                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+            }
+
+            const { include } = getProjectSchema({
                 role,
                 activityId,
-                goalsQuery,
+                goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
             });
 
             const project = await prisma.project.findUnique({
@@ -398,11 +437,18 @@ export const project = router({
         .query(async ({ ctx, input: { ids, goalsQuery } }) => {
             const { activityId, role } = ctx.session.user;
 
+            let hideCriteriaFilterIds: string[] = [];
+            if (goalsQuery?.hideCriteria) {
+                hideCriteriaFilterIds = (
+                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
+                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+            }
+
             const projects = await prisma.project.findMany({
-                ...(await getProjectSchema({
+                ...getProjectSchema({
                     role,
                     activityId,
-                    goalsQuery,
+                    goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
                     whereQuery: {
                         id: {
                             in: ids,
@@ -412,17 +458,29 @@ export const project = router({
                                   OR: [
                                       {
                                           goals: {
-                                              some: (await goalsFilter(goalsQuery, activityId, role)).where,
+                                              some: goalsFilter(
+                                                  { ...goalsQuery, hideCriteriaFilterIds },
+                                                  activityId,
+                                                  role,
+                                              ).where,
                                           },
                                       },
                                       {
                                           goals: {
-                                              none: (await goalsFilter(goalsQuery, activityId, role)).where,
+                                              none: goalsFilter(
+                                                  { ...goalsQuery, hideCriteriaFilterIds },
+                                                  activityId,
+                                                  role,
+                                              ).where,
                                           },
                                           children: {
                                               some: {
                                                   goals: {
-                                                      some: (await goalsFilter(goalsQuery, activityId, role)).where,
+                                                      some: goalsFilter(
+                                                          { ...goalsQuery, hideCriteriaFilterIds },
+                                                          activityId,
+                                                          role,
+                                                      ).where,
                                                   },
                                               },
                                           },
@@ -431,7 +489,7 @@ export const project = router({
                               }
                             : {}),
                     },
-                })),
+                }),
             });
 
             return projects.map((project) => addCalculatedProjectFields(project, activityId, role));
@@ -450,12 +508,19 @@ export const project = router({
                 OR: [{ projectId: id }, { partnershipProjects: { some: { id } } }],
             };
 
+            let hideCriteriaFilterIds: string[] = [];
+            if (goalsQuery?.hideCriteria) {
+                hideCriteriaFilterIds = (
+                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
+                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+            }
+
             const [allProjectGoals, filtredProjectGoals] = await Promise.all([
                 prisma.goal.count({
                     where: goalsWhere,
                 }),
                 prisma.goal.findMany({
-                    ...(await goalsFilter(goalsQuery, activityId, role, goalsWhere)),
+                    ...goalsFilter({ ...goalsQuery, hideCriteriaFilterIds }, activityId, role, goalsWhere),
                     include: getGoalDeepQuery({
                         activityId,
                         role,
