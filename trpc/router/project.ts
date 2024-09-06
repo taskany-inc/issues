@@ -12,12 +12,7 @@ import {
     participantsToProjectSchema,
     teamsToProjectSchema,
 } from '../../src/schema/project';
-import {
-    getGoalActivityFilterIdsQuery,
-    getGoalDeepQuery,
-    goalsFilter,
-    nonArchievedGoalsPartialQuery,
-} from '../queries/goals';
+import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
 import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
@@ -30,6 +25,7 @@ import { getProjectAccessFilter } from '../queries/access';
 import { prepareRecipients } from '../../src/utils/prepareRecipients';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 import { getDeepChildrenProjectsId } from '../queries/projectV2';
+import { getGoalActivityFilterIdsQuery } from '../queries/goalV2';
 
 const getUserItemsWhereSchema = ({ type, activityId }: { type: 'goal' | 'project'; activityId: string }) => {
     return [
@@ -109,9 +105,8 @@ export const project = router({
             let hideCriteriaFilterIds: string[] = [];
 
             if (goalsQuery?.hideCriteria) {
-                hideCriteriaFilterIds = (
-                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
-                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                const ids = await getGoalActivityFilterIdsQuery.execute();
+                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
             }
 
             const goalsFilters = goalsQuery
@@ -317,9 +312,8 @@ export const project = router({
 
                 let hideCriteriaFilterIds: string[] = [];
                 if (goalsQuery?.hideCriteria) {
-                    hideCriteriaFilterIds = (
-                        await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
-                    ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                    const ids = await getGoalActivityFilterIdsQuery.execute();
+                    hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
                 }
 
                 const whereQuery = {
@@ -373,9 +367,8 @@ export const project = router({
             const { activityId, role } = ctx.session.user;
             let hideCriteriaFilterIds: string[] = [];
             if (goalsQuery?.hideCriteria) {
-                hideCriteriaFilterIds = (
-                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
-                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                const ids = await getGoalActivityFilterIdsQuery.execute();
+                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
             }
 
             return prisma.project
@@ -405,9 +398,8 @@ export const project = router({
 
             let hideCriteriaFilterIds: string[] = [];
             if (goalsQuery?.hideCriteria) {
-                hideCriteriaFilterIds = (
-                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
-                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                const ids = await getGoalActivityFilterIdsQuery.execute();
+                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
             }
 
             const { include } = getProjectSchema({
@@ -439,9 +431,8 @@ export const project = router({
 
             let hideCriteriaFilterIds: string[] = [];
             if (goalsQuery?.hideCriteria) {
-                hideCriteriaFilterIds = (
-                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
-                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                const ids = await getGoalActivityFilterIdsQuery.execute();
+                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
             }
 
             const projects = await prisma.project.findMany({
@@ -510,9 +501,8 @@ export const project = router({
 
             let hideCriteriaFilterIds: string[] = [];
             if (goalsQuery?.hideCriteria) {
-                hideCriteriaFilterIds = (
-                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
-                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                const ids = await getGoalActivityFilterIdsQuery.execute();
+                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
             }
 
             const [allProjectGoals, filtredProjectGoals] = await Promise.all([

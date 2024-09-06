@@ -2,14 +2,10 @@ import z from 'zod';
 import { TRPCError } from '@trpc/server';
 import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
+import { getGoalActivityFilterIdsQuery, getDeepParentGoalIds } from '../queries/goalV2';
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import {
-    getGoalActivityFilterIdsQuery,
-    getGoalDeepQuery,
-    goalsFilter,
-    nonArchievedGoalsPartialQuery,
-} from '../queries/goals';
+import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
@@ -67,7 +63,6 @@ import { commentsByGoalIdQuery, reactionsForGoalComments } from '../queries/comm
 import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
-import { getDeepParentGoalIds } from '../queries/goalV2';
 
 import { tr } from './router.i18n';
 
@@ -157,9 +152,8 @@ export const goal = router({
             let hideCriteriaFilterIds: string[] = [];
 
             if (query?.hideCriteria || baseQuery.hideCriteria) {
-                hideCriteriaFilterIds = (
-                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
-                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                const ids = await getGoalActivityFilterIdsQuery.execute();
+                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
             }
 
             const baseWhere = {
@@ -191,17 +185,8 @@ export const goal = router({
             let hideCriteriaFilterIds: string[] = [];
 
             if (query?.hideCriteria) {
-                hideCriteriaFilterIds = (
-                    await prisma.goalAchieveCriteria.findMany({
-                        where: {
-                            criteriaGoalId: { not: null },
-                            deleted: { not: true },
-                        },
-                        select: {
-                            criteriaGoalId: true,
-                        },
-                    })
-                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+                const ids = await getGoalActivityFilterIdsQuery.execute();
+                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
             }
 
             const [items, count] = await Promise.all([
