@@ -1,6 +1,6 @@
 import { FC, MouseEvent } from 'react';
 import { Button } from '@taskany/bricks/harmony';
-import { IconAddOutline } from '@taskany/icons';
+import { IconAddOutline, IconTopRightOutline } from '@taskany/icons';
 import { nullable } from '@taskany/bricks';
 
 import { useProjectResource } from '../../hooks/useProjectResource';
@@ -8,6 +8,7 @@ import { dispatchModalEvent, ModalEvent } from '../../utils/dispatchModal';
 import { StarButton } from '../StarButton/StarButton';
 import { WatchButton } from '../WatchButton/WatchButton';
 import { createGoalInlineControl } from '../../utils/domObjects';
+import { NextLink } from '../NextLink';
 
 import { tr } from './ProjectSubscriptionButtons.i18n';
 
@@ -20,6 +21,7 @@ interface ProjectSubscriptionButtonsProps {
     starred?: boolean;
     watching?: boolean;
     stargizersCounter: number;
+    href: string;
     view?: 'default' | 'icons';
 }
 
@@ -28,6 +30,7 @@ export const ProjectSubscriptionButtons: FC<ProjectSubscriptionButtonsProps> = (
     starred,
     watching,
     stargizersCounter,
+    href,
     view = 'default',
 }) => {
     const { toggleProjectWatching, toggleProjectStar } = useProjectResource(project.id);
@@ -35,6 +38,10 @@ export const ProjectSubscriptionButtons: FC<ProjectSubscriptionButtonsProps> = (
         e.preventDefault();
         e.stopPropagation();
         dispatchModalEvent(ModalEvent.GoalCreateModal, { project })();
+    };
+
+    const onNewTabClick = (e: MouseEvent<HTMLAnchorElement>) => {
+        e.stopPropagation();
     };
 
     return (
@@ -58,6 +65,11 @@ export const ProjectSubscriptionButtons: FC<ProjectSubscriptionButtonsProps> = (
                     onClick={onAddClick}
                 />,
             )}
+            {nullable(view === 'icons', () => (
+                <NextLink href={href} target="_blank" onClick={onNewTabClick}>
+                    <Button view="clear" iconLeft={<IconTopRightOutline size="s" />} />
+                </NextLink>
+            ))}
         </>
     );
 };
