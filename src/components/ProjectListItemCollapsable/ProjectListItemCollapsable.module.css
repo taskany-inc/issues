@@ -1,3 +1,7 @@
+.ProjectListItemCollapsableRow {
+    width: 1020px;
+}
+
 .ProjectIcons {
     display: flex;
     align-items: center;

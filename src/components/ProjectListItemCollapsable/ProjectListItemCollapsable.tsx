@@ -54,6 +54,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
                 </div>
             }
             onClick={onClick}
+            className={s.ProjectListItemCollapsableRow}
         >
             <ProjectListItem
                 id={project.id}
