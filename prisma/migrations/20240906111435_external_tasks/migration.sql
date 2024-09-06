@@ -19,6 +19,8 @@ CREATE TABLE "ExternalTask" (
     "stateId" TEXT NOT NULL,
     "stateIconUrl" TEXT NOT NULL,
     "stateColor" TEXT,
+    "stateCategoryId" INTEGER NOT NULL,
+    "stateCategoryName" TEXT NOT NULL,
     "ownerEmail" TEXT NOT NULL,
     "ownerName" TEXT NOT NULL,
     "ownerId" TEXT NOT NULL,

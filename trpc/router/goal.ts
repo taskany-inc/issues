@@ -64,6 +64,7 @@ import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
 import { getOrCreateExternalTask } from '../queries/external';
+import { jiraService, searchIssue } from '../../src/utils/integration/jira';
 
 import { tr } from './router.i18n';
 
@@ -1131,7 +1132,12 @@ export const goal = router({
                     id: input.externalTask.externalKey,
                 });
 
-                criteriaTitle = externalTask?.title;
+                if (externalTask) {
+                    isDoneByConnect = jiraService.checkStatusIsFinished(
+                        (await searchIssue({ value: externalTask.externalKey, limit: 1 }))[0].status,
+                    );
+                    criteriaTitle = externalTask?.title;
+                }
             }
 
             const parentIds = await getDeepParentGoalIds([input.goalId]).execute();
@@ -1262,6 +1268,10 @@ export const goal = router({
 
                         // override from db data for next connect between criteria and task
                         input.externalTask.externalKey = existTask.id;
+
+                        isDoneByConnect = jiraService.checkStatusIsFinished(
+                            (await searchIssue({ value: existTask.externalKey, limit: 1 }))[0].status,
+                        );
                     }
                 }
 

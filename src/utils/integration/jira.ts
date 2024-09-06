@@ -1,3 +1,4 @@
+import assert from 'assert';
 import JiraApi from 'jira-client';
 
 export enum AvatarSize {
@@ -28,7 +29,7 @@ export interface JiraIssueStatus {
     iconUrl: string;
     name: string;
     id: string;
-    statusCategory?: {
+    statusCategory: {
         self: string;
         id: number;
         key: string;
@@ -82,8 +83,36 @@ const isDebugEnabled = process.env.NODE_ENV === 'development' && process.env.DEB
 
 // @ts-ignore
 class JiraService extends JiraApi {
+    private positiveFinishedStatuses: string;
+
+    private finishedStatusCategory: JiraIssueStatus['statusCategory'];
+
+    constructor(options: JiraApi.JiraApiOptions) {
+        super(options);
+
+        assert(
+            process.env.JIRA_POSITIVE_STATUS_NAMES,
+            `Env variable \`JIRA_POSITIVE_STATUS_NAMES\` must be string, but get ${typeof process.env
+                .JIRA_POSITIVE_STATUS_NAMES}`,
+        );
+        assert(
+            process.env.JIRA_FINISHED_CATEGORY,
+            `Env variable \`JIRA_FINISHED_CATEGORY\` must be string, but get ${typeof process.env
+                .JIRA_FINISHED_CATEGORY}`,
+        );
+
+        this.positiveFinishedStatuses = process.env.JIRA_POSITIVE_STATUS_NAMES;
+        this.finishedStatusCategory = JSON.parse(process.env.JIRA_FINISHED_CATEGORY);
+
+        assert(
+            typeof this.finishedStatusCategory === 'object' && this.finishedStatusCategory != null,
+            "Env variable 'JIRA_FINISHED_CATEGORY' must be JSON string value",
+        );
+    }
+
+    /** start overriding private instamce methods */
     // @ts-ignore
-    private async doRequest(options: any) {
+    private async doRequest<T extends JiraApi.JsonResponse>(options: any): Promise<T> {
         if (isDebugEnabled) {
             console.log(options);
         }
@@ -93,7 +122,33 @@ class JiraService extends JiraApi {
         if (isDebugEnabled) {
             console.table(res);
         }
-        return res;
+        return res as unknown as T;
+    }
+
+    protected getUri(options: JiraApi.UriOptions) {
+        // @ts-ignore
+        return this.makeUri(options);
+    }
+
+    protected getRequestHeaders(url: string, options?: JiraApi.UriOptions) {
+        // @ts-ignore
+        return this.makeRequestHeader(url, options);
+    }
+    /** end overriding private instamce methods */
+
+    public async statusesByCategory(categoryId: number) {
+        const uri = this.getUri({ pathname: '/status' });
+
+        const res = await this.doRequest<JiraIssueStatus[]>(this.getRequestHeaders(uri));
+        return res.filter(({ statusCategory }) => statusCategory.id === categoryId);
+    }
+
+    public checkStatusIsFinished(status: JiraIssueStatus) {
+        return (
+            (status.statusCategory.key === this.finishedStatusCategory.key ||
+                status.statusCategory.id === this.finishedStatusCategory.id) &&
+            this.positiveFinishedStatuses.includes(status.name)
+        );
     }
 }
 
@@ -167,3 +222,5 @@ export const searchIssue = async (params: { value: string; limit: number }): Pro
         ...val.fields,
     })) as Array<JiraIssue>;
 };
+
+jiraService.listStatus;
