@@ -58,7 +58,7 @@ export const checkProjectAccess = <T extends { accessUsers: WithId[]; activityId
     );
 };
 
-export const getProjectSchema = async ({
+export const getProjectSchema = ({
     role,
     goalsQuery,
     activityId,
@@ -67,7 +67,7 @@ export const getProjectSchema = async ({
 }: {
     role: Role;
     activityId: string;
-    goalsQuery?: QueryWithFilters;
+    goalsQuery?: QueryWithFilters & { hideCriteriaFilterIds?: string[] };
     firstLevel?: boolean;
     whereQuery?: Record<string, unknown>;
 }) => {
@@ -131,7 +131,7 @@ export const getProjectSchema = async ({
                     goals:
                         goalsQuery && activityId
                             ? {
-                                  where: (await goalsFilter(goalsQuery, activityId, role)).where,
+                                  where: goalsFilter(goalsQuery, activityId, role).where,
                               }
                             : true,
                     parent: true,

@@ -1,6 +1,5 @@
 import { Prisma, Role, StateType } from '@prisma/client';
 
-import { prisma } from '../../src/utils/prisma';
 import { QueryWithFilters } from '../../src/schema/common';
 import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
@@ -84,15 +83,15 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
     return state;
 };
 
-export const goalsFilter = async (
-    data: QueryWithFilters,
+export const goalsFilter = (
+    data: QueryWithFilters & { hideCriteriaFilterIds?: string[] },
     activityId: string,
     role: Role,
     extra: Prisma.GoalFindManyArgs['where'] = {},
-): Promise<{
+): {
     where: Prisma.GoalFindManyArgs['where'];
     orderBy: Prisma.GoalFindManyArgs['orderBy'];
-}> => {
+} => {
     const priorityFilter = data.priority?.length
         ? {
               priority: {
@@ -181,21 +180,11 @@ export const goalsFilter = async (
               },
           };
 
-    let criteriaFilter: Prisma.GoalFindManyArgs['where'] = {};
-
-    if (data.hideCriteria) {
-        const criteriaGoalIds = await prisma.goalAchieveCriteria.findMany({
-            where: {
-                criteriaGoalId: { not: null },
-            },
-            select: {
-                criteriaGoalId: true,
-            },
-        });
-        criteriaFilter = {
-            id: { not: { in: criteriaGoalIds.map(({ criteriaGoalId }) => criteriaGoalId) as string[] } },
-        };
-    }
+    const criteriaFilter: Prisma.GoalFindManyArgs['where'] = data.hideCriteria
+        ? {
+              id: { not: { in: data.hideCriteriaFilterIds } },
+          }
+        : {};
 
     const orderBy: any = [];
 
@@ -304,6 +293,14 @@ export const goalsFilter = async (
         orderBy: orderBy.length ? orderBy : defaultOrderBy,
     };
 };
+
+export const getGoalActivityFilterIdsQuery = (): Prisma.GoalAchieveCriteriaFindManyArgs => ({
+    where: {
+        criteriaGoalId: { not: null },
+        deleted: { not: true },
+    },
+    select: { id: true },
+});
 
 export const getGoalDeepQuery = (user?: { activityId: string; role: Role }) => {
     const depsWhere = {

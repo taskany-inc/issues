@@ -4,7 +4,12 @@ import { GoalHistory, Prisma, StateType } from '@prisma/client';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
-import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
+import {
+    getGoalActivityFilterIdsQuery,
+    getGoalDeepQuery,
+    goalsFilter,
+    nonArchievedGoalsPartialQuery,
+} from '../queries/goals';
 import { commentEditSchema } from '../../src/schema/comment';
 import {
     goalChangeProjectSchema,
@@ -148,9 +153,18 @@ export const goal = router({
             const { query, baseQuery = {} } = input;
             const { activityId, role } = ctx.session.user;
             const projectAccessFilter = getProjectAccessFilter(activityId, role);
+
+            let hideCriteriaFilterIds: string[] = [];
+
+            if (query?.hideCriteria || baseQuery.hideCriteria) {
+                hideCriteriaFilterIds = (
+                    await prisma.goalAchieveCriteria.findMany(getGoalActivityFilterIdsQuery())
+                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+            }
+
             const baseWhere = {
                 ...nonArchivedPartialQuery,
-                ...(await goalsFilter(baseQuery, activityId, role)).where,
+                ...goalsFilter({ ...baseQuery, hideCriteriaFilterIds }, activityId, role).where,
                 project: {
                     ...projectAccessFilter,
                 },
@@ -161,7 +175,7 @@ export const goal = router({
                     where: baseWhere,
                 }),
                 prisma.goal.count({
-                    where: query ? (await goalsFilter(query, activityId, role)).where : baseWhere,
+                    where: query ? goalsFilter({ ...query, hideCriteriaFilterIds }, activityId, role).where : baseWhere,
                 }),
             ]);
             return {
@@ -174,6 +188,22 @@ export const goal = router({
         .query(async ({ ctx, input: { query, limit, skip, cursor } }) => {
             const { activityId, role } = ctx.session.user;
 
+            let hideCriteriaFilterIds: string[] = [];
+
+            if (query?.hideCriteria) {
+                hideCriteriaFilterIds = (
+                    await prisma.goalAchieveCriteria.findMany({
+                        where: {
+                            criteriaGoalId: { not: null },
+                            deleted: { not: true },
+                        },
+                        select: {
+                            criteriaGoalId: true,
+                        },
+                    })
+                ).map(({ criteriaGoalId }) => criteriaGoalId) as string[];
+            }
+
             const [items, count] = await Promise.all([
                 prisma.goal.findMany({
                     take: limit + 1,
@@ -182,7 +212,7 @@ export const goal = router({
                     orderBy: {
                         id: 'asc',
                     },
-                    ...(query ? await goalsFilter(query, activityId, role) : {}),
+                    ...(query ? goalsFilter({ ...query, hideCriteriaFilterIds }, activityId, role) : {}),
                     include: getGoalDeepQuery({
                         activityId,
                         role,
