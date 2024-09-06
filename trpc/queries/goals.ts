@@ -181,20 +181,21 @@ export const goalsFilter = async (
               },
           };
 
-    const criteriaGoalIds = await prisma.goalAchieveCriteria.findMany({
-        where: {
-            criteriaGoalId: { not: null },
-        },
-        select: {
-            criteriaGoalId: true,
-        },
-    });
+    let criteriaFilter: Prisma.GoalFindManyArgs['where'] = {};
 
-    const criteriaFilter: Prisma.GoalFindManyArgs['where'] = data.hideCriteria
-        ? {
-              id: { not: { in: criteriaGoalIds.map(({ criteriaGoalId }) => criteriaGoalId) as string[] } },
-          }
-        : {};
+    if (data.hideCriteria) {
+        const criteriaGoalIds = await prisma.goalAchieveCriteria.findMany({
+            where: {
+                criteriaGoalId: { not: null },
+            },
+            select: {
+                criteriaGoalId: true,
+            },
+        });
+        criteriaFilter = {
+            id: { not: { in: criteriaGoalIds.map(({ criteriaGoalId }) => criteriaGoalId) as string[] } },
+        };
+    }
 
     const orderBy: any = [];
 
