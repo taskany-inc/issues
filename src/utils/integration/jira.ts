@@ -83,31 +83,46 @@ const isDebugEnabled = process.env.NODE_ENV === 'development' && process.env.DEB
 
 // @ts-ignore
 class JiraService extends JiraApi {
-    private positiveFinishedStatuses: string;
+    private positiveFinishedStatuses = '';
 
-    private finishedStatusCategory: JiraIssueStatus['statusCategory'];
+    private finishedStatusCategory?: JiraIssueStatus['statusCategory'];
 
-    constructor(options: JiraApi.JiraApiOptions) {
-        super(options);
+    public isEnable = false;
 
-        assert(
-            process.env.JIRA_POSITIVE_STATUS_NAMES,
-            `Env variable \`JIRA_POSITIVE_STATUS_NAMES\` must be string, but get ${typeof process.env
-                .JIRA_POSITIVE_STATUS_NAMES}`,
-        );
-        assert(
-            process.env.JIRA_FINISHED_CATEGORY,
-            `Env variable \`JIRA_FINISHED_CATEGORY\` must be string, but get ${typeof process.env
-                .JIRA_FINISHED_CATEGORY}`,
-        );
+    constructor() {
+        super({
+            protocol: 'https',
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            host: process.env.JIRA_URL!,
+            username: process.env.JIRA_USER,
+            password: process.env.JIRA_PASSWORD,
+            apiVersion: process.env.JIRA_API_VERSION,
+            strictSSL: process.env.NODE_ENV === 'production',
+        });
 
-        this.positiveFinishedStatuses = process.env.JIRA_POSITIVE_STATUS_NAMES;
-        this.finishedStatusCategory = JSON.parse(process.env.JIRA_FINISHED_CATEGORY);
+        try {
+            // check env variables which contains `JIRA` prefix
+            Object.keys(process.env)
+                .filter((k) => k.includes('JIRA'))
+                .forEach((jiraEnvKey) => {
+                    const val = process.env[jiraEnvKey];
 
-        assert(
-            typeof this.finishedStatusCategory === 'object' && this.finishedStatusCategory != null,
-            "Env variable 'JIRA_FINISHED_CATEGORY' must be JSON string value",
-        );
+                    assert(val, `Env variable \`${jiraEnvKey}\` must be string, but get ${typeof val}`);
+                });
+
+            // here suppoed that env variable is available
+            this.positiveFinishedStatuses = process.env.JIRA_POSITIVE_STATUS_NAMES as string;
+            this.finishedStatusCategory = JSON.parse(process.env.JIRA_FINISHED_CATEGORY as string);
+
+            assert(
+                typeof this.finishedStatusCategory === 'object' && this.finishedStatusCategory != null,
+                "Env variable 'JIRA_FINISHED_CATEGORY' must be JSON string value",
+            );
+            this.isEnable = true;
+        } catch (error) {
+            console.error(error);
+            this.isEnable = false;
+        }
     }
 
     /** start overriding private instance methods */
@@ -137,23 +152,19 @@ class JiraService extends JiraApi {
     /** end overriding private instance methods */
 
     public checkStatusIsFinished(status: JiraIssueStatus) {
-        return (
-            (status.statusCategory.key === this.finishedStatusCategory.key ||
-                status.statusCategory.id === this.finishedStatusCategory.id) &&
-            this.positiveFinishedStatuses.includes(status.name)
-        );
+        if (this.isEnable && this.finishedStatusCategory) {
+            return (
+                (status.statusCategory.key === this.finishedStatusCategory.key ||
+                    status.statusCategory.id === this.finishedStatusCategory.id) &&
+                this.positiveFinishedStatuses.includes(status.name)
+            );
+        }
+
+        return false;
     }
 }
 
-export const jiraService = new JiraService({
-    protocol: 'https',
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    host: process.env.JIRA_URL!,
-    username: process.env.JIRA_USER,
-    password: process.env.JIRA_PASSWORD,
-    apiVersion: process.env.JIRA_API_VERSION,
-    strictSSL: process.env.NODE_ENV === 'production',
-});
+export const jiraService = new JiraService();
 
 const re = '(\\w+)-(\\d+)';
 

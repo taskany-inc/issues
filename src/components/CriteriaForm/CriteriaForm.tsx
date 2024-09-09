@@ -172,6 +172,7 @@ interface CriteriaFormProps {
     withModeSwitch?: boolean;
     values?: CriteriaFormValues;
     validityData: ValidityData;
+    externalAllowed?: boolean;
 
     setMode: (mode: CriteriaFormMode) => void;
     onSubmit: (values: CriteriaFormValues) => void;
@@ -308,6 +309,7 @@ export const CriteriaForm = ({
     onReset,
     items,
     withModeSwitch,
+    externalAllowed,
     validityData,
     validateBindingsFor,
     values,
@@ -333,11 +335,18 @@ export const CriteriaForm = ({
 
     const isEditMode = values != null && !!values.title?.length;
 
-    const radios: Array<{ value: CriteriaFormMode; title: string }> = [
-        { title: tr('Simple'), value: 'simple' },
-        { title: tr('Goal'), value: 'goal' },
-        { title: tr('Task'), value: 'task' },
-    ];
+    const radios = useMemo<Array<{ value: CriteriaFormMode; title: string }>>(() => {
+        const base: Array<{ value: CriteriaFormMode; title: string }> = [
+            { title: tr('Simple'), value: 'simple' },
+            { title: tr('Goal'), value: 'goal' },
+        ];
+
+        if (externalAllowed) {
+            base.push({ title: tr('Task'), value: 'task' });
+        }
+
+        return base;
+    }, [externalAllowed]);
 
     const title = watch('title');
     const selected = watch('selected');
