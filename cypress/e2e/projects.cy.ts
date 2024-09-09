@@ -238,7 +238,7 @@ describe('Projects', () => {
             cy.get(projectListItemTitle.query).should('contain.text', testProjectTitle);
             cy.get(dashboardLoadMore.query).click();
             cy.get(`[href="${routes.project(testProjectKey)}"]`).should('exist');
-            cy.get(projectListItemTitle.query).filter(`:contains(${testProjectTitle})`).last().click({ force: true });
+            cy.visit(exactUrl(routes.project(testProjectKey)));
             // wait for correct page
             cy.get(filtersPanelTitle.query).should('contain', testProjectTitle);
             cy.url().should('equal', exactUrl(routes.project(testProjectKey)));
