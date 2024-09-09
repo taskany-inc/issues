@@ -10,6 +10,8 @@ import type { TrpcRouter } from '../../trpc/router';
 import { transformer } from './transformer';
 import { setSSRLocale, TLocale } from './getLang';
 
+type IntegrationServices = 'jira';
+
 export interface SSRProps<P = { [key: string]: string }> {
     user: Session['user'];
     req: GetServerSidePropsContext['req'];
@@ -17,6 +19,9 @@ export interface SSRProps<P = { [key: string]: string }> {
     query: Record<string, string | string[] | undefined>;
     ssrTime: number;
     ssrHelpers: DecoratedProcedureSSGRecord<TrpcRouter>;
+    allowedServices?: {
+        [key in IntegrationServices]: boolean;
+    };
 }
 
 export interface ExternalPageProps<P = { [key: string]: string }> extends SSRProps<P> {
@@ -52,9 +57,12 @@ export function declareSsrProps<T = ExternalPageProps>(
             transformer,
         });
 
-        await ssrHelpers.appConfig.get.fetch();
-        await ssrHelpers.v2.project.userProjects.fetch({});
-        await ssrHelpers.filter.getUserFilters.fetch();
+        await Promise.all([
+            ssrHelpers.appConfig.get.fetch(),
+            ssrHelpers.v2.project.userProjects.fetch({}),
+            ssrHelpers.filter.getUserFilters.fetch(),
+            ssrHelpers.jira.isEnable.fetch(),
+        ]);
 
         const ssrTime = Date.now();
 

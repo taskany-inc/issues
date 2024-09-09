@@ -57,6 +57,9 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
     const { setPreview } = useGoalPreview();
     const { data: userSettings = user?.settings } = trpc.user.settings.useQuery();
     const { data: config } = trpc.appConfig.get.useQuery();
+    const { data: jiraIsEnable = false } = trpc.jira.isEnable.useQuery(undefined, {
+        staleTime: Infinity,
+    });
 
     const router = useRouter();
 
@@ -80,7 +83,9 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
     }, [router, userSettings]);
 
     return (
-        <pageContext.Provider value={{ user, theme, themeId: mapThemeOnId[theme], ssrTime }}>
+        <pageContext.Provider
+            value={{ user, theme, themeId: mapThemeOnId[theme], ssrTime, allowedServices: { jira: jiraIsEnable } }}
+        >
             <Head>
                 <link rel="icon" href={config?.favicon || '/favicon.png'} />
                 <title>{title}</title>

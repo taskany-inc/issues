@@ -37,7 +37,7 @@ type AddCriteriaMode = NonNullable<React.ComponentProps<typeof GoalCriteriaSugge
 
 export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps>(
     ({ goal, shortId, onGoalDeleteConfirm, onInvalidate }, ref) => {
-        const { user } = usePageContext();
+        const { user, allowedServices } = usePageContext();
         const {
             onGoalCommentUpdate,
             onGoalDelete,
@@ -217,6 +217,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     validateGoalCriteriaBindings={validateGoalCriteriaBindings}
                                     validityData={criteriaValidityData}
                                     filter={[goal.id, ...parentGoalIds.map((id) => id.id)]}
+                                    externalAllowed={allowedServices?.jira || false}
                                 />
                             </GoalFormPopupTrigger>
                         ))}

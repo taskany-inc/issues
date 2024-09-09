@@ -34,6 +34,7 @@ interface GoalCriteriaSuggestProps {
     versa?: boolean;
     /** Value allows restrict search results by current user */
     restrictedSearch?: boolean;
+    externalAllowed?: boolean;
     withModeSwitch?: React.ComponentProps<typeof CriteriaForm>['withModeSwitch'];
     defaultMode?: React.ComponentProps<typeof CriteriaForm>['mode'];
     values?: React.ComponentProps<typeof CriteriaForm>['values'];
@@ -57,6 +58,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
     validityData,
     onGoalSelect,
     restrictedSearch = false,
+    externalAllowed = false,
 }) => {
     const [mode, setMode] = useState(defaultMode);
     const [query, setQuery] = useState<string | void>('');
@@ -174,6 +176,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
             items={itemsToRender}
             validityData={validityData}
             validateBindingsFor={validateBindings}
+            externalAllowed={externalAllowed}
         />
     );
 };

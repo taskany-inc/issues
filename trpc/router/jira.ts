@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { protectedProcedure, router } from '../trpcBackend';
-import { JiraIssue, searchIssue } from '../../src/utils/integration/jira';
+import { JiraIssue, searchIssue, jiraService } from '../../src/utils/integration/jira';
 import { ExternalTask } from '../../generated/kysely/types';
 import { ExtractTypeFromGenerated } from '../utils';
 
@@ -30,6 +30,9 @@ const jiraIssueToExternalTask = (
 };
 
 export const jira = router({
+    isEnable: protectedProcedure.query(async () => {
+        return Promise.resolve(jiraService.isEnable);
+    }),
     search: protectedProcedure
         .input(
             z.object({

@@ -6,6 +6,9 @@ export interface PageContext {
     themeId: number;
     ssrTime: number;
     user?: Session['user'];
+    allowedServices?: {
+        jira: boolean;
+    };
 }
 
 export const pageContext = React.createContext<PageContext>({ theme: 'dark', themeId: 0, ssrTime: 0 });
