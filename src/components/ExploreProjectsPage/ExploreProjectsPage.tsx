@@ -1,6 +1,5 @@
 import { nullable } from '@taskany/bricks';
-import { Table, Link } from '@taskany/bricks/harmony';
-import NextLink from 'next/link';
+import { Table } from '@taskany/bricks/harmony';
 
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { routes } from '../../hooks/router';
@@ -22,24 +21,21 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
             <Table>
                 {data.projects.map((project) =>
                     nullable(project, (p) => (
-                        <NextLink key={p.id} href={routes.project(p.id)} passHref legacyBehavior>
-                            <Link>
-                                <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
-                                    <ProjectListItem
-                                        id={p.id}
-                                        title={p.title}
-                                        flowId={p.flowId}
-                                        stargizers={p._count.stargizers}
-                                        owner={p.activity}
-                                        starred={p._isStarred}
-                                        watching={p._isWatching}
-                                        participants={p.participants}
-                                        averageScore={p.averageScore}
-                                        actionButtonView="icons"
-                                    />
-                                </TableRowItem>
-                            </Link>
-                        </NextLink>
+                        <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
+                            <ProjectListItem
+                                href={routes.project(p.id)}
+                                id={p.id}
+                                title={p.title}
+                                flowId={p.flowId}
+                                stargizers={p._count.stargizers}
+                                owner={p.activity}
+                                starred={p._isStarred}
+                                watching={p._isWatching}
+                                participants={p.participants}
+                                averageScore={p.averageScore}
+                                actionButtonView="icons"
+                            />
+                        </TableRowItem>
                     )),
                 )}
             </Table>

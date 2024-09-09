@@ -7,12 +7,11 @@ import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { ProjectSubscriptionButtons } from '../ProjectSubscriptionButtons/ProjectSubscriptionButtons';
 import { safeUserData } from '../../utils/getUserName';
 import { participants as participantsDO } from '../../utils/domObjects';
-import { routes } from '../../hooks/router';
-import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 
 import s from './ProjectListItem.module.css';
 
 interface ProjectListItemProps {
+    href?: string;
     id: string;
     stargizers: number;
     flowId: string;
@@ -37,9 +36,9 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
     averageScore,
     className,
     actionButtonView,
+    href,
     ...attrs
 }) => {
-    const { view } = useUrlFilterParams({});
     const ownerUserGroup = useMemo(() => [owner].map(safeUserData).filter(Boolean), [owner]);
     const participantUserGroup = useMemo(() => participants?.map(safeUserData).filter(Boolean), [participants]);
 
@@ -69,7 +68,7 @@ export const ProjectListItem: React.FC<ProjectListItemProps & ComponentProps<typ
                     view={actionButtonView}
                     watching={watching}
                     stargizersCounter={stargizers}
-                    href={routes.project(id, view ? `view=${view}` : undefined)}
+                    href={href}
                 />
             </TableCell>
         </TableRow>

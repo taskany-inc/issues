@@ -11,6 +11,7 @@ import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import s from './ProjectListItemCollapsable.module.css';
 
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
+    href?: string;
     project: NonNullable<Omit<DashboardProjectV2, 'children' | 'goals'>>;
     parent?: NonNullable<Omit<DashboardProjectV2, 'children' | 'goals'>>;
     goals?: ReactNode;
@@ -25,6 +26,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     parent,
     children,
     goals,
+    href,
     className,
     titleSize = 'l',
     interactive = true,
@@ -55,6 +57,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         >
             <ProjectListItem
                 id={project.id}
+                href={href}
                 flowId={project.flowId}
                 title={project.title}
                 stargizers={project._count.stargizers}

@@ -26,26 +26,21 @@ export const ExploreProjectsStarredPage = ({ user, ssrTime }: ExternalPageProps)
                         <Table>
                             {projects.map((project) =>
                                 nullable(project, (p) => (
-                                    <NextLink key={p.id} href={routes.project(p.id)} passHref legacyBehavior>
-                                        <Link>
-                                            <TableRowItem
-                                                title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}
-                                            >
-                                                <ProjectListItem
-                                                    title={p.title}
-                                                    flowId={p.flowId}
-                                                    id={p.id}
-                                                    stargizers={p._count.stargizers}
-                                                    owner={p.activity}
-                                                    starred={!!p._isStarred}
-                                                    watching={!!p._isWatching}
-                                                    participants={p.participants as ActivityByIdReturnType[]}
-                                                    averageScore={p.averageScore}
-                                                    actionButtonView="icons"
-                                                />
-                                            </TableRowItem>
-                                        </Link>
-                                    </NextLink>
+                                    <TableRowItem title={<TableRowItemTitle size="l">{p.title}</TableRowItemTitle>}>
+                                        <ProjectListItem
+                                            href={routes.project(p.id)}
+                                            title={p.title}
+                                            flowId={p.flowId}
+                                            id={p.id}
+                                            stargizers={p._count.stargizers}
+                                            owner={p.activity}
+                                            starred={!!p._isStarred}
+                                            watching={!!p._isWatching}
+                                            participants={p.participants as ActivityByIdReturnType[]}
+                                            averageScore={p.averageScore}
+                                            actionButtonView="icons"
+                                        />
+                                    </TableRowItem>
                                 )),
                             )}
                         </Table>
