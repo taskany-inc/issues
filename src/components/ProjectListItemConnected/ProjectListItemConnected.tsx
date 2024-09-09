@@ -6,7 +6,6 @@ import { FilterById, GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { refreshInterval } from '../../utils/config';
-import { routes } from '../../hooks/router';
 import { GoalTableList, mapToRenderProps } from '../GoalTableList/GoalTableList';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
@@ -140,7 +139,6 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     return (
         <>
             <ProjectListItemCollapsable
-                href={routes.project(project.id, view ? `view=${view}` : undefined)}
                 onClick={onProjectClickHandler}
                 project={project}
                 parent={isKanbanView ? parent : undefined}

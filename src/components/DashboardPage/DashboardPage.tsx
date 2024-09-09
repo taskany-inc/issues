@@ -15,7 +15,6 @@ import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { useFMPMetric } from '../../utils/telemetry';
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
-import { routes } from '../../hooks/router';
 import { GoalTableList, mapToRenderProps } from '../GoalTableList/GoalTableList';
 import { PresetModals } from '../PresetModals';
 import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
@@ -153,10 +152,9 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                     return (
                         <ProjectListItemCollapsable
                             key={project.id}
-                            interactive={false}
+                            interactive
                             visible
                             project={project}
-                            href={routes.project(project.id, view ? `view=${view}` : undefined)}
                             goals={children}
                             actionButtonView="icons"
                         >

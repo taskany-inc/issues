@@ -1,7 +1,6 @@
 import React, { ComponentProps, MouseEventHandler, ReactNode } from 'react';
-import NextLink from 'next/link';
 import { nullable } from '@taskany/bricks';
-import { TreeView, TreeViewNode, Text, Link } from '@taskany/bricks/harmony';
+import { TreeView, TreeViewNode, Text } from '@taskany/bricks/harmony';
 import { IconServersOutline } from '@taskany/icons';
 
 import { DashboardProjectV2 } from '../../../trpc/inferredTypes';
@@ -12,7 +11,6 @@ import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 import s from './ProjectListItemCollapsable.module.css';
 
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
-    href?: string;
     project: NonNullable<Omit<DashboardProjectV2, 'children' | 'goals'>>;
     parent?: NonNullable<Omit<DashboardProjectV2, 'children' | 'goals'>>;
     goals?: ReactNode;
@@ -27,7 +25,6 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     parent,
     children,
     goals,
-    href,
     className,
     titleSize = 'l',
     interactive = true,
@@ -73,19 +70,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
 
     return (
         <TreeView className={className} {...projectListItem.attr}>
-            <TreeViewNode
-                interactive={interactive}
-                title={nullable(
-                    href,
-                    (h) => (
-                        <NextLink href={h} passHref legacyBehavior>
-                            <Link>{projectComponent}</Link>
-                        </NextLink>
-                    ),
-                    projectComponent,
-                )}
-                {...props}
-            >
+            <TreeViewNode interactive={interactive} title={projectComponent} {...props}>
                 {goals}
                 {children}
             </TreeViewNode>
