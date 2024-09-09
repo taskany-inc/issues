@@ -11,6 +11,7 @@ import { createGoalInlineControl } from '../../utils/domObjects';
 import { NextLink } from '../NextLink';
 
 import { tr } from './ProjectSubscriptionButtons.i18n';
+import s from './ProjectSubscriptionButtons.module.css';
 
 interface ProjectSubscriptionButtonsProps {
     project: {
@@ -21,7 +22,7 @@ interface ProjectSubscriptionButtonsProps {
     starred?: boolean;
     watching?: boolean;
     stargizersCounter: number;
-    href: string;
+    href?: string;
     view?: 'default' | 'icons';
 }
 
@@ -65,9 +66,9 @@ export const ProjectSubscriptionButtons: FC<ProjectSubscriptionButtonsProps> = (
                     onClick={onAddClick}
                 />,
             )}
-            {nullable(view === 'icons', () => (
-                <NextLink href={href} target="_blank" onClick={onNewTabClick}>
-                    <Button view="clear" iconLeft={<IconTopRightOutline size="s" />} />
+            {nullable(view === 'icons' && href, (h) => (
+                <NextLink href={h} target="_blank" onClick={onNewTabClick}>
+                    <Button className={s.NewTabButton} view="clear" iconLeft={<IconTopRightOutline size="s" />} />
                 </NextLink>
             ))}
         </>

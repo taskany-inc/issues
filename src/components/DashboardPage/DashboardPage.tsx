@@ -21,6 +21,7 @@ import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 import { Kanban, buildKanban } from '../Kanban/Kanban';
 import { NoGoalsText } from '../NoGoalsText/NoGoalsText';
 import { safeUserData } from '../../utils/getUserName';
+import { routes } from '../../hooks/router';
 
 import { tr } from './DashboardPage.i18n';
 
@@ -151,6 +152,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
 
                     return (
                         <ProjectListItemCollapsable
+                            href={routes.project(project.id, view ? `view=${view}` : undefined)}
                             key={project.id}
                             interactive
                             visible
