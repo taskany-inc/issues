@@ -20,6 +20,7 @@ import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCo
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { StateDot } from '../StateDot/StateDot';
 import { JiraTaskBadge, JiraTaskBadgeIcon } from '../JiraTaskBadge/JiraTaskBadge';
+import { BetaLiteral } from '../BetaLiteral';
 
 import { tr } from './CriteriaForm.i18n';
 import s from './CriteriaForm.module.css';
@@ -335,14 +336,14 @@ export const CriteriaForm = ({
 
     const isEditMode = values != null && !!values.title?.length;
 
-    const radios = useMemo<Array<{ value: CriteriaFormMode; title: string }>>(() => {
-        const base: Array<{ value: CriteriaFormMode; title: string }> = [
+    const radios = useMemo<Array<{ value: CriteriaFormMode; title: string; iconRight?: React.ReactNode }>>(() => {
+        const base: Array<{ value: CriteriaFormMode; title: string; iconRight?: React.ReactNode }> = [
             { title: tr('Simple'), value: 'simple' },
             { title: tr('Goal'), value: 'goal' },
         ];
 
         if (externalAllowed) {
-            base.push({ title: tr('Task'), value: 'task' });
+            base.push({ title: tr('Task'), value: 'task', iconRight: <BetaLiteral size="s" /> });
         }
 
         return base;
@@ -465,6 +466,7 @@ export const CriteriaForm = ({
                                             key={radio.value}
                                             text={radio.title}
                                             value={radio.value}
+                                            iconRight={radio.iconRight}
                                         />
                                     ))}
                                 </Switch>
