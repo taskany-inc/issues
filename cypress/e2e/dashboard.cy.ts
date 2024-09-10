@@ -7,6 +7,9 @@ import {
     participants,
     projectListItem,
     watch,
+    sortPanel,
+    sortPanelDropdownTrigger,
+    sortPanelEmptyProjectsCheckbox,
 } from '../../src/utils/domObjects';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { getTranslation } from '../support/lang';
@@ -33,16 +36,10 @@ describe('Dashboard', () => {
         cy.signInViaEmail();
     });
 
-    it('filters are active by default', () => {
-        cy.get('body')
-            .should('exist')
-            .then(($body) => {
-                if ($body.find(projectListItem.query).length > 0) {
-                    cy.get(projectListItem.query).filter(`:contains(${projectOne})`).should('not.exist');
-                    return;
-                }
-                cy.get(projectListItem.query).should('not.exist');
-            });
+    it.only('filters are active by default', () => {
+        cy.get('body').should('exist');
+
+        cy.get(projectListItem.query).filter(`:contains(${projectOne})`).should('exist');
 
         cy.get(filtersPanelResetButton.query).should('exist').click().should('not.exist');
 
@@ -89,23 +86,32 @@ describe('User dashboard', () => {
             }).then((res) => Cypress.env('testUserProject', res));
         });
 
-        it('user dont see own project without goals with applied filters', () => {
+        it('user see own project without goals with applied filters', () => {
+            cy.get(projectListItem.query).should('exist').and('include.text', userProjectTitle);
+        });
+
+        it("user don't see own project without goals with empty projects filters", () => {
+            cy.get(projectListItem.query).should('exist');
+
+            cy.get(sortPanel.query).should('not.exist');
+            cy.get(sortPanelDropdownTrigger.query).should('exist').click();
+            cy.get(sortPanel.query).should('exist');
+            cy.get(sortPanelEmptyProjectsCheckbox.query)
+                .should('exist')
+                .and('be.checked')
+                .click()
+                .should('not.checked');
+
             cy.get(projectListItem.query).should('not.exist');
         });
 
         it('user see own project without goals with clear filters', () => {
-            cy.get(projectListItem.query).should('not.exist');
-
             cy.get(filtersPanelResetButton.query).should('exist').click().should('not.exist');
 
             cy.get(projectListItem.query).should('exist').and('include.text', userProjectTitle);
         });
 
         it("user can create goal from projects's list", () => {
-            cy.get(projectListItem.query).should('not.exist');
-
-            cy.get(filtersPanelResetButton.query).should('exist').click().should('not.exist');
-
             cy.get(projectListItem.query).find(createGoalInlineControl.query).and('not.include.text');
         });
 

@@ -19,6 +19,7 @@ import {
     appliedFiltersPanel,
     appliedFiltersPanelEstimate,
     appliedFiltersPanelState,
+    sortPanelEmptyProjectsCheckbox,
 } from '../../utils/domObjects';
 import {
     FiltersBarViewDropdown,
@@ -276,6 +277,7 @@ export const FiltersPanel: FC<{
                             {nullable(enableHideProjectToggle, () => (
                                 <FiltersBarDropdownContent>
                                     <Checkbox
+                                        {...sortPanelEmptyProjectsCheckbox.attr}
                                         label={tr('Empty Projects')}
                                         checked={!hideEmptyProjects}
                                         onChange={() => setHideEmptyProjects(!hideEmptyProjects)}

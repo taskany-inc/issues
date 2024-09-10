@@ -16,6 +16,10 @@ export const filtersPanel = DO('filtersPanel');
 export const filtersPanelTitle = filtersPanel.add('title');
 export const filtersPanelResetButton = filtersPanel.add('resetButton');
 
+export const sortPanel = DO('sortPanel');
+export const sortPanelDropdownTrigger = DO('sortPanelDropdownTrigger');
+export const sortPanelEmptyProjectsCheckbox = sortPanel.add('emptyProjectsCheckbox');
+
 export const appliedFiltersPanel = DO('appliedFiltersPanel');
 export const appliedFiltersPanelEstimate = appliedFiltersPanel.add('estimate');
 export const appliedFiltersPanelState = appliedFiltersPanel.add('state');

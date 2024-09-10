@@ -5,6 +5,7 @@ import { nullable } from '@taskany/bricks';
 
 import { PageView } from '../../hooks/useUrlFilterParams';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
+import { sortPanel, sortPanelDropdownTrigger } from '../../utils/domObjects';
 
 import s from './FiltersBar.module.css';
 import { tr } from './FiltersBar.i18n';
@@ -37,14 +38,16 @@ export const FiltersBarLayoutSwitch: FC<FiltersBarLayoutSwitchProps> = ({ value 
 export const FiltersBarViewDropdown: FC<{ children?: ReactNode }> = ({ children }) => {
     return (
         <Dropdown>
-            <DropdownTrigger className={s.FiltersBarViewDropdownDrigger} view="fill">
+            <DropdownTrigger className={s.FiltersBarViewDropdownDrigger} view="fill" {...sortPanelDropdownTrigger.attr}>
                 <div className={s.FiltersBarViewDropdownDrigger}>
                     <IconAdjustHorizontalSolid size="xxs" />
                     <Text size="s">{tr('View')}</Text>
                 </div>
             </DropdownTrigger>
             <DropdownPanel width={335} placement="bottom-start" className={s.FiltersBarDropdownPanel}>
-                <div className={s.FiltersBarDropdownPanelContainer}>{children}</div>
+                <div className={s.FiltersBarDropdownPanelContainer} {...sortPanel.attr}>
+                    {children}
+                </div>
             </DropdownPanel>
         </Dropdown>
     );
