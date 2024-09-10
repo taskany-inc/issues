@@ -221,6 +221,7 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                                 .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
                                 .where('GoalAchieveCriteria.deleted', 'is not', true),
                         ),
+                        hideEmptyProjects: null,
                         sort: null,
                         starred: null,
                         watching: null,

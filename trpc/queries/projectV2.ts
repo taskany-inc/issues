@@ -277,16 +277,6 @@ interface GetProjectsWithGoalsByIdsParams extends GetUserProjectsQueryParams {
     offset?: number;
 }
 
-const queryParamsIsExists = (query?: QueryWithFilters | null) => {
-    if (query == null) {
-        return true;
-    }
-
-    const { limit: _limit, offset: _offset, ...restQuery } = query;
-
-    return Object.keys(restQuery).length > 0;
-};
-
 /** Limit for subquery goals by project */
 const dashboardGoalByProjectLimit = 30;
 
@@ -481,6 +471,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                                 .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
                                 .where('GoalAchieveCriteria.deleted', 'is not', true),
                         ),
+                        hideEmptyProjects: null,
                         sort: null,
                         starred: null,
                         watching: null,
@@ -570,7 +561,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
         )
         .groupBy('Project.id')
         .orderBy('Project.updatedAt desc')
-        .$if(queryParamsIsExists(params.goalsQuery), (qb) => qb.having(({ fn }) => fn.count('goal.id'), '>', 0))
+        .$if(!!params.goalsQuery?.hideEmptyProjects, (qb) => qb.having(({ fn }) => fn.count('goal.id'), '>', 0))
         .limit(params.limit || 5)
         .offset(params.offset || 0);
 };

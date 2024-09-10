@@ -122,6 +122,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                     filterPreset={preset}
                     loading={isLoading}
                     enableLayoutToggle
+                    enableHideProjectToggle
                 />
             }
         >
