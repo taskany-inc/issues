@@ -33,6 +33,7 @@ export interface FilterQueryState {
     query: string;
     sort: Array<{ key: SortableProps; dir: SortDirection }>;
     hideCriteria?: boolean;
+    hideEmptyProjects?: boolean;
 }
 
 const groupByValue = {
@@ -113,6 +114,7 @@ export const buildURLSearchParams = ({
     view,
     limit,
     hideCriteria,
+    hideEmptyProjects,
 }: Partial<QueryState>): URLSearchParams => {
     const urlParams = new URLSearchParams();
 
@@ -152,6 +154,8 @@ export const buildURLSearchParams = ({
 
     hideCriteria ? urlParams.set('hideCriteria', '1') : urlParams.delete('hideCriteria');
 
+    hideEmptyProjects ? urlParams.set('hideEmptyProjects', '1') : urlParams.delete('hideEmptyProjects');
+
     return urlParams;
 };
 
@@ -182,6 +186,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
         queryMap.sort = parseSortQueryParam(query.sort?.toString());
     }
     if (query.hideCriteria) queryMap.hideCriteria = Boolean(query.hideCriteria) || undefined;
+    if (query.hideEmptyProjects) queryMap.hideEmptyProjects = Boolean(query.hideEmptyProjects) || undefined;
 
     return queryMap;
 };
@@ -202,7 +207,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
-    const { queryState, queryFilterState, groupBy, hideCriteria, view } = useMemo(() => {
+    const { queryState, queryFilterState, groupBy, hideCriteria, hideEmptyProjects, view } = useMemo(() => {
         const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { groupBy, view, id, ...queries } = query;
@@ -217,6 +222,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             groupBy: groupBy as GroupByParam | undefined,
             view: view as PageView | undefined,
             hideCriteria: queryState?.hideCriteria,
+            hideEmptyProjects: queryState?.hideEmptyProjects,
         };
     }, [router.query, currentPreset]);
 
@@ -301,6 +307,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             groupBy: undefined,
             view: undefined,
             hideCriteria: undefined,
+            hideEmptyProjects: undefined,
         });
     }, [pushStateToRouter]);
 
@@ -357,6 +364,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setGroupBy: pushStateProvider.key('groupBy'),
             setView: pushStateProvider.key('view'),
             setHideCriteria: pushStateProvider.key('hideCriteria'),
+            setHideEmptyProjects: pushStateProvider.key('hideEmptyProjects'),
             batchQueryState: pushStateProvider.batch(),
         }),
         [pushStateProvider],
@@ -369,6 +377,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
         currentPreset,
         groupBy,
         hideCriteria,
+        hideEmptyProjects,
         setTagsFilterOutside,
         resetQueryState,
         setPreset,

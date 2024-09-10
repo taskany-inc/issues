@@ -39,6 +39,7 @@ export const queryWithFiltersSchema = z.object({
     limit: z.number().optional(),
     offset: z.number().optional(),
     hideCriteria: z.boolean().optional(),
+    hideEmptyProjects: z.boolean().optional(),
 });
 
 export type QueryWithFilters = z.infer<typeof queryWithFiltersSchema>;

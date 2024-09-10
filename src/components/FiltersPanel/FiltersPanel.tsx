@@ -52,307 +52,336 @@ export const FiltersPanel: FC<{
     filterPreset?: FilterById;
     enableViewToggle?: boolean;
     enableLayoutToggle?: boolean;
+    enableHideProjectToggle?: boolean;
     children?: ReactNode;
-}> = memo(({ children, title, total = 0, counter = 0, enableViewToggle, enableLayoutToggle, filterPreset }) => {
-    const { toggleFilterStar } = useFilterResource();
-    const { user } = usePageContext();
+}> = memo(
+    ({
+        children,
+        title,
+        total = 0,
+        counter = 0,
+        enableViewToggle,
+        enableLayoutToggle,
+        enableHideProjectToggle,
+        filterPreset,
+    }) => {
+        const { toggleFilterStar } = useFilterResource();
+        const { user } = usePageContext();
 
-    const {
-        currentPreset,
-        queryString,
-        queryState,
-        resetQueryState,
-        batchQueryState,
-        setSortFilter,
-        queryFilterState,
-        groupBy,
-        view,
-        setGroupBy,
-        hideCriteria,
-        setHideCriteria,
-        setView,
-    } = useUrlFilterParams({
-        preset: filterPreset,
-    });
-
-    const [filterQuery, setFilterQuery] = useState<Partial<FilterQueryState> | undefined>(queryFilterState);
-    const filterQueryRef = useLatest(filterQuery);
-
-    useEffect(() => {
-        setFilterQuery(queryState);
-    }, [queryState]);
-
-    const setPartialQueryByKey = useCallback(<K extends keyof QueryState>(key: K) => {
-        return (value?: QueryState[K]) => {
-            setFilterQuery((prev) => {
-                return {
-                    ...prev,
-                    [key]: value,
-                };
-            });
-        };
-    }, []);
-
-    const filterStarHandler = useCallback(async () => {
-        if (!currentPreset) {
-            dispatchModalEvent(ModalEvent.FilterCreateModal)();
-            return;
-        }
-
-        if (currentPreset._isOwner) {
-            dispatchModalEvent(ModalEvent.FilterDeleteModal)();
-            return;
-        }
-
-        await toggleFilterStar({
-            id: currentPreset.id,
-            direction: !currentPreset._isStarred,
+        const {
+            currentPreset,
+            queryString,
+            queryState,
+            resetQueryState,
+            batchQueryState,
+            setSortFilter,
+            queryFilterState,
+            groupBy,
+            view,
+            setGroupBy,
+            hideCriteria,
+            setHideCriteria,
+            hideEmptyProjects,
+            setHideEmptyProjects,
+            setView,
+        } = useUrlFilterParams({
+            preset: filterPreset,
         });
-    }, [currentPreset, toggleFilterStar]);
 
-    const onApplyClick = useCallback(
-        (key?: keyof Omit<FilterQueryState, 'query' | 'sort' | 'hideCriteria'>) => {
-            if (!filterQueryRef.current) return;
+        const [filterQuery, setFilterQuery] = useState<Partial<FilterQueryState> | undefined>(queryFilterState);
+        const filterQueryRef = useLatest(filterQuery);
 
-            if (key) {
-                filterQueryRef.current[key] = [];
+        useEffect(() => {
+            setFilterQuery(queryState);
+        }, [queryState]);
+
+        const setPartialQueryByKey = useCallback(<K extends keyof QueryState>(key: K) => {
+            return (value?: QueryState[K]) => {
+                setFilterQuery((prev) => {
+                    return {
+                        ...prev,
+                        [key]: value,
+                    };
+                });
+            };
+        }, []);
+
+        const filterStarHandler = useCallback(async () => {
+            if (!currentPreset) {
+                dispatchModalEvent(ModalEvent.FilterCreateModal)();
+                return;
             }
 
-            if (key === 'state') {
-                filterQueryRef.current.stateType = [];
+            if (currentPreset._isOwner) {
+                dispatchModalEvent(ModalEvent.FilterDeleteModal)();
+                return;
             }
 
-            batchQueryState?.({ ...filterQueryRef.current });
-        },
-        [filterQueryRef, batchQueryState],
-    );
+            await toggleFilterStar({
+                id: currentPreset.id,
+                direction: !currentPreset._isStarred,
+            });
+        }, [currentPreset, toggleFilterStar]);
 
-    const onResetClick = useCallback(() => {
-        setFilterQuery(undefined);
-        resetQueryState();
-    }, [resetQueryState]);
+        const onApplyClick = useCallback(
+            (key?: keyof Omit<FilterQueryState, 'query' | 'sort' | 'hideCriteria' | 'hideEmptyProjects'>) => {
+                if (!filterQueryRef.current) return;
 
-    const handleChange = useCallback(
-        (key: keyof FilterQueryState) => (values?: { id: string }[]) => {
-            if (key === 'state') {
-                setPartialQueryByKey('stateType')();
+                if (key) {
+                    filterQueryRef.current[key] = [];
+                }
+
+                if (key === 'state') {
+                    filterQueryRef.current.stateType = [];
+                }
+
+                batchQueryState?.({ ...filterQueryRef.current });
+            },
+            [filterQueryRef, batchQueryState],
+        );
+
+        const onResetClick = useCallback(() => {
+            setFilterQuery(undefined);
+            resetQueryState();
+        }, [resetQueryState]);
+
+        const handleChange = useCallback(
+            (key: keyof FilterQueryState) => (values?: { id: string }[]) => {
+                if (key === 'state') {
+                    setPartialQueryByKey('stateType')();
+                }
+
+                setPartialQueryByKey(key)(values?.map(({ id }) => id));
+            },
+            [setPartialQueryByKey],
+        );
+
+        const onClearFilter = useCallback(
+            (key: keyof Omit<FilterQueryState, 'query' | 'sort' | 'hideCriteria' | 'hideEmptyProjects'>) => () => {
+                setPartialQueryByKey(key)();
+                onApplyClick(key);
+            },
+            [onApplyClick, setPartialQueryByKey],
+        );
+
+        const isFiltersEmpty = useMemo(
+            () => Object.values(filterQuery || {}).filter(Boolean).length === 0,
+            [filterQuery],
+        );
+        const groupedByProject = groupBy === 'project';
+
+        const filterItems: { id: keyof FilterQueryState; title: string }[] = useMemo(() => {
+            return [
+                { id: 'state', title: tr('State') },
+                { id: 'priority', title: tr('Priority') },
+                { id: 'estimate', title: tr('Estimate') },
+                { id: 'project', title: tr('Project') },
+                { id: 'tag', title: tr('Tag') },
+                { id: 'issuer', title: tr('Issuer') },
+                { id: 'owner', title: tr('Owner') },
+                { id: 'participant', title: tr('Participant') },
+            ];
+        }, []);
+
+        const restFilterItems = useMemo(() => {
+            if (filterQuery && filterQuery.stateType) {
+                filterQuery.state = [];
             }
+            return filterItems.filter(({ id }) => !filterQuery?.[id]);
+        }, [filterQuery, filterItems]);
 
-            setPartialQueryByKey(key)(values?.map(({ id }) => id));
-        },
-        [setPartialQueryByKey],
-    );
+        return (
+            <>
+                <FiltersBar {...filtersPanel.attr}>
+                    <FiltersBarItem>
+                        <FiltersBarTitle {...filtersPanelTitle.attr}>{title}</FiltersBarTitle>
+                    </FiltersBarItem>
+                    <Separator />
+                    {children}
+                    <FiltersBarItem layout="fill">
+                        <FiltersBarControlGroup>
+                            {nullable(
+                                isFiltersEmpty,
+                                () => (
+                                    <AddFilterDropdown
+                                        items={restFilterItems}
+                                        onChange={({ id }) => setPartialQueryByKey(id)([])}
+                                    />
+                                ),
+                                <Button
+                                    key="resetFilter"
+                                    onClick={onResetClick}
+                                    text={tr('Reset')}
+                                    {...filtersPanelResetButton.attr}
+                                />,
+                            )}
+                            <FiltersBarCounter total={total} counter={counter} />
+                        </FiltersBarControlGroup>
+                    </FiltersBarItem>
+                    {nullable(enableLayoutToggle && user?.settings?.beta, () => (
+                        <>
+                            <FiltersBarItem>
+                                <FiltersBarLayoutSwitch value={view} onChange={setView} />
+                            </FiltersBarItem>
+                            <Separator />
+                        </>
+                    ))}
 
-    const onClearFilter = useCallback(
-        (key: keyof Omit<FilterQueryState, 'query' | 'sort' | 'hideCriteria'>) => () => {
-            setPartialQueryByKey(key)();
-            onApplyClick(key);
-        },
-        [onApplyClick, setPartialQueryByKey],
-    );
+                    <FiltersBarItem>
+                        <FiltersBarViewDropdown>
+                            {nullable(enableViewToggle, () => (
+                                <>
+                                    <FiltersBarDropdownTitle>{tr('Grouping')}</FiltersBarDropdownTitle>
+                                    <FiltersBarDropdownContent>
+                                        <Button
+                                            text={tr('Project')}
+                                            view={groupedByProject ? 'checked' : 'default'}
+                                            onClick={() => setGroupBy(groupedByProject ? undefined : 'project')}
+                                        />
+                                    </FiltersBarDropdownContent>
+                                </>
+                            ))}
 
-    const isFiltersEmpty = useMemo(() => Object.values(filterQuery || {}).filter(Boolean).length === 0, [filterQuery]);
-    const groupedByProject = groupBy === 'project';
+                            <FiltersBarDropdownTitle>{tr('Sort')}</FiltersBarDropdownTitle>
+                            <FiltersBarDropdownContent>
+                                <SortList
+                                    value={filterQuery?.sort}
+                                    onChange={(key, dir) => {
+                                        let sortParams = (filterQuery?.sort ?? []).slice();
 
-    const filterItems: { id: keyof FilterQueryState; title: string }[] = useMemo(() => {
-        return [
-            { id: 'state', title: tr('State') },
-            { id: 'priority', title: tr('Priority') },
-            { id: 'estimate', title: tr('Estimate') },
-            { id: 'project', title: tr('Project') },
-            { id: 'tag', title: tr('Tag') },
-            { id: 'issuer', title: tr('Issuer') },
-            { id: 'owner', title: tr('Owner') },
-            { id: 'participant', title: tr('Participant') },
-        ];
-    }, []);
+                                        if (!dir) {
+                                            sortParams = sortParams.filter(({ key: k }) => key !== k);
+                                        } else {
+                                            const paramExistingIndex = sortParams.findIndex(({ key: k }) => key === k);
 
-    const restFilterItems = useMemo(() => {
-        if (filterQuery && filterQuery.stateType) {
-            filterQuery.state = [];
-        }
-        return filterItems.filter(({ id }) => !filterQuery?.[id]);
-    }, [filterQuery, filterItems]);
+                                            if (paramExistingIndex > -1) {
+                                                sortParams[paramExistingIndex] = { key, dir };
+                                            } else {
+                                                sortParams.push({ key, dir });
+                                            }
+                                        }
 
-    return (
-        <>
-            <FiltersBar {...filtersPanel.attr}>
-                <FiltersBarItem>
-                    <FiltersBarTitle {...filtersPanelTitle.attr}>{title}</FiltersBarTitle>
-                </FiltersBarItem>
-                <Separator />
-                {children}
-                <FiltersBarItem layout="fill">
-                    <FiltersBarControlGroup>
-                        {nullable(
-                            isFiltersEmpty,
-                            () => (
-                                <AddFilterDropdown
-                                    items={restFilterItems}
-                                    onChange={({ id }) => setPartialQueryByKey(id)([])}
+                                        setSortFilter(sortParams);
+                                    }}
                                 />
-                            ),
-                            <Button
-                                key="resetFilter"
-                                onClick={onResetClick}
-                                text={tr('Reset')}
-                                {...filtersPanelResetButton.attr}
-                            />,
-                        )}
-                        <FiltersBarCounter total={total} counter={counter} />
-                    </FiltersBarControlGroup>
-                </FiltersBarItem>
-                {nullable(enableLayoutToggle && user?.settings?.beta, () => (
-                    <>
-                        <FiltersBarItem>
-                            <FiltersBarLayoutSwitch value={view} onChange={setView} />
-                        </FiltersBarItem>
-                        <Separator />
-                    </>
-                ))}
-
-                <FiltersBarItem>
-                    <FiltersBarViewDropdown>
-                        {nullable(enableViewToggle, () => (
-                            <>
-                                <FiltersBarDropdownTitle>{tr('Grouping')}</FiltersBarDropdownTitle>
+                            </FiltersBarDropdownContent>
+                            <FiltersBarDropdownTitle>{tr('Visibility')}</FiltersBarDropdownTitle>
+                            <FiltersBarDropdownContent>
+                                <Checkbox
+                                    label={tr('Criteria')}
+                                    checked={!hideCriteria}
+                                    onChange={() => setHideCriteria(!hideCriteria)}
+                                />
+                            </FiltersBarDropdownContent>
+                            {nullable(enableHideProjectToggle, () => (
                                 <FiltersBarDropdownContent>
-                                    <Button
-                                        text={tr('Project')}
-                                        view={groupedByProject ? 'checked' : 'default'}
-                                        onClick={() => setGroupBy(groupedByProject ? undefined : 'project')}
+                                    <Checkbox
+                                        label={tr('Empty Projects')}
+                                        checked={!hideEmptyProjects}
+                                        onChange={() => setHideEmptyProjects(!hideEmptyProjects)}
                                     />
                                 </FiltersBarDropdownContent>
-                            </>
+                            ))}
+                        </FiltersBarViewDropdown>
+                    </FiltersBarItem>
+                    <Separator />
+                    <FiltersBarItem>
+                        <GlobalSearch />
+                    </FiltersBarItem>
+                    <FiltersBarItem>
+                        <PageUserMenu />
+                    </FiltersBarItem>
+                </FiltersBar>
+                {nullable(!isFiltersEmpty, () => (
+                    <AppliedFiltersBar
+                        filterPreset={filterPreset}
+                        queryString={queryString}
+                        onDeletePreset={filterStarHandler}
+                        onSavePreset={filterStarHandler}
+                        {...appliedFiltersPanel.attr}
+                    >
+                        {nullable(Boolean(filterQuery?.state) || Boolean(filterQuery?.stateType), () => (
+                            <AppliedStateFilter
+                                label={tr('State')}
+                                value={filterQuery?.state}
+                                stateTypes={filterQuery?.stateType}
+                                onChange={handleChange('state')}
+                                onClose={onApplyClick}
+                                onClearFilter={onClearFilter('state')}
+                                {...appliedFiltersPanelState.attr}
+                            />
                         ))}
-
-                        <FiltersBarDropdownTitle>{tr('Sort')}</FiltersBarDropdownTitle>
-                        <FiltersBarDropdownContent>
-                            <SortList
-                                value={filterQuery?.sort}
-                                onChange={(key, dir) => {
-                                    let sortParams = (filterQuery?.sort ?? []).slice();
-
-                                    if (!dir) {
-                                        sortParams = sortParams.filter(({ key: k }) => key !== k);
-                                    } else {
-                                        const paramExistingIndex = sortParams.findIndex(({ key: k }) => key === k);
-
-                                        if (paramExistingIndex > -1) {
-                                            sortParams[paramExistingIndex] = { key, dir };
-                                        } else {
-                                            sortParams.push({ key, dir });
-                                        }
-                                    }
-
-                                    setSortFilter(sortParams);
-                                }}
+                        {nullable(Boolean(filterQuery?.issuer), () => (
+                            <AppliedUsersFilter
+                                label={tr('Issuer')}
+                                value={filterQuery?.issuer}
+                                onChange={handleChange('issuer')}
+                                onClose={onApplyClick}
+                                onClearFilter={onClearFilter('issuer')}
                             />
-                        </FiltersBarDropdownContent>
-                        <FiltersBarDropdownTitle>{tr('Visibility')}</FiltersBarDropdownTitle>
-                        <FiltersBarDropdownContent>
-                            <Checkbox
-                                label={tr('Criteria')}
-                                checked={!hideCriteria}
-                                onChange={() => setHideCriteria(!hideCriteria)}
+                        ))}
+                        {nullable(Boolean(filterQuery?.owner), () => (
+                            <AppliedUsersFilter
+                                label={tr('Owner')}
+                                value={filterQuery?.owner}
+                                onChange={handleChange('owner')}
+                                onClose={onApplyClick}
+                                onClearFilter={onClearFilter('owner')}
                             />
-                        </FiltersBarDropdownContent>
-                    </FiltersBarViewDropdown>
-                </FiltersBarItem>
-                <Separator />
-                <FiltersBarItem>
-                    <GlobalSearch />
-                </FiltersBarItem>
-                <FiltersBarItem>
-                    <PageUserMenu />
-                </FiltersBarItem>
-            </FiltersBar>
-            {nullable(!isFiltersEmpty, () => (
-                <AppliedFiltersBar
-                    filterPreset={filterPreset}
-                    queryString={queryString}
-                    onDeletePreset={filterStarHandler}
-                    onSavePreset={filterStarHandler}
-                    {...appliedFiltersPanel.attr}
-                >
-                    {nullable(Boolean(filterQuery?.state) || Boolean(filterQuery?.stateType), () => (
-                        <AppliedStateFilter
-                            label={tr('State')}
-                            value={filterQuery?.state}
-                            stateTypes={filterQuery?.stateType}
-                            onChange={handleChange('state')}
-                            onClose={onApplyClick}
-                            onClearFilter={onClearFilter('state')}
-                            {...appliedFiltersPanelState.attr}
+                        ))}
+                        {nullable(Boolean(filterQuery?.participant), () => (
+                            <AppliedUsersFilter
+                                label={tr('Participant')}
+                                value={filterQuery?.participant}
+                                onChange={handleChange('participant')}
+                                onClose={onApplyClick}
+                                onClearFilter={onClearFilter('participant')}
+                            />
+                        ))}
+                        {nullable(Boolean(filterQuery?.estimate), () => (
+                            <AppliedEstimateFilter
+                                label={tr('Estimate')}
+                                value={filterQuery?.estimate}
+                                onChange={setPartialQueryByKey('estimate')}
+                                onClose={onApplyClick}
+                                onClearFilter={onClearFilter('estimate')}
+                                {...appliedFiltersPanelEstimate.attr}
+                            />
+                        ))}
+                        {nullable(Boolean(filterQuery?.priority), () => (
+                            <AppliedPriorityFilter
+                                label={tr('Priority')}
+                                value={filterQuery?.priority}
+                                onChange={handleChange('priority')}
+                                onClose={onApplyClick}
+                                onClearFilter={onClearFilter('priority')}
+                            />
+                        ))}
+                        {nullable(Boolean(filterQuery?.project), () => (
+                            <AppliedGoalParentFilter
+                                label={tr('Project')}
+                                value={filterQuery?.project}
+                                onChange={handleChange('project')}
+                                onClose={onApplyClick}
+                                onClearFilter={onClearFilter('project')}
+                            />
+                        ))}
+                        {nullable(Boolean(filterQuery?.tag), () => (
+                            <AppliedTagFilter
+                                label={tr('Tag')}
+                                value={filterQuery?.tag}
+                                onChange={handleChange('tag')}
+                                onClose={onApplyClick}
+                                onClearFilter={onClearFilter('tag')}
+                            />
+                        ))}
+                        <AddFilterDropdown
+                            items={restFilterItems}
+                            onChange={({ id }) => setPartialQueryByKey(id)([])}
                         />
-                    ))}
-                    {nullable(Boolean(filterQuery?.issuer), () => (
-                        <AppliedUsersFilter
-                            label={tr('Issuer')}
-                            value={filterQuery?.issuer}
-                            onChange={handleChange('issuer')}
-                            onClose={onApplyClick}
-                            onClearFilter={onClearFilter('issuer')}
-                        />
-                    ))}
-                    {nullable(Boolean(filterQuery?.owner), () => (
-                        <AppliedUsersFilter
-                            label={tr('Owner')}
-                            value={filterQuery?.owner}
-                            onChange={handleChange('owner')}
-                            onClose={onApplyClick}
-                            onClearFilter={onClearFilter('owner')}
-                        />
-                    ))}
-                    {nullable(Boolean(filterQuery?.participant), () => (
-                        <AppliedUsersFilter
-                            label={tr('Participant')}
-                            value={filterQuery?.participant}
-                            onChange={handleChange('participant')}
-                            onClose={onApplyClick}
-                            onClearFilter={onClearFilter('participant')}
-                        />
-                    ))}
-                    {nullable(Boolean(filterQuery?.estimate), () => (
-                        <AppliedEstimateFilter
-                            label={tr('Estimate')}
-                            value={filterQuery?.estimate}
-                            onChange={setPartialQueryByKey('estimate')}
-                            onClose={onApplyClick}
-                            onClearFilter={onClearFilter('estimate')}
-                            {...appliedFiltersPanelEstimate.attr}
-                        />
-                    ))}
-                    {nullable(Boolean(filterQuery?.priority), () => (
-                        <AppliedPriorityFilter
-                            label={tr('Priority')}
-                            value={filterQuery?.priority}
-                            onChange={handleChange('priority')}
-                            onClose={onApplyClick}
-                            onClearFilter={onClearFilter('priority')}
-                        />
-                    ))}
-                    {nullable(Boolean(filterQuery?.project), () => (
-                        <AppliedGoalParentFilter
-                            label={tr('Project')}
-                            value={filterQuery?.project}
-                            onChange={handleChange('project')}
-                            onClose={onApplyClick}
-                            onClearFilter={onClearFilter('project')}
-                        />
-                    ))}
-                    {nullable(Boolean(filterQuery?.tag), () => (
-                        <AppliedTagFilter
-                            label={tr('Tag')}
-                            value={filterQuery?.tag}
-                            onChange={handleChange('tag')}
-                            onClose={onApplyClick}
-                            onClearFilter={onClearFilter('tag')}
-                        />
-                    ))}
-                    <AddFilterDropdown items={restFilterItems} onChange={({ id }) => setPartialQueryByKey(id)([])} />
-                </AppliedFiltersBar>
-            ))}
-        </>
-    );
-});
+                    </AppliedFiltersBar>
+                ))}
+            </>
+        );
+    },
+);
