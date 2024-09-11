@@ -9,6 +9,7 @@ import {
     Goal,
     Ghost,
     Priority,
+    ExternalTask,
 } from '@prisma/client';
 import { nullable } from '@taskany/bricks';
 import {
@@ -31,6 +32,7 @@ import { getUserName, prepareUserDataFromActivity, safeUserData } from '../../ut
 import { UserBadge } from '../UserBadge/UserBadge';
 import { ProjectBadge } from '../ProjectBadge';
 import { getStateProps, GoalBadge } from '../GoalBadge';
+import { JiraTaskBadge } from '../JiraTaskBadge/JiraTaskBadge';
 import { routes } from '../../hooks/router';
 import { State } from '../State';
 
@@ -42,10 +44,13 @@ type WholeSubject =
     | 'estimate'
     | 'description'
     | 'priority'
-    | 'goalAsCriteria'
     | 'criteriaState'
     | 'goalComplete'
     | 'goalInProgress'
+    | 'goalAsCriteria'
+    | 'taskComplete'
+    | 'taskInProgress'
+    | 'taskAsCriteria'
     | keyof HistoryRecordSubject;
 
 interface HistoryRecordInnerProps {
@@ -151,10 +156,13 @@ const useHistoryTranslates = () => {
             priority: tr('priority'),
             criteria: tr('criteria'),
             partnerProject: tr('partner project'),
-            goalAsCriteria: tr('goal as criteria'),
             criteriaState: tr('marked criteria'),
+            goalAsCriteria: tr('goal as criteria'),
             goalComplete: tr('goal complete'),
             goalInProgress: tr('goal in progress'),
+            taskAsCriteria: tr('task as criteria'),
+            taskComplete: tr('task complete'),
+            taskInProgress: tr('task in progress'),
             complete: '',
             uncomplete: '',
         };
@@ -402,21 +410,35 @@ const HistoryRecordParticipant: React.FC<
 
 type CriteriaItem = GoalAchieveCriteria & {
     criteriaGoal: (Goal & { state?: StateData }) | null;
+    externalTask: ExternalTask | null;
     strike?: boolean;
 };
 
-const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title, strike }) => {
+const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, externalTask, title, strike }) => {
     if (criteriaGoal) {
         return (
-            <>
-                <GoalBadge
-                    className={cn(s.HistoryBadge, s.HistoryRecordTextPrimary)}
-                    title={criteriaGoal.title}
-                    state={getStateProps(criteriaGoal.state)}
-                    href={routes.goal(`${criteriaGoal.projectId}-${criteriaGoal.scopeId}`)}
-                    strike={strike}
-                />
-            </>
+            <GoalBadge
+                className={cn(s.HistoryBadge, s.HistoryRecordTextPrimary)}
+                title={criteriaGoal.title}
+                state={getStateProps(criteriaGoal.state)}
+                href={routes.goal(`${criteriaGoal.projectId}-${criteriaGoal.scopeId}`)}
+                strike={strike}
+            />
+        );
+    }
+
+    if (externalTask) {
+        return (
+            <JiraTaskBadge
+                className={cn(s.HistoryBadge, s.HistoryRecordTextPrimary)}
+                state={{
+                    title: externalTask.state,
+                    color: externalTask.stateColor,
+                }}
+                title={externalTask.title}
+                href={routes.jiraTask(externalTask.externalKey)}
+                strike={strike}
+            />
         );
     }
 
@@ -425,6 +447,19 @@ const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, title
             {title}
         </HistoryRecordText>
     );
+};
+
+const trKeyMap: Record<'criteriaGoal' | 'externalTask', Record<'default' | 'inProgress' | 'complete', WholeSubject>> = {
+    criteriaGoal: {
+        default: 'goalAsCriteria',
+        inProgress: 'goalInProgress',
+        complete: 'goalComplete',
+    },
+    externalTask: {
+        default: 'taskAsCriteria',
+        inProgress: 'taskInProgress',
+        complete: 'taskComplete',
+    },
 };
 
 const HistoryRecordCriteria: React.FC<
@@ -440,14 +475,22 @@ const HistoryRecordCriteria: React.FC<
     useEffect(() => {
         recordCtx.setSubjectText((prev) => {
             const target = from || to;
-            if (target?.criteriaGoal != null) {
+            const translateMap =
+                // eslint-disable-next-line no-nested-ternary
+                target?.criteriaGoal != null
+                    ? trKeyMap.criteriaGoal
+                    : target?.externalTask != null
+                    ? trKeyMap.externalTask
+                    : null;
+
+            if (translateMap) {
                 if (isChangeAction) {
                     if (action === 'complete') {
-                        return 'goalComplete';
+                        return translateMap.complete;
                     }
-                    return 'goalInProgress';
+                    return translateMap.inProgress;
                 }
-                return 'goalAsCriteria';
+                return translateMap.default;
             }
 
             if (isChangeAction) {
@@ -467,7 +510,7 @@ const HistoryRecordCriteria: React.FC<
             to={nullable(to, (val) => (
                 <>
                     <HistoryRecordCriteriaItem {...val} strike={action === 'remove'} />
-                    {val?.criteriaGoal && <HistoryRecordText> {tr('as criteria')}</HistoryRecordText>}
+                    {val?.criteriaGoal && <HistoryRecordText>{tr('as criteria')}</HistoryRecordText>}
                     {nullable(isChangeAction, () => (
                         <HistoryRecordText>
                             {' '}
@@ -480,7 +523,16 @@ const HistoryRecordCriteria: React.FC<
     );
 };
 
-type OuterSubjects = Exclude<WholeSubject, 'goalAsCriteria' | 'criteriaState' | 'goalComplete' | 'goalInProgress'>;
+type BanSubjects =
+    | 'goalAsCriteria'
+    | 'criteriaState'
+    | 'goalComplete'
+    | 'goalInProgress'
+    | 'taskAsCriteria'
+    | 'taskComplete'
+    | 'taskInProgress';
+
+type OuterSubjects = Exclude<WholeSubject, BanSubjects>;
 
 /**
  * let it be like this, with `any` props annotation
