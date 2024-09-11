@@ -2,7 +2,16 @@ import { sql } from 'kysely';
 
 import { db } from '../connection/kysely';
 import { ExtractTypeFromGenerated } from '../utils';
-import { Goal, GoalAchieveCriteria, GoalHistory, Priority, Project, State, Tag } from '../../generated/kysely/types';
+import {
+    Goal,
+    GoalAchieveCriteria,
+    GoalHistory,
+    Priority,
+    Project,
+    State,
+    Tag,
+    ExternalTask,
+} from '../../generated/kysely/types';
 
 import { Activity, getUserActivity } from './activity';
 import { tagQuery } from './tag';
@@ -50,7 +59,8 @@ export interface HistoryRecordMeta {
     owner: Activity;
     participants: Activity;
     state: ExtractTypeFromGenerated<State>;
-    criteria: ExtractTypeFromGenerated<GoalAchieveCriteria> & { criteriaGoal: ExtendedGoal };
+    criteria: ExtractTypeFromGenerated<GoalAchieveCriteria> &
+        ({ criteriaGoal: ExtendedGoal } | { externalTask: ExtractTypeFromGenerated<ExternalTask> });
     partnerProject: ExtractTypeFromGenerated<Project>;
     priority: ExtractTypeFromGenerated<Priority>;
     title: string;
@@ -180,6 +190,14 @@ export const extraDataForEachRecord = async <T extends HisrotyRecord>(
                                     () => goalBaseQuery().as('criteriaGoal'),
                                     (join) => join.onRef('GoalAchieveCriteria.criteriaGoalId', '=', 'criteriaGoal.id'),
                                 )
+                                .leftJoinLateral(
+                                    ({ selectFrom }) =>
+                                        selectFrom('ExternalTask')
+                                            .selectAll()
+                                            .whereRef('GoalAchieveCriteria.externalTaskId', '=', 'ExternalTask.id')
+                                            .as('externalTask'),
+                                    (join) => join.onTrue(),
+                                )
                                 .selectAll('GoalAchieveCriteria')
                                 .select((eb) => [
                                     eb
@@ -189,6 +207,13 @@ export const extraDataForEachRecord = async <T extends HisrotyRecord>(
                                         .else(null)
                                         .end()
                                         .as('criteriaGoal'),
+                                    eb
+                                        .case()
+                                        .when('GoalAchieveCriteria.externalTaskId', 'is not', null)
+                                        .then(sql`to_json("externalTask")`)
+                                        .else(null)
+                                        .end()
+                                        .as('externalTask'),
                                 ])
                                 .where('GoalAchieveCriteria.id', 'in', ids)
                                 .$castTo<HistoryRecordMeta['criteria']>();
