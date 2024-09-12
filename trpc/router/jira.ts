@@ -29,7 +29,7 @@ const jiraIssueToExternalTask = (
     };
 };
 
-export const external = router({
+export const jira = router({
     search: protectedProcedure
         .input(
             z.object({

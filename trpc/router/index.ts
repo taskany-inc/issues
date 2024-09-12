@@ -16,7 +16,7 @@ import { crew } from './crew';
 import { appConfig } from './appConfig';
 import { project as projectV2 } from './projectV2';
 import { goal as goalV2 } from './goalV2';
-import { external } from './external';
+import { jira } from './jira';
 
 export const trpcRouter = router({
     filter,
@@ -37,7 +37,7 @@ export const trpcRouter = router({
         project: projectV2,
         goal: goalV2,
     }),
-    external,
+    jira,
 });
 
 export type TrpcRouter = typeof trpcRouter;
