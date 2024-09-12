@@ -1,12 +1,12 @@
-import { AnyColumnWithTable, Expression, OrderByExpression, sql } from 'kysely';
+import { sql } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
-import { OrderByDirection, DirectedOrderByStringReference } from 'kysely/dist/cjs/parser/order-by-parser';
 
 import { db } from '../connection/kysely';
-import { DB, Role } from '../../generated/kysely/types';
+import { Role } from '../../generated/kysely/types';
 import { QueryWithFilters } from '../../src/schema/common';
 import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
+import { mapSortParamsToTableColumns } from './goalV2';
 import { getUserActivity } from './activity';
 
 export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId: string; role: Role }) => {
@@ -221,53 +221,6 @@ export const getUserProjectsQuery = ({
         )
         .limit(limit)
         .orderBy('Project.updatedAt desc');
-};
-
-const mapSortParamsToTableColumns = (
-    sort: QueryWithFilters['sort'] = [],
-): Array<OrderByExpression<DB, 'Goal', unknown>> => {
-    if (!sort.length) {
-        return ['Goal.updatedAt desc'];
-    }
-
-    const mapToTableColumn: Record<
-        NonNullable<QueryWithFilters['sort']>[number]['key'],
-        AnyColumnWithTable<DB, 'Goal'> | Record<OrderByDirection, Expression<string>>
-    > = {
-        title: 'Goal.title',
-        updatedAt: 'Goal.updatedAt',
-        createdAt: 'Goal.createdAt',
-        state: {
-            asc: sql`(select title from "State" where "State".id = "Goal"."stateId") asc`,
-            desc: sql`(select title from "State" where "State".id = "Goal"."stateId") desc`,
-        },
-        priority: {
-            asc: sql`(select value from "Priority" where "Priority".id = "Goal"."priorityId") asc`,
-            desc: sql`(select value from "Priority" where "Priority".id = "Goal"."priorityId") desc`,
-        },
-        project: {
-            asc: sql`(select title from "Project" where "Project".id = "Goal"."projectId") asc`,
-            desc: sql`(select title from "Project" where "Project".id = "Goal"."projectId") desc`,
-        },
-        activity: {
-            asc: sql`(select name from "User" where "User"."activityId" = "Goal"."activityId") asc`,
-            desc: sql`(select name from "User" where "User"."activityId" = "Goal"."activityId") desc`,
-        },
-        owner: {
-            asc: sql`(select name from "User" where "User"."activityId" = "Goal"."ownerId") asc`,
-            desc: sql`(select name from "User" where "User"."activityId" = "Goal"."ownerId") desc`,
-        },
-    };
-
-    return sort.map<OrderByExpression<DB, 'Goal', unknown>>(({ key, dir }) => {
-        const rule = mapToTableColumn[key];
-
-        if (typeof rule === 'string') {
-            return `${rule} ${dir}` as DirectedOrderByStringReference<DB, 'Goal', unknown>;
-        }
-
-        return rule[dir];
-    });
 };
 
 interface GetProjectsWithGoalsByIdsParams extends GetUserProjectsQueryParams {
@@ -503,7 +456,7 @@ export const getUserProjectsWithGoals = (params: GetProjectsWithGoalsByIdsParams
                 })
                 .where('Goal.archived', 'is not', true)
                 .groupBy('Goal.id')
-                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort)),
+                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort, 'Goal')),
         )
         .selectFrom('Project')
         .leftJoinLateral(
