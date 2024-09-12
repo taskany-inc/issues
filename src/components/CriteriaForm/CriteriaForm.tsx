@@ -15,32 +15,33 @@ import {
 } from '@taskany/bricks/harmony';
 
 import { GoalSelect } from '../GoalSelect/GoalSelect';
-import { getStateProps, GoalBadge } from '../GoalBadge';
+import { GoalBadge } from '../GoalBadge';
 import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCompleteInput';
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { StateDot } from '../StateDot/StateDot';
-import { TaskBadge, TaskBadgeIcon } from '../TaskBadge/TaskBadge';
+import { JiraTaskBadge, JiraTaskBadgeIcon } from '../JiraTaskBadge/JiraTaskBadge';
 
 import { tr } from './CriteriaForm.i18n';
 import s from './CriteriaForm.module.css';
 
-type GoalStateProps = ComponentProps<typeof StateDot>['state'];
-type TaskTypeProps = NonNullable<ComponentProps<typeof TaskBadge>['type']>;
-type TaskStateProps = NonNullable<ComponentProps<typeof TaskBadge>['state']>;
+type GoalStateProps = NonNullable<ComponentProps<typeof StateDot>['state']>;
+type TaskTypeProps = NonNullable<ComponentProps<typeof JiraTaskBadge>['type']>;
 
-interface SuggestItem {
-    id: string;
-    title: string;
-    state?: GoalStateProps | TaskStateProps | null;
-    type?: TaskTypeProps | null;
-    _shortId: string;
-}
-
-const isGoalStateProps = (props: unknown): props is GoalStateProps =>
-    typeof props === 'object' && props != null && 'lightForeground' in props && 'darkForeground' in props;
-
-const isTaskStateProps = (props: unknown): props is TaskStateProps =>
-    typeof props === 'object' && props != null && 'src' in props && 'title' in props;
+type SuggestItem =
+    | {
+          itemType: 'goal';
+          id: string;
+          title: string;
+          state: GoalStateProps | null;
+          _shortId: string;
+      }
+    | {
+          itemType: 'task';
+          id: string;
+          title: string;
+          type: TaskTypeProps;
+          key: string;
+      };
 
 interface ValidityData {
     title: string[];
@@ -101,7 +102,7 @@ function patchZodSchema<T extends FormValues>(
                 mode: z.literal('task'),
                 id: z.string(),
                 selected: z.object({
-                    externalKey: z.string(),
+                    key: z.string(),
                 }),
             }),
         ])
@@ -241,12 +242,9 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
     const { selected, title } = errors;
 
     const icon = useMemo(() => {
-        if (selectedItem == null) {
-            return null;
-        }
-
+        const existItem = selectedItem != null;
         if (mode === 'goal') {
-            if (isGoalStateProps(selectedItem.state)) {
+            if (existItem && selectedItem?.itemType === 'goal') {
                 return <StateDot size="s" state={selectedItem.state} view="stroke" />;
             }
 
@@ -254,8 +252,8 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
         }
 
         if (mode === 'task') {
-            if (isTaskStateProps(selectedItem.type)) {
-                return <TaskBadgeIcon src={selectedItem.type.src} />;
+            if (existItem && selectedItem?.itemType === 'task') {
+                return <JiraTaskBadgeIcon src={selectedItem.type.src} />;
             }
 
             return <IconDatabaseOutline size="s" />;
@@ -301,14 +299,6 @@ const CriteriaTitleField: React.FC<CriteriaTitleFieldProps> = ({
             autoFocus
         />
     );
-};
-
-const isGoalProps = (props: unknown): props is React.ComponentProps<typeof GoalBadge> => {
-    return typeof props === 'object' && props != null && '_shortId' in props;
-};
-
-const isTaskProps = (props: unknown): props is React.ComponentProps<typeof TaskBadge> => {
-    return typeof props === 'object' && props != null && 'type' in props;
 };
 
 export const CriteriaForm = ({
@@ -444,18 +434,12 @@ export const CriteriaForm = ({
                 renderItem={(props) => {
                     const renderData = props.item;
 
-                    if (mode === 'goal' && isGoalProps(renderData)) {
-                        return (
-                            <GoalBadge
-                                title={renderData.title}
-                                state={getStateProps(renderData?.state)}
-                                className={s.GoalBadge}
-                            />
-                        );
+                    if (mode === 'goal' && renderData.itemType === 'goal') {
+                        return <GoalBadge title={renderData.title} state={renderData.state} className={s.GoalBadge} />;
                     }
 
-                    if (mode === 'task' && isTaskProps(renderData)) {
-                        return <TaskBadge {...renderData} />;
+                    if (mode === 'task' && renderData.itemType === 'task') {
+                        return <JiraTaskBadge {...renderData} />;
                     }
                 }}
             >

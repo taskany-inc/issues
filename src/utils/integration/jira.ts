@@ -110,7 +110,7 @@ class JiraService extends JiraApi {
         );
     }
 
-    /** start overriding private instamce methods */
+    /** start overriding private instance methods */
     // @ts-ignore
     private async doRequest<T extends JiraApi.JsonResponse>(options: any): Promise<T> {
         if (isDebugEnabled) {
@@ -134,14 +134,7 @@ class JiraService extends JiraApi {
         // @ts-ignore
         return this.makeRequestHeader(url, options);
     }
-    /** end overriding private instamce methods */
-
-    public async statusesByCategory(categoryId: number) {
-        const uri = this.getUri({ pathname: '/status' });
-
-        const res = await this.doRequest<JiraIssueStatus[]>(this.getRequestHeaders(uri));
-        return res.filter(({ statusCategory }) => statusCategory.id === categoryId);
-    }
+    /** end overriding private instance methods */
 
     public checkStatusIsFinished(status: JiraIssueStatus) {
         return (
@@ -222,5 +215,3 @@ export const searchIssue = async (params: { value: string; limit: number }): Pro
         ...val.fields,
     })) as Array<JiraIssue>;
 };
-
-jiraService.listStatus;

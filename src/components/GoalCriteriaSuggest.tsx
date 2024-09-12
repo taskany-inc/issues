@@ -5,6 +5,7 @@ import { useGoalResource } from '../hooks/useGoalResource';
 
 import { CriteriaForm, useCriteriaValidityData } from './CriteriaForm/CriteriaForm';
 import { dispatchPreviewUpdateEvent } from './GoalPreview/GoalPreviewProvider';
+import { getStateProps } from './GoalBadge';
 
 type SuggestItems = React.ComponentProps<typeof CriteriaForm>['items'];
 
@@ -41,6 +42,7 @@ interface GoalCriteriaSuggestProps {
     validityData: React.ComponentProps<typeof CriteriaForm>['validityData'];
     onGoalSelect?: (goal: { id: string }) => void;
 }
+type SuggestItem = React.ComponentProps<typeof CriteriaForm>['items'][number];
 
 export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
     id,
@@ -83,7 +85,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
         { enabled: mode === 'goal' && shouldEnabledQuery, cacheTime: 0 },
     );
 
-    const { data: issues = [] } = trpc.external.search.useQuery(
+    const { data: issues = [] } = trpc.jira.search.useQuery(
         {
             value: query as string,
             limit: 5,
@@ -94,7 +96,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
         },
     );
 
-    const itemsToRender = useMemo(() => {
+    const itemsToRender = useMemo<SuggestItem[]>(() => {
         if (selectedGoal?.title === query || mode === 'simple') {
             return [];
         }
@@ -103,20 +105,15 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
             return goals.map(({ id, title, state, _shortId }) => ({
                 id,
                 title,
-                state:
-                    state?.lightForeground != null && state?.darkForeground != null
-                        ? {
-                              lightForeground: state.lightForeground,
-                              darkForeground: state.darkForeground,
-                          }
-                        : null,
+                state: getStateProps(state),
                 _shortId,
+                itemType: 'goal',
             }));
         }
 
         return issues.map((issue) => ({
             ...issue,
-            _shortId: issue.externalKey,
+            key: issue.externalKey,
             state: null,
             id: issue.externalId,
             title: issue.title,
@@ -124,6 +121,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
                 title: issue.type,
                 src: issue.typeIconUrl,
             },
+            itemType: 'task' as const,
         }));
     }, [goals, selectedGoal, query, mode, issues]);
 

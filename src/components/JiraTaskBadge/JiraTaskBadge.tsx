@@ -5,9 +5,9 @@ import { BaseIcon } from '@taskany/icons';
 
 import { NextLink } from '../NextLink';
 
-import styles from './TaskBadge.module.css';
+import styles from './JiraTaskBadge.module.css';
 
-interface TaskBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'color' | 'title'> {
+interface JiraTaskBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'color' | 'title'> {
     title: React.ReactNode;
     href?: string;
     type?: {
@@ -25,7 +25,7 @@ interface TaskBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'co
     project?: string;
 }
 
-export const TaskBadgeIcon: React.FC<{ src: string }> = ({ src }) => (
+export const JiraTaskBadgeIcon: React.FC<{ src: string }> = ({ src }) => (
     <BaseIcon
         className={styles.TaskBadgeType}
         size="s"
@@ -37,14 +37,14 @@ export const TaskBadgeIcon: React.FC<{ src: string }> = ({ src }) => (
     />
 );
 
-export const TaskBadgeState: React.FC<{ state: string; color?: string | null }> = ({ state, color }) => {
+export const JiraTaskBadgeState: React.FC<{ state: string; color?: string | null }> = ({ state, color }) => {
     const style = color ? ({ '--task-badge-color': color.split('-')[0] } as React.CSSProperties) : {};
     return (
         <Tooltip
             placement="top"
             target={
-                <span style={style} className={styles.TaskBadgeState}>
-                    <Text size="xs" as="span" className={styles.TaskBadgeStateSymbol}>
+                <span style={style} className={styles.JiraTaskBadgeState}>
+                    <Text size="xs" as="span" className={styles.JiraTaskBadgeStateSymbol}>
                         {state.slice(0, 1).toUpperCase()}
                     </Text>
                 </span>
@@ -55,7 +55,20 @@ export const TaskBadgeState: React.FC<{ state: string; color?: string | null }> 
     );
 };
 
-export const TaskBadge: React.FC<TaskBadgeProps> = ({
+const JiraTaskBadgeLabel: React.FC<Pick<JiraTaskBadgeProps, 'title' | 'project'>> = ({ title, project }) => {
+    return (
+        <>
+            {title}
+            {nullable(project, (p) => (
+                <Text className={styles.JiraTaskBadgeProjectName} as="span" color="var(--gray-500)">
+                    ({p})
+                </Text>
+            ))}
+        </>
+    );
+};
+
+export const JiraTaskBadge: React.FC<JiraTaskBadgeProps> = ({
     href,
     title,
     children,
@@ -72,35 +85,19 @@ export const TaskBadge: React.FC<TaskBadgeProps> = ({
             iconLeft={nullable(
                 type?.src,
                 (src) => (
-                    <TaskBadgeIcon src={src} />
+                    <JiraTaskBadgeIcon src={src} />
                 ),
-                nullable(state, (s) => <TaskBadgeState state={s.title} color={s.color} />),
+                nullable(state, (s) => <JiraTaskBadgeState state={s.title} color={s.color} />),
             )}
             iconRight={children}
             text={nullable(
                 href,
                 (h) => (
                     <NextLink href={h} target="_blank" view="secondary" onClick={onClick}>
-                        {title}
-                        {nullable(project, (p) => (
-                            <>
-                                <Text className={styles.TaskBadgeProjectName} as="span" color="var(--gray8)">
-                                    ({p})
-                                </Text>
-                            </>
-                        ))}
+                        <JiraTaskBadgeLabel title={title} project={project} />
                     </NextLink>
                 ),
-                <>
-                    {title}
-                    {nullable(project, (p) => (
-                        <>
-                            <Text className={styles.TaskBadgeProjectName} as="span" color="var(--gray8)">
-                                ({p})
-                            </Text>
-                        </>
-                    ))}
-                </>,
+                <JiraTaskBadgeLabel title={title} project={project} />,
             )}
             action="dynamic"
             {...attrs}

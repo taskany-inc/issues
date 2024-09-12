@@ -34,8 +34,8 @@ import { ActivityFeedItem } from '../ActivityFeed/ActivityFeed';
 import { IssueMeta } from '../IssueMeta/IssueMeta';
 import { Circle } from '../Circle/Circle';
 import { routes } from '../../hooks/router';
-import { GoalBadge } from '../GoalBadge';
-import { TaskBadge } from '../TaskBadge/TaskBadge';
+import { getStateProps, GoalBadge } from '../GoalBadge';
+import { JiraTaskBadge } from '../JiraTaskBadge/JiraTaskBadge';
 import { safeUserData } from '../../utils/getUserName';
 import { UserBadge } from '../UserBadge/UserBadge';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
@@ -48,7 +48,7 @@ import { tr } from './GoalCriteria.i18n';
 type GoalCriteriaSuggestProps = React.ComponentProps<typeof GoalCriteriaSuggest>;
 
 type GoalStateProps = NonNullable<React.ComponentProps<typeof GoalBadge>['state']>;
-type ExternalTaskTypeProps = React.ComponentProps<typeof TaskBadge>['type'];
+type ExternalTaskTypeProps = NonNullable<React.ComponentProps<typeof JiraTaskBadge>['type']>;
 type CriteriaUpdateDataMode = NonNullable<GoalCriteriaSuggestProps['defaultMode']>;
 interface CriteriaProps {
     title: string;
@@ -70,10 +70,11 @@ interface GoalCriteriaProps extends CriteriaProps {
 
 interface ExternalTaskCriteriaProps extends CriteriaProps {
     externalTask: {
+        id: string;
         title: string;
         externalKey: string;
         project: string;
-        type?: ExternalTaskTypeProps;
+        type: ExternalTaskTypeProps;
         state?: {
             color: string | null;
             title: string;
@@ -85,7 +86,7 @@ interface ExternalTaskCriteriaProps extends CriteriaProps {
 
 type UnionCriteria = CriteriaProps | GoalCriteriaProps | ExternalTaskCriteriaProps;
 
-type CanBeNullableValue<T extends { [key: string]: any }> = {
+type CanBeNullableValue<T extends { [key: string]: unknown }> = {
     [K in keyof T]: T[K] | null;
 };
 
@@ -224,7 +225,7 @@ const ExternalTaskCriteria = ({ title, externalTask, weight, isDone }: Omit<Exte
     return (
         <>
             <TableCell className={classes.GoalCriteriaTitleCell} width={200}>
-                <TaskBadge
+                <JiraTaskBadge
                     title={title}
                     state={
                         externalTask.state
@@ -272,31 +273,12 @@ const GoalCriteria = ({ title, goal, weight, isDone }: Omit<GoalCriteriaProps, '
         [setPreview, title, goal],
     );
 
-    const goalState = useMemo(() => {
-        if (goal.state == null) {
-            return null;
-        }
-
-        const {
-            state: { lightForeground, darkForeground },
-        } = goal;
-
-        if (lightForeground && darkForeground) {
-            return {
-                lightForeground,
-                darkForeground,
-            };
-        }
-
-        return null;
-    }, [goal]);
-
     return (
         <>
             <TableCell className={classes.GoalCriteriaTitleCell} width={200}>
                 <GoalBadge
                     title={title}
-                    state={goalState}
+                    state={getStateProps(goal.state)}
                     href={routes.goal(goal.shortId)}
                     onClick={handleGoalCriteriaClick}
                     progress={goal.progress}
@@ -446,6 +428,7 @@ export const Criteria: React.FC<
                         title: props.title,
                         state: props.goal.state,
                         _shortId: props.goal.shortId,
+                        itemType: 'goal',
                     },
                 },
             ];
@@ -460,11 +443,11 @@ export const Criteria: React.FC<
                     title: props.title,
                     weight: props.weight ? `${props.weight}` : '',
                     selected: {
-                        id: props.externalTask.externalKey,
-                        _shortId: props.externalTask.externalKey,
+                        id: props.externalTask.id,
                         title: props.externalTask.title,
-                        state: props.externalTask.state,
-                        externalKey: props.externalTask.externalKey,
+                        type: props.externalTask.type,
+                        key: props.externalTask.externalKey,
+                        itemType: 'task',
                     },
                 },
             ];
@@ -503,7 +486,7 @@ export const Criteria: React.FC<
                     valuesToUpdate.selected.id = values.selected.id;
                     break;
                 case 'task':
-                    valuesToUpdate.selected.externalKey = values.selected.externalKey;
+                    valuesToUpdate.selected.externalKey = values.selected.key;
                     break;
                 default:
             }
