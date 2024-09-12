@@ -36,7 +36,7 @@ describe('Dashboard', () => {
         cy.signInViaEmail();
     });
 
-    it.only('filters are active by default', () => {
+    it('filters are active by default', () => {
         cy.get('body').should('exist');
 
         cy.get(projectListItem.query).filter(`:contains(${projectOne})`).should('exist');
