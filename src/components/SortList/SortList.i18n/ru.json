@@ -6,5 +6,8 @@
     "Activity": "Автор",
     "Owner": "Ответственный",
     "UpdatedAt": "Обновлено",
-    "CreatedAt": "Создано"
+    "CreatedAt": "Создано",
+    "Stargizers": "В избранном",
+    "Goals": "Цели",
+    "Watchers": "Отслеживается"
 }

@@ -11,16 +11,38 @@ export const StateTypeEnum = z.nativeEnum(StateType);
 export type ToggleSubscription = z.infer<typeof ToggleSubscriptionSchema>;
 
 const sortDirectionValue = z.enum(['asc', 'desc']);
-const sortPropEnum = z.enum(['title', 'state', 'priority', 'project', 'activity', 'owner', 'updatedAt', 'createdAt']);
+const sortGoalsPropEnum = z.enum([
+    'title',
+    'state',
+    'priority',
+    'project',
+    'activity',
+    'owner',
+    'updatedAt',
+    'createdAt',
+]);
 
-export const sortablePropertiesArraySchema = z
+const sortProjectsPropEnum = z.enum(['title', 'owner', 'updatedAt', 'createdAt', 'stargizers', 'watchers', 'goals']);
+
+export const sortableGoalsPropertiesArraySchema = z
     .array(
         z.object({
-            key: sortPropEnum,
+            key: sortGoalsPropEnum,
             dir: sortDirectionValue,
         }),
     )
     .optional();
+
+export const sortableProjectsPropertiesArraySchema = z
+    .array(
+        z.object({
+            key: sortProjectsPropEnum,
+            dir: sortDirectionValue,
+        }),
+    )
+    .optional();
+
+export type SortableProjectsPropertiesArray = z.infer<typeof sortableProjectsPropertiesArraySchema>;
 
 export const queryWithFiltersSchema = z.object({
     priority: z.array(z.string()).optional(),
@@ -33,7 +55,7 @@ export const queryWithFiltersSchema = z.object({
     participant: z.array(z.string()).optional(),
     project: z.array(z.string()).optional(),
     partnershipProject: z.array(z.string()).optional(),
-    sort: sortablePropertiesArraySchema,
+    sort: sortableGoalsPropertiesArraySchema,
     query: z.string().optional(),
     starred: z.boolean().optional(),
     watching: z.boolean().optional(),

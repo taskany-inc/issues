@@ -6,5 +6,8 @@
     "Activity": "Activity",
     "Owner": "Owner",
     "UpdatedAt": "Updated",
-    "CreatedAt": "Created"
+    "CreatedAt": "Created",
+    "Stargizers": "Stargizers",
+    "Goals": "Goals",
+    "Watchers": "Watchers"
 }

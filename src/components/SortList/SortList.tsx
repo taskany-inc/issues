@@ -1,52 +1,80 @@
 import React, { useCallback, useMemo } from 'react';
 import { AutoComplete, AutoCompleteList } from '@taskany/bricks/harmony';
 
-import type { FilterQueryState, SortableProps, SortDirection } from '../../hooks/useUrlFilterParams';
+import type {
+    FilterQueryState,
+    SortableBaseProps,
+    SortableGoalsProps,
+    SortableProjectsProps,
+    SortDirection,
+} from '../../hooks/useUrlFilterParams';
 import { SortButton } from '../SortButton/SortButton';
 
 import { tr } from './SortList.i18n';
 import styles from './SortList.module.css';
 
-interface SortListProps {
-    value?: FilterQueryState['sort'];
-    onChange: (key: SortableProps, dir: SortDirection | null) => void;
+interface SortListProps<T extends FilterQueryState['sort'] | FilterQueryState['projectsSort']> {
+    variant?: 'goals' | 'projects';
+    value?: T;
+    onChange: (key: SortableGoalsProps | SortableProjectsProps, dir: SortDirection | null) => void;
 }
 
 interface SingleSortItem {
-    id: SortableProps;
+    id: SortableGoalsProps | SortableProjectsProps;
     title: string;
     dir: SortDirection | null;
 }
 
-export const SortList: React.FC<SortListProps> = ({ value, onChange }) => {
+export const SortList = <T extends FilterQueryState['sort'] | FilterQueryState['projectsSort']>({
+    variant = 'goals',
+    value,
+    onChange,
+}: SortListProps<T>) => {
     const { itemsToRender, sortItems } = useMemo(() => {
-        const sortItems = {
+        const baseSortItems: Record<SortableBaseProps, string> = {
             title: tr('Title'),
-            state: tr('State'),
-            priority: tr('Priority'),
-            project: tr('Project'),
-            activity: tr('Activity'),
             owner: tr('Owner'),
             updatedAt: tr('UpdatedAt'),
             createdAt: tr('CreatedAt'),
         };
+        const sortGoalsItems: Record<Exclude<SortableGoalsProps, SortableProjectsProps>, string> = {
+            state: tr('State'),
+            activity: tr('Activity'),
+            priority: tr('Priority'),
+            project: tr('Project'),
+        };
+
+        const sortProjectItems: Record<Exclude<SortableProjectsProps, SortableGoalsProps>, string> = {
+            stargizers: tr('Stargizers'),
+            watchers: tr('Watchers'),
+            goals: tr('Goals'),
+        };
+
+        const sortItems =
+            variant === 'goals' ? { ...baseSortItems, ...sortGoalsItems } : { ...baseSortItems, ...sortProjectItems };
 
         return {
             sortItems,
-            itemsToRender: (Object.entries(sortItems) as Array<[SortableProps, string]>).map(([id, title]) => ({
+            itemsToRender: (
+                Object.entries(sortItems) as Array<[SortableGoalsProps | SortableProjectsProps, string]>
+            ).map(([id, title]) => ({
                 id,
                 title,
                 dir: null,
             })),
         };
-    }, []);
+    }, [variant]);
 
     const selected: SingleSortItem[] | undefined = useMemo(() => {
-        return value?.map(({ key, dir }) => ({ id: key, title: sortItems[key], dir }));
+        return value?.map(({ key, dir }) => ({
+            id: key,
+            title: sortItems[key as SortableBaseProps],
+            dir,
+        }));
     }, [value, sortItems]);
 
     const handleChange = useCallback(
-        (key: SortableProps) => (dir: SortDirection | null) => {
+        (key: SortableGoalsProps | SortableProjectsProps) => (dir: SortDirection | null) => {
             onChange(key, dir);
         },
         [onChange],

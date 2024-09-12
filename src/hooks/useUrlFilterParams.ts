@@ -3,11 +3,11 @@ import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
 
 import { FilterById, StateType } from '../../trpc/inferredTypes';
-import { StateTypeEnum } from '../schema/common';
+import { SortableProjectsPropertiesArray, StateTypeEnum } from '../schema/common';
 import { setCookie } from '../utils/cookies';
 
 export type SortDirection = 'asc' | 'desc';
-export type SortableProps =
+export type SortableGoalsProps =
     | 'title'
     | 'state'
     | 'priority'
@@ -16,6 +16,10 @@ export type SortableProps =
     | 'owner'
     | 'updatedAt'
     | 'createdAt';
+
+export type SortableProjectsProps = NonNullable<SortableProjectsPropertiesArray>[number]['key'];
+
+export type SortableBaseProps = SortableGoalsProps & SortableProjectsProps;
 
 export const filtersNoSearchPresetCookie = 'taskany.NoSearchPreset';
 
@@ -32,7 +36,8 @@ export interface FilterQueryState {
     project: string[];
     partnershipProject: string[];
     query: string;
-    sort: Array<{ key: SortableProps; dir: SortDirection }>;
+    sort: Array<{ key: SortableGoalsProps; dir: SortDirection }>;
+    projectsSort: NonNullable<SortableProjectsPropertiesArray>;
     hideCriteria?: boolean;
     hideEmptyProjects?: boolean;
 }
@@ -86,16 +91,20 @@ export interface QueryState extends BaseQueryState, FilterQueryState {}
 
 const parseQueryParam = (param = '') => param.split(',').filter(Boolean);
 
-const parseSortQueryParam = (param = '') =>
+const parseSortQueryParam = <K extends 'goals' | 'projects'>(param = '') =>
     param.split(',').reduce((acc, curr) => {
         if (curr) {
-            const [key, dir] = curr.split(':') as [SortableProps, SortDirection];
-            acc.push({ key, dir });
+            const [key, dir] = curr.split(':') as [
+                K extends 'goals' ? SortableGoalsProps : SortableProjectsProps,
+                SortDirection,
+            ];
+            acc.push({ key: key as SortableBaseProps, dir });
         }
         return acc;
-    }, [] as QueryState['sort']);
+    }, [] as K extends 'goals' ? QueryState['sort'] : QueryState['projectsSort']);
 
-const stringifySortQueryParam = (param: QueryState['sort']) => param.map(({ key, dir }) => `${key}:${dir}`).join(',');
+const stringifySortQueryParam = (param: QueryState['sort' | 'projectsSort']) =>
+    param.map(({ key, dir }) => `${key}:${dir}`).join(',');
 
 export const buildURLSearchParams = ({
     priority = [],
@@ -112,6 +121,7 @@ export const buildURLSearchParams = ({
     starred,
     watching,
     sort = [],
+    projectsSort = [],
     groupBy,
     view,
     limit,
@@ -145,6 +155,10 @@ export const buildURLSearchParams = ({
         : urlParams.delete('partnershipProject');
 
     sort.length > 0 ? urlParams.set('sort', stringifySortQueryParam(sort)) : urlParams.delete('sort');
+
+    projectsSort.length > 0
+        ? urlParams.set('projectsSort', stringifySortQueryParam(projectsSort))
+        : urlParams.delete('projectsSort');
 
     query.length > 0 ? urlParams.set('query', query.toString()) : urlParams.delete('query');
 
@@ -190,7 +204,10 @@ export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
     if (query.partnershipProject) queryMap.partnershipProject = parseQueryParam(query.partnershipProject?.toString());
     if (query.query) queryMap.query = parseQueryParam(query.query?.toString()).toString();
     if (query.sort) {
-        queryMap.sort = parseSortQueryParam(query.sort?.toString());
+        queryMap.sort = parseSortQueryParam<'goals'>(query.sort?.toString());
+    }
+    if (query.projectsSort) {
+        queryMap.projectsSort = parseSortQueryParam<'projects'>(query.projectsSort?.toString());
     }
     if (query.hideCriteria) queryMap.hideCriteria = Boolean(query.hideCriteria) || undefined;
     if (query.hideEmptyProjects) queryMap.hideEmptyProjects = Boolean(query.hideEmptyProjects) || undefined;
@@ -214,24 +231,26 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
     const router = useRouter();
     const [currentPreset, setCurrentPreset] = useState(preset);
     const [prevPreset, setPrevPreset] = useState(preset);
-    const { queryState, queryFilterState, groupBy, hideCriteria, hideEmptyProjects, view } = useMemo(() => {
-        const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { groupBy, view, id, ...queries } = query;
+    const { queryState, queryFilterState, projectsSort, groupBy, hideCriteria, hideEmptyProjects, view } =
+        useMemo(() => {
+            const query = currentPreset ? Object.fromEntries(new URLSearchParams(currentPreset.params)) : router.query;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { groupBy, view, id, ...queries } = query;
 
-        const { queryState = undefined, queryFilterState = undefined } = Object.keys(queries).length
-            ? parseQueryState({ groupBy, view, ...queries })
-            : {};
+            const { queryState = undefined, queryFilterState = undefined } = Object.keys(queries).length
+                ? parseQueryState({ groupBy, view, ...queries })
+                : {};
 
-        return {
-            queryFilterState,
-            queryState,
-            groupBy: groupBy as GroupByParam | undefined,
-            view: view as PageView | undefined,
-            hideCriteria: queryState?.hideCriteria,
-            hideEmptyProjects: queryState?.hideEmptyProjects,
-        };
-    }, [router.query, currentPreset]);
+            return {
+                queryFilterState,
+                queryState,
+                groupBy: groupBy as GroupByParam | undefined,
+                view: view as PageView | undefined,
+                hideCriteria: queryState?.hideCriteria,
+                projectsSort: queryState?.projectsSort,
+                hideEmptyProjects: queryState?.hideEmptyProjects,
+            };
+        }, [router.query, currentPreset]);
 
     const queryString = router.asPath.split('?')[1];
 
@@ -312,6 +331,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             watching: false,
             query: '',
             sort: [],
+            projectsSort: [],
             groupBy: undefined,
             view: undefined,
             hideCriteria: undefined,
@@ -368,6 +388,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setStarredFilter: pushStateProvider.key('starred'),
             setWatchingFilter: pushStateProvider.key('watching'),
             setSortFilter: pushStateProvider.key('sort'),
+            setProjectsSortFilter: pushStateProvider.key('projectsSort'),
             setFulltextFilter: pushStateProvider.key('query'),
             setLimitFilter: pushStateProvider.key('limit'),
             setGroupBy: pushStateProvider.key('groupBy'),
@@ -381,6 +402,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
 
     return {
         queryState,
+        projectsSort,
         queryFilterState,
         queryString,
         currentPreset,

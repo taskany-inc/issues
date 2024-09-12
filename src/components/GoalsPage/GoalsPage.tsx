@@ -55,6 +55,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback, baseQueryState
                     counter={data?.filtered || 0}
                     filterPreset={preset}
                     enableViewToggle
+                    enableProjectsSort={groupedView}
                 />
             }
         >

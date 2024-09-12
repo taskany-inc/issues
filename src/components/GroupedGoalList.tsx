@@ -21,7 +21,7 @@ export const projectsSize = 20;
 export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }) => {
     const { setPreview, on } = useGoalPreview();
 
-    const { queryState } = useUrlFilterParams({
+    const { queryState, projectsSort } = useUrlFilterParams({
         preset: filterPreset,
     });
 
@@ -31,6 +31,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }
             limit: projectsSize,
             goalsQuery: queryState,
             firstLevel: !!queryState?.project?.length,
+            projectsSort,
         },
         {
             getNextPageParam: ({ pagination }) => pagination.offset,

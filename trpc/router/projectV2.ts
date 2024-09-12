@@ -15,7 +15,7 @@ import {
     getAllProjectsQuery,
     getChildrenProjectQuery,
 } from '../queries/projectV2';
-import { queryWithFiltersSchema } from '../../src/schema/common';
+import { queryWithFiltersSchema, sortableProjectsPropertiesArraySchema } from '../../src/schema/common';
 import {
     Project,
     User,
@@ -169,10 +169,11 @@ export const project = router({
                 limit: z.number().optional(),
                 goalsQuery: queryWithFiltersSchema.optional(),
                 cursor: z.number().optional(),
+                projectsSort: sortableProjectsPropertiesArraySchema.optional(),
             }),
         )
         .query(async ({ ctx, input }) => {
-            const { limit = 5, cursor: offset = 0, goalsQuery } = input;
+            const { limit = 5, cursor: offset = 0, goalsQuery, projectsSort } = input;
             const {
                 session: { user },
             } = ctx;
@@ -180,6 +181,7 @@ export const project = router({
             const dashboardProjects = await getUserDashboardProjects({
                 ...user,
                 goalsQuery,
+                projectsSort,
                 limit: limit + 1,
                 offset,
             })
@@ -229,12 +231,13 @@ export const project = router({
             z.object({
                 limit: z.number().optional(),
                 goalsQuery: queryWithFiltersSchema.optional(),
+                projectsSort: sortableProjectsPropertiesArraySchema.optional(),
                 firstLevel: z.boolean(),
                 cursor: z.number().optional(),
             }),
         )
         .query(async ({ input, ctx }) => {
-            const { limit = 20, cursor = 0, goalsQuery, firstLevel: _ = true } = input;
+            const { limit = 20, cursor = 0, goalsQuery, projectsSort, firstLevel: _ = true } = input;
 
             const projects = await getAllProjectsQuery({
                 ...ctx.session.user,
@@ -242,6 +245,7 @@ export const project = router({
                 limit: limit + 1,
                 cursor,
                 ids: goalsQuery?.project,
+                projectsSort,
             })
                 .$castTo<Omit<ProjectResponse, 'children'> & Pick<DashboardProject, '_count'>>()
                 .execute();
