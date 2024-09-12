@@ -10,7 +10,13 @@ import {
 } from '@taskany/bricks/harmony';
 import { nullable, useLatest } from '@taskany/bricks';
 
-import { FilterQueryState, QueryState, useUrlFilterParams } from '../../hooks/useUrlFilterParams';
+import {
+    FilterQueryState,
+    QueryState,
+    SortableGoalsProps,
+    SortableProjectsProps,
+    useUrlFilterParams,
+} from '../../hooks/useUrlFilterParams';
 import { FilterById } from '../../../trpc/inferredTypes';
 import {
     filtersPanel,
@@ -52,8 +58,9 @@ export const FiltersPanel: FC<{
     filterPreset?: FilterById;
     enableViewToggle?: boolean;
     enableLayoutToggle?: boolean;
-    enableHideProjectToggle?: boolean;
     children?: ReactNode;
+    enableHideProjectToggle?: boolean;
+    enableProjectsSort?: boolean;
 }> = memo(
     ({
         children,
@@ -62,6 +69,7 @@ export const FiltersPanel: FC<{
         counter = 0,
         enableViewToggle,
         enableLayoutToggle,
+        enableProjectsSort,
         enableHideProjectToggle,
         filterPreset,
     }) => {
@@ -72,8 +80,10 @@ export const FiltersPanel: FC<{
             currentPreset,
             queryString,
             queryState,
+            projectsSort,
             resetQueryState,
             batchQueryState,
+            setProjectsSortFilter,
             setSortFilter,
             queryFilterState,
             groupBy,
@@ -242,7 +252,7 @@ export const FiltersPanel: FC<{
                                 </>
                             ))}
 
-                            <FiltersBarDropdownTitle>{tr('Sort')}</FiltersBarDropdownTitle>
+                            <FiltersBarDropdownTitle>{tr('Goals sort')}</FiltersBarDropdownTitle>
                             <FiltersBarDropdownContent>
                                 <SortList
                                     value={filterQuery?.sort}
@@ -255,9 +265,12 @@ export const FiltersPanel: FC<{
                                             const paramExistingIndex = sortParams.findIndex(({ key: k }) => key === k);
 
                                             if (paramExistingIndex > -1) {
-                                                sortParams[paramExistingIndex] = { key, dir };
+                                                sortParams[paramExistingIndex] = {
+                                                    key: key as SortableGoalsProps,
+                                                    dir,
+                                                };
                                             } else {
-                                                sortParams.push({ key, dir });
+                                                sortParams.push({ key: key as SortableGoalsProps, dir });
                                             }
                                         }
 
@@ -265,6 +278,39 @@ export const FiltersPanel: FC<{
                                     }}
                                 />
                             </FiltersBarDropdownContent>
+                            {nullable(enableProjectsSort, () => (
+                                <>
+                                    <FiltersBarDropdownTitle>{tr('Projects sort')}</FiltersBarDropdownTitle>
+                                    <FiltersBarDropdownContent>
+                                        <SortList
+                                            variant="projects"
+                                            value={projectsSort}
+                                            onChange={(key, dir) => {
+                                                let sortParams = (projectsSort ?? []).slice();
+
+                                                if (!dir) {
+                                                    sortParams = sortParams.filter(({ key: k }) => key !== k);
+                                                } else {
+                                                    const paramExistingIndex = sortParams.findIndex(
+                                                        ({ key: k }) => key === k,
+                                                    );
+
+                                                    if (paramExistingIndex > -1) {
+                                                        sortParams[paramExistingIndex] = {
+                                                            key: key as SortableProjectsProps,
+                                                            dir,
+                                                        };
+                                                    } else {
+                                                        sortParams.push({ key: key as SortableProjectsProps, dir });
+                                                    }
+                                                }
+
+                                                setProjectsSortFilter(sortParams);
+                                            }}
+                                        />
+                                    </FiltersBarDropdownContent>
+                                </>
+                            ))}
                             <FiltersBarDropdownTitle>{tr('Visibility')}</FiltersBarDropdownTitle>
                             <FiltersBarDropdownContent>
                                 <Checkbox

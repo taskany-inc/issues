@@ -1,9 +1,10 @@
-import { sql } from 'kysely';
+import { AnyColumnWithTable, Expression, OrderByExpression, sql } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
+import { OrderByDirection } from 'kysely/dist/cjs/parser/order-by-parser';
 
 import { db } from '../connection/kysely';
-import { Role } from '../../generated/kysely/types';
-import { QueryWithFilters } from '../../src/schema/common';
+import { DB, Role } from '../../generated/kysely/types';
+import { QueryWithFilters, SortableProjectsPropertiesArray } from '../../src/schema/common';
 import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
 import { mapSortParamsToTableColumns } from './goalV2';
@@ -223,9 +224,53 @@ export const getUserProjectsQuery = ({
         .orderBy('Project.updatedAt desc');
 };
 
+const mapProjectsSortParamsToTableColumns = (
+    sort: SortableProjectsPropertiesArray = [],
+): Array<OrderByExpression<DB, 'Project', unknown>> => {
+    if (!sort.length) {
+        return ['Project.updatedAt desc'];
+    }
+
+    const mapToTableColumn: Record<
+        NonNullable<SortableProjectsPropertiesArray>[number]['key'],
+        AnyColumnWithTable<DB, 'Project'> | Record<OrderByDirection, Expression<string>>
+    > = {
+        title: 'Project.title',
+        updatedAt: 'Project.updatedAt',
+        createdAt: 'Project.createdAt',
+        stargizers: {
+            asc: sql`(select count("A") from "_projectStargizers" where "B" = "Project".id) asc`,
+            desc: sql`(select count("A") from "_projectStargizers" where "B" = "Project".id) desc`,
+        },
+        watchers: {
+            asc: sql`(select count("A") from "_projectStargizers" where "B" = "Project".id) asc`,
+            desc: sql`(select count("A") from "_projectStargizers" where "B" = "Project".id) desc`,
+        },
+        owner: {
+            asc: sql`(select name from "User" where "User"."activityId" = "Project"."activityId") asc`,
+            desc: sql`(select name from "User" where "User"."activityId" = "Project"."activityId") desc`,
+        },
+        goals: {
+            asc: sql`(select count(*) from "Goal" where "Goal"."projectId" = "Project".id) asc`,
+            desc: sql`(select count(*) from "Goal" where "Goal"."projectId" = "Project".id) desc`,
+        },
+    };
+
+    return sort.map<OrderByExpression<DB, 'Project', unknown>>(({ key, dir }) => {
+        const rule = mapToTableColumn[key];
+
+        if (typeof rule === 'string') {
+            return `${rule} ${dir}`;
+        }
+
+        return rule[dir];
+    });
+};
+
 interface GetUserDashboardProjectsParams extends GetUserProjectsQueryParams {
     in?: Array<{ id: string }>;
     goalsQuery?: QueryWithFilters;
+    projectsSort?: SortableProjectsPropertiesArray;
     limit?: number;
     offset?: number;
 }
@@ -452,7 +497,7 @@ export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams)
             ]),
         )
         .groupBy('Project.id')
-        .orderBy('Project.updatedAt desc')
+        .orderBy(mapProjectsSortParamsToTableColumns(params.projectsSort))
         .$if(!!params.goalsQuery?.hideEmptyProjects, (qb) => qb.having(({ fn }) => fn.count('goal.id'), '>', 0))
         .limit(params.limit || 5)
         .offset(params.offset || 0);
@@ -530,6 +575,7 @@ interface GetAllProjectsQueryParams {
     limit: number;
     cursor: number;
     ids?: string[];
+    projectsSort?: SortableProjectsPropertiesArray;
 }
 
 export const getAllProjectsQuery = ({
@@ -539,6 +585,7 @@ export const getAllProjectsQuery = ({
     ids = [],
     limit,
     cursor,
+    projectsSort,
 }: GetAllProjectsQueryParams) => {
     return db
         .selectFrom(({ selectFrom }) =>
@@ -590,7 +637,7 @@ export const getAllProjectsQuery = ({
                 )
                 .limit(limit)
                 .offset(cursor)
-                .orderBy(['Project.updatedAt desc', 'Project.id asc'])
+                .orderBy(mapProjectsSortParamsToTableColumns(projectsSort))
                 .groupBy(['Project.id'])
                 .as('projects'),
         )

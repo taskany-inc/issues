@@ -23,7 +23,7 @@ import { tr } from './DashboardPage.i18n';
 export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const { preset } = useFiltersPreset({ defaultPresetFallback });
 
-    const { currentPreset, queryState } = useUrlFilterParams({
+    const { currentPreset, queryState, projectsSort } = useUrlFilterParams({
         preset,
     });
 
@@ -33,6 +33,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 ...queryState,
                 limit: 10,
             },
+            projectsSort,
         },
         {
             getNextPageParam: ({ pagination }) => pagination.offset,
@@ -85,6 +86,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                     counter={goalsCount}
                     filterPreset={preset}
                     enableLayoutToggle
+                    enableProjectsSort
                     enableHideProjectToggle
                 />
             }
