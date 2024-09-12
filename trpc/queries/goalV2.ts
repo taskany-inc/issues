@@ -1,6 +1,6 @@
-import { AnyColumnWithTable, Expression, OrderByExpression, sql } from 'kysely';
+import { Expression, OrderByExpression, sql } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
-import { OrderByDirection, DirectedOrderByStringReference } from 'kysely/dist/cjs/parser/order-by-parser';
+import { OrderByDirection } from 'kysely/dist/cjs/parser/order-by-parser';
 
 import { db } from '../connection/kysely';
 import { QueryWithFilters } from '../../src/schema/common';
@@ -9,51 +9,55 @@ import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
 import { getUserActivity } from './activity';
 
-const mapSortParamsToTableColumns = (
-    sort: QueryWithFilters['sort'] = [],
-): Array<OrderByExpression<DB, 'Goal', unknown>> => {
-    if (!sort.length) {
-        return ['Goal.updatedAt desc'];
+export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R = T[K]>(
+    sort: QueryWithFilters['sort'],
+    key: K,
+): Array<OrderByExpression<T, K, R>> => {
+    const dbKey = db.dynamic.ref(key as string);
+
+    if (sort == null || !sort.length) {
+        return [sql`${dbKey}."updatedAt" desc`];
     }
 
     const mapToTableColumn: Record<
         NonNullable<QueryWithFilters['sort']>[number]['key'],
-        AnyColumnWithTable<DB, 'Goal'> | Record<OrderByDirection, Expression<string>>
+        Record<OrderByDirection, Expression<keyof T[K]>>
     > = {
-        title: 'Goal.title',
-        updatedAt: 'Goal.updatedAt',
-        createdAt: 'Goal.createdAt',
+        title: {
+            desc: sql`${dbKey}.title desc`,
+            asc: sql`${dbKey}.title asc`,
+        },
+        updatedAt: {
+            desc: sql`${dbKey}."updatedAt" desc`,
+            asc: sql`${dbKey}."updatedAt" asc`,
+        },
+        createdAt: {
+            desc: sql`${dbKey}."createdAt" desc`,
+            asc: sql`${dbKey}."createdAt" asc`,
+        },
         state: {
-            asc: sql`(select title from "State" where "State".id = "Goal"."stateId") asc`,
-            desc: sql`(select title from "State" where "State".id = "Goal"."stateId") desc`,
+            asc: sql`(select title from "State" where "State".id = ${dbKey}."stateId") asc`,
+            desc: sql`(select title from "State" where "State".id = ${dbKey}."stateId") desc`,
         },
         priority: {
-            asc: sql`(select value from "Priority" where "Priority".id = "Goal"."priorityId") asc`,
-            desc: sql`(select value from "Priority" where "Priority".id = "Goal"."priorityId") desc`,
+            asc: sql`(select value from "Priority" where "Priority".id = ${dbKey}."priorityId") asc`,
+            desc: sql`(select value from "Priority" where "Priority".id = ${dbKey}."priorityId") desc`,
         },
         project: {
-            asc: sql`(select title from "Project" where "Project".id = "Goal"."projectId") asc`,
-            desc: sql`(select title from "Project" where "Project".id = "Goal"."projectId") desc`,
+            asc: sql`(select title from "Project" where "Project".id = ${dbKey}."projectId") asc`,
+            desc: sql`(select title from "Project" where "Project".id = ${dbKey}."projectId") desc`,
         },
         activity: {
-            asc: sql`(select name from "User" where "User"."activityId" = "Goal"."activityId") asc`,
-            desc: sql`(select name from "User" where "User"."activityId" = "Goal"."activityId") desc`,
+            asc: sql`(select name from "User" where "User"."activityId" = ${dbKey}."activityId") asc`,
+            desc: sql`(select name from "User" where "User"."activityId" = ${dbKey}."activityId") desc`,
         },
         owner: {
-            asc: sql`(select name from "User" where "User"."activityId" = "Goal"."ownerId") asc`,
-            desc: sql`(select name from "User" where "User"."activityId" = "Goal"."ownerId") desc`,
+            asc: sql`(select name from "User" where "User"."activityId" = ${dbKey}."ownerId") asc`,
+            desc: sql`(select name from "User" where "User"."activityId" = ${dbKey}."ownerId") desc`,
         },
     };
 
-    return sort.map<OrderByExpression<DB, 'Goal', unknown>>(({ key, dir }) => {
-        const rule = mapToTableColumn[key];
-
-        if (typeof rule === 'string') {
-            return `${rule} ${dir}` as DirectedOrderByStringReference<DB, 'Goal', unknown>;
-        }
-
-        return rule[dir];
-    });
+    return sort.map<OrderByExpression<T, K, R>>(({ key, dir }) => mapToTableColumn[key][dir]);
 };
 
 interface GetGoalsQueryParams {
@@ -156,7 +160,14 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                         .end()
                         .as('partnershipProjects'),
                 ])
-                .where('Goal.projectId', '=', params.projectId)
+                .where(({ or, eb }) =>
+                    or([
+                        eb('Goal.projectId', '=', params.projectId),
+                        eb('Goal.id', 'in', ({ selectFrom }) =>
+                            selectFrom('_partnershipProjects').where('B', '=', params.projectId).select('A'),
+                        ),
+                    ]),
+                )
                 .where(({ or, and, eb, selectFrom, cast, val }) => {
                     const { goalsQuery } = params;
                     const estimate: Array<Date> = [];
@@ -242,10 +253,7 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                     return and(filterToApply);
                 })
                 .where('Goal.archived', 'is not', true)
-                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort))
-                .groupBy(['Goal.id'])
-                .limit(params.limit ?? 10)
-                .offset(params.offset ?? 0),
+                .groupBy(['Goal.id']),
         )
         .selectFrom('proj_goals')
         .innerJoin('State', 'State.id', 'proj_goals.stateId')
@@ -276,7 +284,15 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
             fn.toJson('State').as('state'),
             fn.toJson('Priority').as('priority'),
             fn.toJson('Project').as('project'),
-        ]);
+        ])
+        .orderBy(
+            mapSortParamsToTableColumns<DB & { proj_goals: DB['Goal'] }, 'proj_goals'>(
+                params.goalsQuery?.sort,
+                'proj_goals',
+            ),
+        )
+        .limit(params.limit ?? 10)
+        .offset(params.offset ?? 0);
 
 export const goalBaseQuery = () => {
     return db
