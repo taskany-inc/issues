@@ -89,7 +89,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             async (data: {
                 title: string;
                 weight: string;
-                selected?: { id?: string; externalKey?: string };
+                selected?: { id?: string; key?: string };
                 mode: AddCriteriaMode;
             }) => {
                 await onGoalCriteriaAdd({
@@ -103,9 +103,9 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                               }
                             : undefined,
                     externalTask:
-                        data.mode === 'task' && data.selected?.externalKey
+                        data.mode === 'task' && data.selected?.key
                             ? {
-                                  externalKey: data.selected.externalKey,
+                                  externalKey: data.selected.key,
                               }
                             : undefined,
                 });
