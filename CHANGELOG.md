@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.56.1](https://github.com/taskany-inc/issues/compare/v2.56.0...v2.56.1) (2024-09-13)
+
+
+### Bug Fixes
+
+* **ExternalTasks:** get right props ([59f1ece](https://github.com/taskany-inc/issues/commit/59f1ece515e8faaa5c037b7c718fc86767945fc0))
+
 ## [2.56.0](https://github.com/taskany-inc/issues/compare/v2.55.0...v2.56.0) (2024-09-12)
 
 
