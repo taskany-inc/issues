@@ -1,5 +1,5 @@
 import { nullable } from '@taskany/bricks';
-import { Link, Table, TreeView, TreeViewElement, TreeViewNode } from '@taskany/bricks/harmony';
+import { Link, Table, TreeView, TreeViewElement, TreeViewNode, TreeViewTitle } from '@taskany/bricks/harmony';
 import { useCallback, useMemo } from 'react';
 
 import { Team } from '../../utils/db/types';
@@ -84,13 +84,19 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
                         {ts.map((t) => (
                             <TreeViewNode
                                 title={
-                                    <Link
-                                        className={s.ProjectTeamPageTeamLink}
-                                        href={routes.crewTeam(t.id)}
-                                        target="_blank"
-                                    >
-                                        <TeamListItem name={t.name} units={t.units} onRemoveClick={() => onRemove(t)} />
-                                    </Link>
+                                    <TreeViewTitle>
+                                        <Link
+                                            className={s.ProjectTeamPageTeamLink}
+                                            href={routes.crewTeam(t.id)}
+                                            target="_blank"
+                                        >
+                                            <TeamListItem
+                                                name={t.name}
+                                                units={t.units}
+                                                onRemoveClick={() => onRemove(t)}
+                                            />
+                                        </Link>
+                                    </TreeViewTitle>
                                 }
                                 key={t.id}
                                 visible
