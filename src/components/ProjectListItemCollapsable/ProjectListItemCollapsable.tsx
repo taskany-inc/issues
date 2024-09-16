@@ -1,6 +1,6 @@
 import React, { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 import { nullable } from '@taskany/bricks';
-import { TreeView, TreeViewNode, Text } from '@taskany/bricks/harmony';
+import { TreeView, TreeViewNode, TreeViewTitle, Text } from '@taskany/bricks/harmony';
 import { IconServersOutline } from '@taskany/icons';
 
 import { DashboardProjectV2 } from '../../../trpc/inferredTypes';
@@ -75,7 +75,11 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
 
     return (
         <TreeView className={className} {...projectListItem.attr}>
-            <TreeViewNode interactive={interactive} title={projectComponent} {...props}>
+            <TreeViewNode
+                interactive={interactive}
+                title={<TreeViewTitle>{projectComponent}</TreeViewTitle>}
+                {...props}
+            >
                 {goals}
                 {children}
             </TreeViewNode>
