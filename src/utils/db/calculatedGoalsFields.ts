@@ -1,6 +1,8 @@
 import { Role } from '@prisma/client';
 
 import { calcAchievedWeight } from '../recalculateCriteriaScore';
+import { getShortId } from '../getShortId';
+import { jiraService } from '../integration/jira';
 
 export const addCommonCalculatedGoalFields = (goal: any) => {
     const _shortId = `${goal.projectId}-${goal.scopeId}`;
@@ -62,4 +64,58 @@ export const addCalculatedGoalsFields = <
         _isEditable,
         ...addCommonCalculatedGoalFields(goal),
     };
+};
+
+// in this case type of Prisma & Kysely model of GoalAchieveCriteria is different and cannot matched between both
+// TODO: fix any type annotation
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const calculateGoalCriteria = (list: Array<any>) => {
+    const taskStatusColorMap = jiraService.config?.mapStatusIdToColor;
+
+    return list.map(({ criteriaGoal, externalTask, ...criteria }) => {
+        const baseCriteria = {
+            ...criteria,
+            criteriaGoal: null,
+            externalTask: null,
+        };
+
+        if (criteriaGoal != null) {
+            return {
+                ...baseCriteria,
+                criteriaGoal: {
+                    ...criteriaGoal,
+                    _shortId: getShortId(criteriaGoal),
+                },
+            };
+        }
+
+        if (externalTask) {
+            let color = taskStatusColorMap?.default;
+
+            const isFinishedStatus = jiraService.checkStatusIsFinished(externalTask.stateCategoryId);
+            if (isFinishedStatus) {
+                const isPositiveStatus = jiraService.positiveStatuses?.includes(externalTask.state) || false;
+
+                color = isPositiveStatus ? taskStatusColorMap?.complete : taskStatusColorMap?.failed;
+            } else if (jiraService.config?.mapStatusKey != null) {
+                const colorKey = jiraService.config.mapStatusKey[
+                    externalTask.stateCategoryId
+                ] as keyof typeof taskStatusColorMap;
+                color = taskStatusColorMap?.[colorKey];
+            }
+
+            return {
+                ...baseCriteria,
+                // mark undone criteria as done if task in finished status
+                isDone: baseCriteria.isDone || isFinishedStatus,
+                externalTask: {
+                    ...externalTask,
+                    stateColor: color,
+                },
+                criteriaGoal: null,
+            };
+        }
+
+        return baseCriteria;
+    });
 };
