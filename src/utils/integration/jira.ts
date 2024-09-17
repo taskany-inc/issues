@@ -105,92 +105,72 @@ const toCamelCase = (key: string): string => {
 const requiredConfigFields: Array<keyof JiraServiceConfig> = ['url', 'user', 'password', 'apiVersion'];
 
 const readJiraEnv = () => {
-    const baseConfig: Partial<JiraServiceConfig> = {};
-    try {
-        const config = Object.keys(process.env)
-            .filter((k) => k.startsWith('JIRA'))
-            .reduce<JiraServiceConfig>((acc, jiraEnvKey) => {
-                const configKey = toCamelCase(jiraEnvKey) as keyof JiraServiceConfig;
-                const existingValue = process.env[jiraEnvKey];
-                const val = existingValue ? safelyParseJson(existingValue) ?? existingValue : null;
+    const config = Object.keys(process.env)
+        .filter((k) => k.startsWith('JIRA'))
+        .reduce<JiraServiceConfig>((acc, jiraEnvKey) => {
+            const configKey = toCamelCase(jiraEnvKey) as keyof JiraServiceConfig;
+            const existingValue = process.env[jiraEnvKey];
+            const val = existingValue ? safelyParseJson(existingValue) ?? existingValue : null;
 
-                acc[configKey] = val;
+            acc[configKey] = val;
 
-                return acc;
-            }, baseConfig as JiraServiceConfig);
+            return acc;
+        }, {} as JiraServiceConfig);
 
-        return config;
-    } catch (error) {
-        console.log(error);
-
-        return baseConfig as JiraServiceConfig;
-    }
+    return config;
 };
 
-const isDebugEnabled = process.env.NODE_ENV === 'development' && process.env.DEBUG?.includes('service:jira');
-const config = readJiraEnv();
-const isValidConfig = requiredConfigFields.every((k) => k in config && config[k] != null);
+// TODO: come up with logging for jira queries
+const _isDebugEnabled = process.env.NODE_ENV === 'development' && process.env.DEBUG?.includes('service:jira');
 
-// @ts-ignore
-class JiraService extends JiraApi {
-    constructor(private _config: JiraServiceConfig, private _isEnabled = false) {
-        super({
-            protocol: 'https',
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            host: _config.url,
-            username: _config.user,
-            password: _config.password,
-            apiVersion: _config.apiVersion,
-            strictSSL: process.env.NODE_ENV === 'production',
-        });
-    }
+const initJiraClient = () => {
+    const config = readJiraEnv();
+    const isValidConfig = requiredConfigFields.every((k) => k in config && config[k] != null);
 
-    /** start overriding private instance methods */
-    // @ts-ignore
-    private async doRequest<T extends JiraApi.JsonResponse>(options: any): Promise<T> {
-        if (isDebugEnabled) {
-            console.log(options);
-        }
+    const instance = new JiraApi({
+        protocol: 'https',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        host: config.url,
+        username: config.user,
+        password: config.password,
+        apiVersion: config.apiVersion,
+        strictSSL: process.env.NODE_ENV === 'production',
+    });
 
-        // @ts-ignore
-        const res = await super.doRequest(options);
-        if (isDebugEnabled) {
-            console.table(res);
-        }
-        return res as unknown as T;
-    }
-    /** end overriding private instance methods */
-
-    public checkStatusIsFinished(status: JiraIssueStatus | JiraIssueStatus['statusCategory']['id']) {
-        if (this.config.finishedCategory != null) {
+    function checkStatusIsFinished(status: JiraIssueStatus | JiraIssueStatus['statusCategory']['id']) {
+        if (config.finishedCategory != null) {
             if (typeof status === 'number') {
-                return status === this.config.finishedCategory.id;
+                return status === config.finishedCategory.id;
             }
 
             return Boolean(
-                (status.statusCategory.key === this.config.finishedCategory.key ||
-                    status.statusCategory.id === this.config.finishedCategory.id) &&
-                    this.config.positiveStatusNames?.includes(status.name),
+                (status.statusCategory.key === config.finishedCategory.key ||
+                    status.statusCategory.id === config.finishedCategory.id) &&
+                    config.positiveStatusNames?.includes(status.name),
             );
         }
 
         return false;
     }
 
-    get positiveStatuses() {
-        return this.config.positiveStatusNames;
-    }
+    return {
+        instance,
+        checkStatusIsFinished,
+        get positiveStatuses() {
+            return config.positiveStatusNames;
+        },
 
-    get config() {
-        return this._config;
-    }
+        get config() {
+            return config;
+        },
 
-    get isEnable() {
-        return this._isEnabled;
-    }
-}
+        get isEnable() {
+            return isValidConfig;
+        },
+    };
+};
 
-export const jiraService = new JiraService(config, isValidConfig);
+export const jiraService = initJiraClient();
 
 const re = '(\\w+)-(\\d+)';
 
@@ -233,7 +213,7 @@ export const searchIssue = async (params: { value: string; limit: number }): Pro
         const issueKey = extractIssueKey(params.value);
 
         if (issueKey) {
-            const res = await jiraService.findIssue(issueKey);
+            const res = await jiraService.instance.findIssue(issueKey);
             return [
                 {
                     ...res,
@@ -243,7 +223,7 @@ export const searchIssue = async (params: { value: string; limit: number }): Pro
         }
     }
 
-    const searchResults = await jiraService.searchJira(`summary ~ "${escapeSearchString(params.value)}"`, {
+    const searchResults = await jiraService.instance.searchJira(`summary ~ "${escapeSearchString(params.value)}"`, {
         maxResults: params.limit,
     });
 
