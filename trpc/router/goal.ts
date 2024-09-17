@@ -52,7 +52,7 @@ import { recalculateCriteriaScore, goalIncludeCriteriaParams } from '../../src/u
 import { getProjectAccessFilter, goalAchiveCriteriaFilter } from '../queries/access';
 import { prepareRecipients } from '../../src/utils/prepareRecipients';
 import { updateProjectUpdatedAt } from '../../src/utils/db/updateProjectUpdatedAt';
-import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
+import { addCalculatedGoalsFields, calculateGoalCriteria } from '../../src/utils/db/calculatedGoalsFields';
 import { createComment } from '../../src/utils/db/createComment';
 import { parseCrewLoginFromText } from '../../src/utils/crew';
 import { getLocalUsersByCrewLogin } from '../../src/utils/db/crewIntegration';
@@ -395,23 +395,7 @@ export const goal = router({
                         },
                     })),
 
-                    _criteria: goal.goalAchiveCriteria.map(({ criteriaGoal, externalTask, ...criteria }) => ({
-                        ...criteria,
-                        criteriaGoal:
-                            criteriaGoal != null
-                                ? {
-                                      ...criteriaGoal,
-                                      _shortId: getShortId(criteriaGoal),
-                                  }
-                                : null,
-                        externalTask:
-                            externalTask != null
-                                ? {
-                                      ...externalTask,
-                                      _shortId: externalTask.externalKey,
-                                  }
-                                : null,
-                    })),
+                    _criteria: calculateGoalCriteria(goal.goalAchiveCriteria),
                 };
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1954,7 +1938,7 @@ export const goal = router({
                 );
                 const res = await query.execute();
 
-                return res;
+                return calculateGoalCriteria(res);
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message, cause: error });
             }
