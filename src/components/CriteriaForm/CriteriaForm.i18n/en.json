@@ -7,7 +7,7 @@
     "Passed weight is not in range": "Weight must be between 1 and {upTo}",
     "Simple": "Todo",
     "Goal": "",
-    "Task": "External Task",
+    "Jira task": "Jira task",
     "Weight": "Weight (%)",
     "ex: NN%": "ex: {val}",
     "Add weight": "",
@@ -18,6 +18,6 @@
     "Suggestions": "",
     "This binding is already exist": "",
     "Criteria title": "",
-    "Place link here": "Insert task link or type title",
+    "Place link here": "Insert task link or type title or jira task key",
     "Reset": "Reset"
 }
