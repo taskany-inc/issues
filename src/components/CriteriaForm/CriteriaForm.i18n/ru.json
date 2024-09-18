@@ -7,7 +7,7 @@
     "Passed weight is not in range": "Вес критерия должен быть от 1 до {upTo}",
     "Simple": "Критерий",
     "Goal": "Цель",
-    "Task": "Внешняя задача",
+    "Jira task": "Задача из Jira",
     "Weight": "Вес (%)",
     "Add weight": "Добавить вес",
     "ex: NN%": "ex: {val}",
@@ -18,6 +18,6 @@
     "Suggestions": "Предложения",
     "This binding is already exist": "Такая связка уже существует",
     "Criteria title": "Заголовок критерия",
-    "Place link here": "Ссылка на задачу или ее название",
+    "Place link here": "Ссылка на задачу или ее название или ключ",
     "Reset": "Сброс"
 }

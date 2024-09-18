@@ -343,7 +343,7 @@ export const CriteriaForm = ({
         ];
 
         if (externalAllowed) {
-            base.push({ title: tr('Task'), value: 'task', iconRight: <BetaLiteral size="s" /> });
+            base.push({ title: tr('Jira task'), value: 'task', iconRight: <BetaLiteral size="s" /> });
         }
 
         return base;
