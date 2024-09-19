@@ -23,7 +23,7 @@ import { tr } from './DashboardPage.i18n';
 export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const { preset } = useFiltersPreset({ defaultPresetFallback });
 
-    const { currentPreset, queryState, projectsSort } = useUrlFilterParams({
+    const { currentPreset, queryState, projectsSort, view } = useUrlFilterParams({
         preset,
     });
 
@@ -75,6 +75,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             user={user}
             ssrTime={ssrTime}
             title={tr('title')}
+            scrollerShadow={view === 'kanban' ? 70 : 0}
             header={
                 <FiltersPanel
                     title={getPageTitle({

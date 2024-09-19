@@ -28,7 +28,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
     const { preset } = useFiltersPreset({ defaultPresetFallback });
 
-    const { queryState } = useUrlFilterParams({
+    const { queryState, view } = useUrlFilterParams({
         preset,
     });
 
@@ -84,6 +84,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
             <Page
                 user={user}
                 ssrTime={ssrTime}
+                scrollerShadow={view === 'kanban' ? 70 : 0}
                 title={tr
                     .raw('title', {
                         project: project?.title,

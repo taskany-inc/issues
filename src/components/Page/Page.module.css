@@ -19,6 +19,11 @@
 .PageContent {
     flex: 1;
     overflow: auto;
-    margin: var(--gap-xs) var(--gap-sm) 0;
-    padding: var(--gap-m) var(--gap-s);
+}
+
+.PageScroller {
+    margin: 0 var(--gap-sm);
+    padding: 0 var(--gap-s);
+    padding-top: calc(var(--gap-m) + var(--gap-xs));
+    box-sizing: border-box;
 }
