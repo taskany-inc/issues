@@ -1,5 +1,11 @@
 .KanbanState{
-    margin-bottom: var(--gap-m);
+    padding: var(--gap-m) 0;
+    position: sticky;
+    width: 100%;
+    top: calc(var(--gap-l) + var(--gap-s));
+    background: var(--background);
+    background: linear-gradient(var(--background) 70%, rgba(0, 0, 0, 0) 100%);
+    z-index: 2;
 }
 
 .KanbanLink {

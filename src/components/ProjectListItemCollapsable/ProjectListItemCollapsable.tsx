@@ -1,5 +1,6 @@
 import React, { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 import { nullable } from '@taskany/bricks';
+import cn from 'classnames';
 import { TreeView, TreeViewNode, TreeViewTitle, Text } from '@taskany/bricks/harmony';
 import { IconServersOutline } from '@taskany/icons';
 
@@ -21,6 +22,7 @@ interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof Tre
     onClick?: MouseEventHandler<HTMLElement>;
     titleSize?: 'm' | 'l';
     actionButtonView?: 'default' | 'icons';
+    sticky?: boolean;
 }
 
 export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProps> = ({
@@ -34,6 +36,7 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
     interactive = true,
     actionButtonView,
     onClick,
+    sticky,
     ...props
 }) => {
     const projectComponent = (
@@ -77,7 +80,11 @@ export const ProjectListItemCollapsable: React.FC<ProjectListItemCollapsableProp
         <TreeView className={className} {...projectListItem.attr}>
             <TreeViewNode
                 interactive={interactive}
-                title={<TreeViewTitle>{projectComponent}</TreeViewTitle>}
+                title={
+                    <TreeViewTitle className={cn({ [s.ProjectListItemCollapsableHeader_sticky]: sticky })}>
+                        {projectComponent}
+                    </TreeViewTitle>
+                }
                 {...props}
             >
                 {goals}

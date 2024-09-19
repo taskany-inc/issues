@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { KanbanScroller } from '@taskany/bricks/harmony';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
@@ -37,6 +38,7 @@ interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
     title?: string;
     header: React.ReactNode;
     children?: React.ReactNode;
+    scrollerShadow?: number;
 }
 
 const mapThemeOnId = { light: 0, dark: 1 } as const;
@@ -53,7 +55,15 @@ const toastOptions: ToastOptions = {
     },
 };
 
-export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', children, header, ...attrs }) => {
+export const Page: React.FC<PageProps> = ({
+    user,
+    ssrTime,
+    title = 'Untitled',
+    children,
+    header,
+    scrollerShadow,
+    ...attrs
+}) => {
     const { setPreview } = useGoalPreview();
     const { data: userSettings = user?.settings } = trpc.user.settings.useQuery();
     const { data: config } = trpc.appConfig.get.useQuery();
@@ -103,8 +113,10 @@ export const Page: React.FC<PageProps> = ({ user, ssrTime, title = 'Untitled', c
 
                 <main className={s.PageMain} {...attrs}>
                     {header}
-                    <div className={s.PageContent} {...pageContent.attr}>
-                        {children}
+                    <div className={s.PageContent}>
+                        <KanbanScroller className={s.PageScroller} shadow={scrollerShadow} {...pageContent.attr}>
+                            {children}
+                        </KanbanScroller>
                     </div>
                     <PageFooter />
                 </main>

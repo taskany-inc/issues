@@ -76,6 +76,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                 href={routes.project(project.id, view ? `view=${view}` : undefined)}
                 onClick={onProjectClickHandler}
                 project={project}
+                sticky={isKanbanView}
                 parent={isKanbanView ? parent : undefined}
                 goals={
                     <TreeViewElement>
