@@ -233,10 +233,14 @@ describe('Projects', () => {
         });
 
         beforeEach(() => {
+            cy.intercept('/api/trpc/v2.project.getUserDashboardProjects*').as('dashboardLoad');
             cy.get(filtersPanelResetButton.query).should('exist').click();
             cy.get(projectListItem.query).should('exist').and('have.length.greaterThan', 1);
             cy.get(projectListItemTitle.query).should('contain.text', testProjectTitle);
             cy.get(dashboardLoadMore.query).click();
+
+            cy.wait('@dashboardLoad');
+
             cy.get(`[href="${routes.project(testProjectKey)}"]`).should('exist');
             cy.visit(exactUrl(routes.project(testProjectKey)));
             // wait for correct page
