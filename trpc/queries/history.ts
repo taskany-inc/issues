@@ -12,6 +12,7 @@ import {
     Tag,
     ExternalTask,
 } from '../../generated/kysely/types';
+import { calcStatusColorForExternalTask } from '../../src/utils/db/calculatedGoalsFields';
 
 import { Activity, getUserActivity } from './activity';
 import { tagQuery } from './tag';
@@ -59,8 +60,10 @@ export interface HistoryRecordMeta {
     owner: Activity;
     participants: Activity;
     state: ExtractTypeFromGenerated<State>;
-    criteria: ExtractTypeFromGenerated<GoalAchieveCriteria> &
-        ({ criteriaGoal: ExtendedGoal } | { externalTask: ExtractTypeFromGenerated<ExternalTask> });
+    criteria: ExtractTypeFromGenerated<GoalAchieveCriteria> & {
+        criteriaGoal: ExtendedGoal | null;
+        externalTask: ExtractTypeFromGenerated<ExternalTask> | null;
+    };
     partnerProject: ExtractTypeFromGenerated<Project>;
     priority: ExtractTypeFromGenerated<Priority>;
     title: string;
@@ -261,6 +264,20 @@ export const extraDataForEachRecord = async <T extends HisrotyRecord>(
             }
         });
     }
+
+    // update state colors of jira tasks in criteria changes records
+
+    historyWithMeta.forEach((record) => {
+        if (record.subject === 'criteria') {
+            if (record.nextValue?.externalTask != null) {
+                record.nextValue.externalTask = calcStatusColorForExternalTask(record.nextValue.externalTask);
+            }
+
+            if (record.previousValue?.externalTask != null) {
+                record.previousValue.externalTask = calcStatusColorForExternalTask(record.previousValue.externalTask);
+            }
+        }
+    });
 
     return historyWithMeta;
 };
