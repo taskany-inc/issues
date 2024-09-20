@@ -510,7 +510,9 @@ const HistoryRecordCriteria: React.FC<
             to={nullable(to, (val) => (
                 <>
                     <HistoryRecordCriteriaItem {...val} strike={action === 'remove'} />
-                    {val?.criteriaGoal && <HistoryRecordText>{tr('as criteria')}</HistoryRecordText>}
+                    {nullable(val.criteriaGoal || val.externalTask, () => (
+                        <HistoryRecordText>{tr('as criteria')}</HistoryRecordText>
+                    ))}
                     {nullable(isChangeAction, () => (
                         <HistoryRecordText>
                             {' '}
