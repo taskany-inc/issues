@@ -26,6 +26,8 @@ const jiraIssueToExternalTask = (
         ownerEmail: issue.reporter.emailAddress,
         ownerId: issue.reporter.key,
         ownerName: issue.reporter.displayName || issue.reporter.name,
+        resolution: issue.resolution?.name ?? null,
+        resolutionId: issue.resolution?.id ?? null,
     };
 };
 

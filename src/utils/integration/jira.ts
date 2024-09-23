@@ -64,6 +64,12 @@ export interface JiraPriority {
     name: string;
     id: string;
 }
+export interface JiraResolution {
+    self: string;
+    id: string;
+    description: string;
+    name: string;
+}
 
 export interface JiraIssue {
     id: string;
@@ -78,6 +84,7 @@ export interface JiraIssue {
     project: JiraProject;
     priority: JiraProject;
     issuetype: JiraIssueType;
+    resolution?: JiraResolution;
 }
 
 interface JiraServiceConfig {
@@ -86,6 +93,7 @@ interface JiraServiceConfig {
     password: string;
     apiVersion: string;
     positiveStatusNames: string;
+    positiveResolutionNames: string;
     finishedCategory: JiraIssueStatus['statusCategory'] | null;
     mapStatusKey: Record<string, string>;
     mapStatusIdToColor: Record<string, string>;
@@ -153,9 +161,25 @@ const initJiraClient = () => {
         return false;
     }
 
+    function checkCompletedStatus(data: {
+        statusName: string;
+        statusCategory: number;
+        resolutionName?: string | null;
+    }) {
+        if (config.finishedCategory?.id === data.statusCategory) {
+            return (
+                config.positiveStatusNames.includes(data.statusName) &&
+                Boolean(data.resolutionName && config.positiveResolutionNames.includes(data.resolutionName))
+            );
+        }
+
+        return false;
+    }
+
     return {
         instance,
         checkStatusIsFinished,
+        checkCompletedStatus,
         get positiveStatuses() {
             return config.positiveStatusNames;
         },

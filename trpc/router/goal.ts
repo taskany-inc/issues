@@ -1117,9 +1117,13 @@ export const goal = router({
                 });
 
                 if (externalTask) {
-                    isDoneByConnect = jiraService.checkStatusIsFinished(
-                        (await searchIssue({ value: externalTask.externalKey, limit: 1 }))[0].status,
-                    );
+                    const issue = (await searchIssue({ value: externalTask.externalKey, limit: 1 }))[0];
+
+                    isDoneByConnect = jiraService.checkCompletedStatus({
+                        statusCategory: issue.status.statusCategory.id,
+                        statusName: issue.status.name,
+                        resolutionName: issue.resolution?.name,
+                    });
                     criteriaTitle = externalTask?.title;
                 }
             }

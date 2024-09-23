@@ -27,7 +27,16 @@ export const getOrCreateExternalTask = async ({ id }: { id: string }) => {
 
     const [externalIssue] = await searchIssue({ value: id, limit: 1 });
 
-    const { summary: title, id: externalId, key, issuetype, status: state, project, reporter } = externalIssue;
+    const {
+        summary: title,
+        id: externalId,
+        key,
+        issuetype,
+        status: state,
+        project,
+        reporter,
+        resolution,
+    } = externalIssue;
 
     return insertExternalTask({
         title,
@@ -47,5 +56,7 @@ export const getOrCreateExternalTask = async ({ id }: { id: string }) => {
         ownerName: reporter.displayName,
         ownerEmail: reporter.emailAddress,
         ownerId: reporter.key,
+        resolution: resolution?.name ?? null,
+        resolutionId: resolution?.id ?? null,
     }).executeTakeFirstOrThrow();
 };
