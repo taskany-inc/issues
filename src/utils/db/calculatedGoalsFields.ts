@@ -114,7 +114,11 @@ export const calculateGoalCriteria = (list: Array<any>) => {
         }
 
         if (externalTask) {
-            const isFinishedStatus = jiraService.checkStatusIsFinished(externalTask.stateCategoryId);
+            const isFinishedStatus = jiraService.checkCompletedStatus({
+                statusCategory: externalTask.stateCategoryId,
+                statusName: externalTask.state,
+                resolutionName: externalTask.resolution,
+            });
 
             return {
                 ...baseCriteria,

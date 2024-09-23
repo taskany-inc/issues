@@ -442,6 +442,8 @@ model ExternalTask {
   ownerEmail        String
   ownerName         String
   ownerId           String
+  resolution        String?
+  resolutionId      String?
   criteria          GoalAchieveCriteria[] @relation("taskToCriteria")
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
