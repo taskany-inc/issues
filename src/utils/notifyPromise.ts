@@ -6,16 +6,16 @@ interface NotifyPromise {
     <T>(
         promise: Promise<T>,
         events: NotificationsEventPromiseData['events'],
-        errorHandler?: (error: any) => string | void,
+        responseHandler?: (error: any | null, res: T | null) => string | void,
     ): PromiseLike<[T, null] | [null, T]>;
     <T>(
         promise: Promise<T>,
         namespace: NotificationNamespaces,
-        errorHandler?: (error: any) => string | void,
+        responseHandler?: (error: any | null, res: T | null) => string | void,
     ): PromiseLike<[T, null] | [null, T]>;
 }
 
-export const notifyPromise: NotifyPromise = (promise, eventsOrNamespace, errorHandler) => {
+export const notifyPromise: NotifyPromise = (promise, eventsOrNamespace, responseHandler) => {
     let events: NotificationsEventPromiseData['events'];
 
     if (typeof eventsOrNamespace === 'string') {
@@ -30,7 +30,7 @@ export const notifyPromise: NotifyPromise = (promise, eventsOrNamespace, errorHa
         events = eventsOrNamespace;
     }
 
-    dispatchPromisedNotificationsEvent(promise, events, errorHandler);
+    dispatchPromisedNotificationsEvent(promise, events, responseHandler);
 
     return promise.then(
         (data) => [data, null],

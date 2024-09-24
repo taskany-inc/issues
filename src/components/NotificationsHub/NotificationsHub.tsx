@@ -20,13 +20,19 @@ const NotificationsHub: React.FC = () => {
         await e.detail.promise
             .then((data) => {
                 toast.dismiss(id);
-                toast.success(tr(e.detail.events.onSuccess as I18nKey));
+
+                const message =
+                    (e.detail.responseHandler && e.detail.responseHandler(null, data)) ??
+                    tr(e.detail.events.onSuccess as I18nKey);
+
+                toast.success(message);
                 return [data, null];
             })
             .catch((error) => {
                 toast.dismiss(id);
                 const message =
-                    (e.detail.errorHandler && e.detail.errorHandler(error)) ?? tr(e.detail.events.onError as I18nKey);
+                    (e.detail.responseHandler && e.detail.responseHandler(error, null)) ??
+                    tr(e.detail.events.onError as I18nKey);
 
                 toast.error(message);
 
