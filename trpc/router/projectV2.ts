@@ -262,12 +262,14 @@ export const project = router({
         .input(
             z.object({
                 id: z.string(),
+                goalsQuery: queryWithFiltersSchema.optional(),
             }),
         )
         .query(async ({ input, ctx }) => {
-            const childrenQuery = getChildrenProjectQuery({ ...ctx.session.user, id: input.id }).$castTo<
-                Omit<ProjectResponse, 'goals'> & Pick<DashboardProject, '_count'>
-            >();
+            const childrenQuery = getChildrenProjectQuery({
+                ...ctx.session.user,
+                ...input,
+            }).$castTo<Omit<ProjectResponse, 'goals'> & Pick<DashboardProject, '_count'>>();
 
             const res = await childrenQuery.execute();
 

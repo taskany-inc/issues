@@ -96,6 +96,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                         counter={projectDeepInfo?.goals?.length}
                         filterPreset={preset}
                         enableLayoutToggle
+                        enableHideProjectToggle
                     >
                         <FiltersBarItem>
                             <ProjectPageTabs id={id} editable={project?._isEditable} />
