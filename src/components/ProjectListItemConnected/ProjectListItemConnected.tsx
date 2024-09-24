@@ -34,7 +34,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     firstLevel,
     ...props
 }) => {
-    const { view } = useUrlFilterParams({
+    const { view, queryState } = useUrlFilterParams({
         preset: filterPreset,
     });
 
@@ -43,6 +43,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     const { data: childrenProjects = [], isLoading: isChildrenLoading } = trpc.v2.project.getProjectChildren.useQuery(
         {
             id: project.id,
+            goalsQuery: queryState,
         },
         {
             enabled: isOpen && !firstLevel,
