@@ -46,6 +46,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             onGoalCriteriaUpdate,
             onGoalCriteriaRemove,
             onGoalCriteriaConvert,
+            onCheckJiraTask,
             validateGoalCriteriaBindings,
             onGoalCommentCreate,
             onGoalCommentReactionToggle,
@@ -175,6 +176,13 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             [onGoalCriteriaConvert],
         );
 
+        const handleCheckJiraTask = useCallback(
+            ({ id }: { id: string }) => {
+                onCheckJiraTask({ id });
+            },
+            [onCheckJiraTask],
+        );
+
         const { data: parentGoalIds = [] } = trpc.v2.goal.getParentIds.useQuery([goal.id]);
 
         const criteriaValidityData = useCriteriaValidityData(goal._criteria);
@@ -187,6 +195,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                         canEdit={goal._isEditable}
                         onUpdate={handleUpdateCriteria}
                         onCheck={handleUpdateCriteriaState}
+                        onCheckJiraTask={handleCheckJiraTask}
                         onConvert={handleConvertCriteriaToGoal}
                         onRemove={handleRemoveCriteria}
                         list={goal._criteria?.map((criteria) =>
