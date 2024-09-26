@@ -21,6 +21,7 @@ import {
     IconEdit1Outline,
     IconMessageTickOutline,
     IconMoreVerticalOutline,
+    IconRefreshOutline,
     IconTargetOutline,
 } from '@taskany/icons';
 import classNames from 'classnames';
@@ -96,6 +97,7 @@ interface GoalCriteriaEditableApi<T extends UnionCriteria> {
     onConvert?: (val: T) => void;
     onRemove?: (val: T) => void;
     onCheck?: (val: T) => void;
+    onCheckJiraTask?: (val: T) => void;
     goalId: string;
     validityData: React.ComponentProps<typeof GoalCriteriaSuggest>['validityData'];
 }
@@ -366,7 +368,7 @@ function criteriaAsExternalTask(props: UnionCriteria): props is ExternalTaskCrit
 
 export const Criteria: React.FC<
     UnionCriteria & GoalCriteriaEditableApi<UnionCriteria & { mode: CriteriaUpdateDataMode }>
-> = ({ onConvert, onRemove, onUpdate, onCheck, validityData, ...props }) => {
+> = ({ onConvert, onRemove, onUpdate, onCheck, onCheckJiraTask, validityData, ...props }) => {
     const [mode, setMode] = useState<'read' | 'edit'>('read');
     const { validateGoalCriteriaBindings } = useGoalResource({});
 
@@ -389,6 +391,14 @@ export const Criteria: React.FC<
             });
         }
 
+        if (!props.isDone && criteriaAsExternalTask(props) && onCheckJiraTask) {
+            actions.push({
+                label: tr('Check the task status'),
+                icon: <IconRefreshOutline size="xs" />,
+                handler: () => onCheckJiraTask({ ...props, mode: 'task' }),
+            });
+        }
+
         if (onRemove) {
             actions.push({
                 label: tr('Delete'),
@@ -399,7 +409,7 @@ export const Criteria: React.FC<
         }
 
         return actions;
-    }, [onConvert, onRemove, onUpdate, props]);
+    }, [onConvert, onRemove, onUpdate, onCheckJiraTask, props]);
 
     const handleCriteriaCheck = useCallback(() => {
         if (onCheck) {
@@ -570,6 +580,7 @@ export const CriteriaList: React.FC<CriteriaListProps> = ({
     onUpdate,
     onRemove,
     onCheck,
+    onCheckJiraTask,
     goalId,
     className,
 }) => {
@@ -585,6 +596,7 @@ export const CriteriaList: React.FC<CriteriaListProps> = ({
                     onUpdate={onUpdate}
                     onRemove={onRemove}
                     onCheck={onCheck}
+                    onCheckJiraTask={onCheckJiraTask}
                     validityData={validityData}
                 />
             ))}
@@ -696,6 +708,7 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
     onUpdate,
     onRemove,
     onCheck,
+    onCheckJiraTask,
     onConvert,
     children,
     canEdit,
@@ -708,9 +721,10 @@ export const GoalCriteriaView: React.FC<React.PropsWithChildren<GoalCriteriaView
                       onRemove,
                       onUpdate,
                       onCheck,
+                      onCheckJiraTask,
                   }
                 : {},
-        [onConvert, onRemove, onUpdate, onCheck, canEdit],
+        [onConvert, onRemove, onUpdate, onCheck, onCheckJiraTask, canEdit],
     );
 
     return (

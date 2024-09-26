@@ -94,6 +94,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
     const addPartnerProjectMutation = trpc.goal.addPartnerProject.useMutation();
     const removePartnerProjectMutation = trpc.goal.removePartnerProject.useMutation();
     const validateGoalCriteriaBindings = utils.goal.checkGoalInExistingCriteria.fetch;
+    const checkJiraTaskInCriteria = trpc.goal.checkJiraTaskInCriteria.useMutation();
 
     const { highlightCommentId, setHighlightCommentId } = useHighlightedComment();
     const { commentReaction } = useReactionsResource();
@@ -476,6 +477,29 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         [invalidate, goalTagsUpdate],
     );
 
+    const onCheckJiraTask = useCallback(
+        async (val: { id: string }) => {
+            const promise = checkJiraTaskInCriteria.mutateAsync(val);
+
+            await notifyPromise(promise, 'criteriaUpdate', (error, response) => {
+                if (error != null && error instanceof TRPCClientError) {
+                    const { data, message } = error;
+
+                    if ('httpStatus' in data && data.httpStatus === 412) {
+                        return message;
+                    }
+                }
+
+                if (response != null && response.code === 'success') {
+                    return response.message;
+                }
+            });
+
+            invalidate();
+        },
+        [checkJiraTaskInCriteria, invalidate],
+    );
+
     return {
         highlightCommentId,
 
@@ -504,6 +528,7 @@ export const useGoalResource = (fields: GoalFields, config?: Configuration) => {
         onGoalCriteriaUpdate,
         onGoalCriteriaRemove,
         onGoalCriteriaConvert,
+        onCheckJiraTask,
         validateGoalCriteriaBindings,
 
         onGoalTagAdd,

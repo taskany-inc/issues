@@ -4,5 +4,9 @@
     "No filter with id": "No filter with id `{id}`",
     "Cannot link goal to selected project": "Cannot link goal to selected project",
     "Cannot transfer goal to selected project": "Cannot transfer goal to selected project",
-    "Goal cannot be it's own criteria": "Goal cannot be it's own criteria"
+    "Goal cannot be it's own criteria": "Goal cannot be it's own criteria",
+    "Criteria haven't the associated Jira task": "Criteria haven't the associated Jira task",
+    "Jira task isn't completed yet": "Jira task isn't completed yet",
+    "Jira task is closed, criteria isn't completed": "Jira task is closed, criteria isn't completed",
+    "Jira task is completed": "Jira task is completed"
 }

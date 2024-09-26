@@ -63,7 +63,7 @@ import { commentsByGoalIdQuery, reactionsForGoalComments } from '../queries/comm
 import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
-import { getOrCreateExternalTask } from '../queries/external';
+import { getOrCreateExternalTask, updateExternalTask } from '../queries/external';
 import { jiraService, searchIssue } from '../../src/utils/integration/jira';
 
 import { tr } from './router.i18n';
@@ -1457,6 +1457,90 @@ export const goal = router({
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
+        }),
+    checkJiraTaskInCriteria: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .use(criteriaAccessMiddleware)
+        .mutation(async ({ input }) => {
+            const currentCriteria = await prisma.goalAchieveCriteria.findUnique({
+                where: { id: input.id },
+                include: { externalTask: true },
+            });
+
+            if (currentCriteria?.externalTask == null) {
+                throw new TRPCError({
+                    code: 'PRECONDITION_FAILED',
+                    message: tr("Criteria haven't the associated Jira task"),
+                });
+            }
+
+            const [updatedTask] = await searchIssue({ value: currentCriteria.externalTask.externalKey, limit: 1 });
+
+            let returnMessage = tr("Jira task isn't completed yet");
+
+            if (updatedTask.status.name !== currentCriteria.externalTask.state) {
+                const {
+                    summary: title,
+                    id: externalId,
+                    key,
+                    issuetype,
+                    status: state,
+                    project,
+                    reporter,
+                    resolution,
+                } = updatedTask;
+
+                await updateExternalTask({
+                    id: currentCriteria.externalTask.id,
+                    title,
+                    externalId,
+                    externalKey: key,
+                    type: issuetype.name,
+                    typeIconUrl: issuetype.iconUrl,
+                    typeId: issuetype.id,
+                    state: state.name,
+                    stateId: state.id,
+                    stateColor: state.statusCategory.colorName,
+                    stateIconUrl: state.iconUrl,
+                    stateCategoryId: state.statusCategory.id,
+                    stateCategoryName: state.statusCategory.name,
+                    project: project.name,
+                    projectId: project.key,
+                    ownerName: reporter.displayName,
+                    ownerEmail: reporter.emailAddress,
+                    ownerId: reporter.key,
+                    resolution: resolution?.name ?? null,
+                    resolutionId: resolution?.id ?? null,
+                }).executeTakeFirstOrThrow();
+
+                if (jiraService.checkStatusIsFinished(updatedTask.status)) {
+                    const isPositiveStatus = jiraService.positiveStatuses?.includes(updatedTask.status.name) || false;
+
+                    if (isPositiveStatus) {
+                        await prisma.goalAchieveCriteria.update({
+                            where: { id: currentCriteria.id },
+                            data: {
+                                isDone: true,
+                            },
+                        });
+
+                        await recalculateCriteriaScore(currentCriteria.goalId)
+                            .recalcCurrentGoalScore()
+                            .recalcLinkedGoalsScores()
+                            .recalcAverageProjectScore()
+                            .run();
+
+                        returnMessage = tr('Jira task is completed');
+                    } else {
+                        returnMessage = tr("Jira task is closed, criteria isn't completed");
+                    }
+                }
+            }
+
+            return {
+                code: 'success',
+                message: returnMessage,
+            };
         }),
     addParticipant: protectedProcedure
         .input(toggleParticipantsSchema)

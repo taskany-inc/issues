@@ -1,6 +1,9 @@
 import { searchIssue } from '../../src/utils/integration/jira';
 import { db } from '../connection/kysely';
 import { ExternalTask } from '../../generated/kysely/types';
+import { ExtractTypeFromGenerated } from '../utils';
+
+type ExtractedTask = ExtractTypeFromGenerated<ExternalTask>;
 
 export const getExternalTask = (params: { externalTaskId: string }) => {
     return db
@@ -60,3 +63,6 @@ export const getOrCreateExternalTask = async ({ id }: { id: string }) => {
         resolutionId: resolution?.id ?? null,
     }).executeTakeFirstOrThrow();
 };
+
+export const updateExternalTask = ({ id, ...data }: Omit<ExtractedTask, 'createdAt' | 'updatedAt'>) =>
+    db.updateTable('ExternalTask').set(data).where('ExternalTask.id', '=', id).returningAll();
