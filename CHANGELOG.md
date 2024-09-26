@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.58.0](https://github.com/taskany-inc/issues/compare/v2.57.0...v2.58.0) (2024-09-26)
+
+
+### Features
+
+* add option to sort projects ([eb99905](https://github.com/taskany-inc/issues/commit/eb99905a2e7d66b696b25a9d08abb02c286ccf40))
+* sticky layout ([d6560b6](https://github.com/taskany-inc/issues/commit/d6560b6fd5e0f683fa4540a74f33d79b5e26530a))
+
+
+### Bug Fixes
+
+* checkbox "empty projects" don't visible on project page ([b12c287](https://github.com/taskany-inc/issues/commit/b12c28706277ee4ba6b895cdfb63bd532d5e830d))
+* **ExternalTasks:** more safely determinate task status ([b3535f8](https://github.com/taskany-inc/issues/commit/b3535f85fc85fb9db9f0cc85647dd2b018e7eb5a))
+
 ## [2.57.0](https://github.com/taskany-inc/issues/compare/v2.56.1...v2.57.0) (2024-09-20)
 
 
