@@ -45,7 +45,7 @@ export const goalCommonSchema = z
     .discriminatedUnion('mode', [
         z.object({
             mode: z.literal('personal'),
-            parent: z.object({}).optional(),
+            parent: z.object({}).nullish(),
         }),
         z.object({
             mode: z.literal('default'),
