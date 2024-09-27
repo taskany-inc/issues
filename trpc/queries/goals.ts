@@ -1,7 +1,7 @@
 import { Prisma, Role, StateType } from '@prisma/client';
+import { decodeUrlDateRange, getDateString } from '@taskany/bricks';
 
 import { QueryWithFilters } from '../../src/schema/common';
-import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
 import { getProjectAccessFilter } from './access';
 

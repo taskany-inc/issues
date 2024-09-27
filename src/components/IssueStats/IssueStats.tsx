@@ -1,8 +1,7 @@
-import { nullable } from '@taskany/bricks';
+import { nullable, DateRangeType } from '@taskany/bricks';
 import { Badge, CircleProgressBar, Link } from '@taskany/bricks/harmony';
 import { IconChatTypingAltOutline } from '@taskany/icons';
 
-import { DateType } from '../../types/date';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { PrivateDepsWarning } from '../PrivateDepsWarning/PrivateDepsWarning';
 import { UserDropdown } from '../UserDropdown/UserDropdown';
@@ -17,7 +16,7 @@ interface IssueStatsProps {
     comments: number;
     owner?: ActivityByIdReturnType | null;
     estimate?: Date | null;
-    estimateType?: DateType | null;
+    estimateType?: DateRangeType | null;
     priority?: Priority | null;
     achivedCriteriaWeight?: number | null;
     hasPrivateDeps?: boolean;

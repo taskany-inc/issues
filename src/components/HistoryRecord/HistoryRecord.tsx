@@ -11,7 +11,7 @@ import {
     Priority,
     ExternalTask,
 } from '@prisma/client';
-import { nullable } from '@taskany/bricks';
+import { nullable, formateEstimate } from '@taskany/bricks';
 import {
     Button,
     HistoryRecord as HistoryRecordBricks,
@@ -23,7 +23,7 @@ import { IconDividerLineOutline } from '@taskany/icons';
 import cn from 'classnames';
 
 import { RelativeTime } from '../RelativeTime/RelativeTime';
-import { decodeHistoryEstimate, formateEstimate } from '../../utils/dateTime';
+import { decodeHistoryEstimate } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { HistoryRecordAction, HistoryRecordSubject, HistoryRecordWithActivity } from '../../../trpc/queries/history';
 import { calculateDiffBetweenArrays } from '../../utils/calculateDiffBetweenArrays';

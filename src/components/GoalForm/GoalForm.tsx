@@ -3,7 +3,7 @@ import { useForm, Controller, WatchObserver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Schema, z } from 'zod';
 import { State, Tag as TagModel } from '@prisma/client';
-import { nullable } from '@taskany/bricks';
+import { DateRangeType, nullable } from '@taskany/bricks';
 import {
     FormControl,
     FormControlInput,
@@ -17,7 +17,6 @@ import {
 
 import { FormControlEditor } from '../FormControlEditor/FormControlEditor';
 import { errorsProvider } from '../../utils/forms';
-import { DateType } from '../../types/date';
 import { TagComboBox } from '../TagComboBox/TagComboBox';
 import { StateDropdown } from '../StateDropdown/StateDropdown';
 import { PriorityDropdown } from '../PriorityDropdown/PriorityDropdown';
@@ -70,7 +69,7 @@ interface GoalFormProps extends React.HTMLAttributes<HTMLDivElement> {
     };
     estimate?: {
         date: string;
-        type: DateType;
+        type: DateRangeType;
     };
     busy?: boolean;
     validitySchema: Schema;

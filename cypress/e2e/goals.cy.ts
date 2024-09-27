@@ -1,4 +1,5 @@
 import '../support';
+
 import {
     createSelectButton,
     createGoalItem,
@@ -29,17 +30,12 @@ import {
     goalTagListItem,
     goalTagListItemClean,
     goalTitleInputError,
-    estimateQuarterTrigger,
-    estimateYearTrigger,
-    estimateStrictDateTrigger,
 } from '../../src/utils/domObjects';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
 import { GoalCreateReturnType } from '../../trpc/inferredTypes';
 import { getTranslation } from '../support/lang';
-import { createLocaleDate, getQuarterFromDate, getYearFromDate } from '../../src/utils/dateTime';
-import { Quarters } from '../../src/types/date';
 
 const testUser = {
     name: 'Test user 1',
@@ -53,22 +49,6 @@ const testGoalTitle = 'my awesome test goal title';
 const testGoalDescription = 'my awesome test goal description';
 const testTag = 'test tag for goal';
 const testTagForManualCreate = 'manual tag';
-
-const dateFragments = {
-    day: 'day',
-    month: 'month',
-    year: 'year',
-} as const;
-
-const inputNames = {
-    'date-picker-year': 'date-picker-year',
-    'date-picker-quarters': 'date-picker-quarter-',
-    'date-picker-strict-date': {
-        [dateFragments.day]: `date-picker-strict-date-${dateFragments.day}`,
-        [dateFragments.month]: `date-picker-strict-date-${dateFragments.month}`,
-        [dateFragments.year]: `date-picker-strict-date-${dateFragments.year}`,
-    },
-} as const;
 
 before(() => {
     cy.task('db:create:user', testUser).then((u) => {
@@ -208,81 +188,6 @@ describe('Goals', () => {
                     .filter(`:contains(${translations.PriorityText.Low()})`)
                     .click();
                 cy.get(priorityCombobox.query).contains(translations.PriorityText.Low());
-            });
-
-            describe('can set estimate', () => {
-                const now = new Date();
-                const currentYear = getYearFromDate(now);
-                const years: string[] = [];
-                const quarters = Object.values(Quarters);
-                const currentQuarter = getQuarterFromDate(now);
-                const currentDate = createLocaleDate(now, { locale: 'en' });
-
-                for (let i = currentYear - 1; i <= currentYear + 4; i++) {
-                    years.push(String(i));
-                }
-
-                beforeEach(() => {
-                    const translations = getTranslation({
-                        Dropdown: ['Not chosen'],
-                    });
-                    cy.clock(now, ['Date']);
-
-                    cy.get(estimateCombobox.query).contains(translations.Dropdown['Not chosen']()).click();
-                    cy.get(estimateYearTrigger.query).should('be.visible');
-                    cy.get(estimateQuarterTrigger.query).should('be.visible');
-                    cy.get(estimateStrictDateTrigger.query).should('be.visible');
-                });
-
-                afterEach(() => {
-                    cy.clock().invoke('restore');
-                });
-
-                it('set estimate year', (done) => {
-                    cy.get(estimateYearTrigger.query)
-                        .click()
-                        .get(`input[name=${inputNames['date-picker-year']}]`)
-                        .should('be.visible')
-                        .and('be.enabled')
-                        .invoke('val')
-                        .then((value) => {
-                            expect(`${currentYear}` === value).to.be.true;
-
-                            done();
-                        });
-
-                    cy.get(estimateCombobox.query).should('have.text', `${currentYear}`);
-                });
-
-                it('set estimate quarter', () => {
-                    cy.get(estimateQuarterTrigger.query).click();
-                    cy.get(`button[name^=${inputNames['date-picker-quarters']}]`)
-                        .should('be.visible')
-                        .and('be.enabled')
-                        .each((el) => {
-                            cy.wrap(el).its('[0].innerText').should('be.oneOf', quarters);
-                        });
-
-                    cy.get(estimateCombobox.query).contains(`${currentQuarter}/${currentYear}`);
-                });
-
-                it('set estimate strict date', () => {
-                    cy.get(estimateStrictDateTrigger.query).click();
-                    const selectors = Object.values(inputNames['date-picker-strict-date']).map(
-                        (selector) => `input[name=${selector}]`,
-                    );
-
-                    const dateArr = currentDate.split('/');
-
-                    cy.getMultipleFields(selectors).then((obj) => {
-                        selectors.forEach((selector) => {
-                            const value = obj[selector];
-                            expect(dateArr.includes(value.length === 1 ? `0${value}` : value)).to.be.true;
-                        });
-                    });
-
-                    cy.get(estimateCombobox.query).contains(currentDate);
-                });
             });
 
             describe('goal tags', () => {

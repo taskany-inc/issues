@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import { deleteCookie } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
-import { deleteCookie } from '../utils/cookies';
 import { refreshInterval } from '../utils/config';
 
 import { filtersNoSearchPresetCookie } from './useUrlFilterParams';

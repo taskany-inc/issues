@@ -1,13 +1,13 @@
 import { Badge, Table, Tag, Text, UserGroup, ListViewItem, Tooltip } from '@taskany/bricks/harmony';
 import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
-import { nullable } from '@taskany/bricks';
+import { nullable, formateEstimate } from '@taskany/bricks';
 import { IconGitBranchOutline, IconMessageTextOutline } from '@taskany/icons';
 
 import { DateType } from '../../../generated/kysely/types';
 import { State as StateType } from '../../../trpc/inferredTypes';
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
 import { safeUserData } from '../../utils/getUserName';
-import { calculateElapsedDays, formateEstimate } from '../../utils/dateTime';
+import { calculateElapsedDays } from '../../utils/dateTime';
 import { getPriorityText } from '../PriorityText/PriorityText';
 import { useLocale } from '../../hooks/useLocale';
 import { NextLink } from '../NextLink';

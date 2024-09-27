@@ -1,11 +1,11 @@
 import { AnyColumnWithTable, Expression, ExpressionOrFactory, Nullable, OrderByExpression, sql, SqlBool } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
 import { OrderByDirection } from 'kysely/dist/cjs/parser/order-by-parser';
+import { decodeUrlDateRange, getDateString } from '@taskany/bricks';
 
 import { db } from '../connection/kysely';
 import { Activity, DB, Role } from '../../generated/kysely/types';
 import { QueryWithFilters, SortableProjectsPropertiesArray } from '../../src/schema/common';
-import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
 import { mapSortParamsToTableColumns } from './goalV2';
 import { getUserActivity } from './activity';

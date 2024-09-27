@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import { StateType } from '@prisma/client';
-
-import { DateType } from '../types/date';
+import { StateType, DateType } from '@prisma/client';
 
 import { tr } from './schema.i18n';
 import { queryWithFiltersSchema } from './common';

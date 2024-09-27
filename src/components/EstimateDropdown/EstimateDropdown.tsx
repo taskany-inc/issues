@@ -1,11 +1,9 @@
 import { DatePicker, DatePickerYear, DatePickerQuarter, DatePickerStrict, Text } from '@taskany/bricks/harmony';
 import { ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
-import { nullable } from '@taskany/bricks';
+import { nullable, formateEstimate, getDateString, DateRangeType, DateRange } from '@taskany/bricks';
 
-import { formateEstimate, getDateString } from '../../utils/dateTime';
 import { DropdownPanel, Dropdown, DropdownTrigger } from '../Dropdown/Dropdown';
 import { useLocale } from '../../hooks/useLocale';
-import { DateRange, DateType } from '../../types/date';
 import {
     estimateYearTrigger,
     estimateQuarterTrigger,
@@ -19,7 +17,7 @@ import s from './EstimateDropdown.module.css';
 interface Estimate {
     range?: DateRange;
     date: string;
-    type?: DateType;
+    type?: DateRangeType;
 }
 
 type EstimateState = Parameters<ComponentProps<typeof DatePicker>['onChange']>['0'];
@@ -54,7 +52,7 @@ const toEstimateState = (value: Estimate): EstimateState => {
     };
 };
 
-export const getEstimateDropdownValueFromDate = (date: Date, type?: DateType | null) => ({
+export const getEstimateDropdownValueFromDate = (date: Date, type?: DateRangeType | null) => ({
     date: getDateString(date),
     type: type ?? 'Strict',
 });

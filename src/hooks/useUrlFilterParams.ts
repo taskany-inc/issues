@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { MouseEventHandler, useCallback, useMemo, useState } from 'react';
+import { setCookie } from '@taskany/bricks';
 
 import { FilterById, StateType } from '../../trpc/inferredTypes';
 import { SortableProjectsPropertiesArray, StateTypeEnum } from '../schema/common';
-import { setCookie } from '../utils/cookies';
 
 export type SortDirection = 'asc' | 'desc';
 export type SortableGoalsProps =
