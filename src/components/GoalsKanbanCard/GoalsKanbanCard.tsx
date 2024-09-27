@@ -8,12 +8,11 @@ import {
     KanbanCardTitle,
     Tag,
 } from '@taskany/bricks/harmony';
-import { nullable } from '@taskany/bricks';
+import { nullable, DateRangeType } from '@taskany/bricks';
 import { IconMessageTextOutline } from '@taskany/icons';
 
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
 import { safeUserData } from '../../utils/getUserName';
-import { DateType } from '../../types/date';
 import { Priority } from '../../types/priority';
 import { TagObject } from '../../types/tag';
 import { RelativeTime } from '../RelativeTime/RelativeTime';
@@ -32,7 +31,7 @@ interface GoalsKanbanCardProps extends HTMLAttributes<HTMLDivElement> {
     updatedAt: Date;
     owner?: ActivityByIdReturnType | null;
     estimate?: Date | null;
-    estimateType?: DateType | null;
+    estimateType?: DateRangeType | null;
     tags?: TagObject[] | null;
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
     priority?: Priority | null;

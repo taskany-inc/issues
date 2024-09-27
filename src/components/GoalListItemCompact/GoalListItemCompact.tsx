@@ -1,14 +1,12 @@
 import React, { ComponentProps, FC, MouseEventHandler, useMemo } from 'react';
 import cn from 'classnames';
-import { nullable } from '@taskany/bricks';
+import { nullable, formateEstimate, DateRangeType } from '@taskany/bricks';
 import { TableRow, TableCell, UserGroup } from '@taskany/bricks/harmony';
 import { IconTargetOutline } from '@taskany/icons';
 import type { State as StateType } from '@prisma/client';
 
-import { DateType } from '../../types/date';
 import { safeUserData } from '../../utils/getUserName';
 import { ActivityByIdReturnType } from '../../../trpc/inferredTypes';
-import { formateEstimate } from '../../utils/dateTime';
 import { useLocale } from '../../hooks/useLocale';
 import { Priority } from '../../types/priority';
 import { getPriorityText } from '../PriorityText/PriorityText';
@@ -26,7 +24,7 @@ interface CommonGoalListItemCompactProps {
     issuer?: ActivityByIdReturnType;
     state?: StateType;
     estimate?: Date;
-    estimateType?: DateType;
+    estimateType?: DateRangeType;
     focused?: boolean;
     priority?: Priority;
 }

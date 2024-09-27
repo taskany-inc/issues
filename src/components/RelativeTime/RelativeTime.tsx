@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { nullable, useMounted } from '@taskany/bricks';
+import { nullable, useMounted, createLocaleDate } from '@taskany/bricks';
 import { Text } from '@taskany/bricks/harmony';
 import cn from 'classnames';
 
-import { dateAgo, createLocaleDate, parseLocaleDate } from '../../utils/dateTime';
+import { dateAgo, parseLocaleDate } from '../../utils/dateTime';
 import { usePageContext } from '../../hooks/usePageContext';
 import { useLocale } from '../../hooks/useLocale';
 

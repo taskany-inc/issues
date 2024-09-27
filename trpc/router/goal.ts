@@ -1,6 +1,7 @@
 import z from 'zod';
 import { TRPCError } from '@trpc/server';
 import { ExternalTask, GoalHistory, Prisma, StateType } from '@prisma/client';
+import { formateEstimate } from '@taskany/bricks';
 
 import { getGoalActivityFilterIdsQuery, getDeepParentGoalIds } from '../queries/goalV2';
 import { prisma } from '../../src/utils/prisma';
@@ -38,7 +39,7 @@ import {
     updateCriteriaState,
 } from '../../src/schema/criteria';
 import type { FieldDiff } from '../../src/types/common';
-import { encodeHistoryEstimate, formateEstimate } from '../../src/utils/dateTime';
+import { encodeHistoryEstimate } from '../../src/utils/dateTime';
 import {
     goalEditAccessMiddleware,
     commentAccessMiddleware,

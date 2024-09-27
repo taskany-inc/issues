@@ -1,8 +1,8 @@
 import { ComponentProps, useCallback, useMemo } from 'react';
 import { AppliedFilter, TagCleanButton } from '@taskany/bricks/harmony';
+import { decodeDateRangeFromString, encodeUrlDateRange } from '@taskany/bricks';
 
 import { EstimateDropdown } from '../EstimateDropdown/EstimateDropdown';
-import { decodeEstimateFromUrl, encodeUrlDateRange } from '../../utils/dateTime';
 import { appliedFiltersPanelEstimate } from '../../utils/domObjects';
 
 interface AppliedEstimateFilterProps {
@@ -24,7 +24,7 @@ export const AppliedEstimateFilter = ({
 }: AppliedEstimateFilterProps) => {
     const estimateValue = useMemo(() => {
         const [estimateValue] = value || [];
-        const estimate = decodeEstimateFromUrl(estimateValue);
+        const estimate = decodeDateRangeFromString(estimateValue);
 
         if (!estimate) return;
 

@@ -1,7 +1,6 @@
 import { Goal, PrismaClient } from '@prisma/client';
 
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
-import { createQuarterRangeFromDate } from '../../src/utils/dateTime';
 
 type TaskParams<K extends string, D, R> = {
     [key in K]: D extends void ? (data?: D) => R : (data: D) => R;
@@ -134,15 +133,13 @@ export const initDb = (on: DbPluginEvents) => {
 
             if (!user.activityId) return;
 
-            const estimateData = createQuarterRangeFromDate(new Date());
-
             const goal = await prisma.goal.create({
                 data: {
                     title,
                     description: '',
                     scopeId: goals.length + 1,
-                    estimate: estimateData.end,
-                    estimateType: 'Quarter',
+                    estimate: new Date(),
+                    estimateType: 'Strict',
                     project: { connect: { id: projectId } },
                     state: { connect: { id: defaultState.id } },
                     priority: { connect: { id: defaultPriority.id } },

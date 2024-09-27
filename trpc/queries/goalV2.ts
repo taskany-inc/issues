@@ -1,11 +1,11 @@
 import { Expression, OrderByExpression, sql } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
 import { OrderByDirection } from 'kysely/dist/cjs/parser/order-by-parser';
+import { decodeUrlDateRange, getDateString } from '@taskany/bricks';
 
 import { db } from '../connection/kysely';
 import { QueryWithFilters } from '../../src/schema/common';
 import { DB, Role } from '../../generated/kysely/types';
-import { decodeUrlDateRange, getDateString } from '../../src/utils/dateTime';
 
 import { getUserActivity } from './activity';
 
