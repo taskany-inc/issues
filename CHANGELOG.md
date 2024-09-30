@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.58.1](https://github.com/taskany-inc/issues/compare/v2.58.0...v2.58.1) (2024-09-30)
+
+
+### Bug Fixes
+
+* **PersonalGoal:** now can create again ([516f7bd](https://github.com/taskany-inc/issues/commit/516f7bd547ea5eb8575b149dd4439053161a88f3))
+
 ## [2.58.0](https://github.com/taskany-inc/issues/compare/v2.57.0...v2.58.0) (2024-09-27)
 
 
