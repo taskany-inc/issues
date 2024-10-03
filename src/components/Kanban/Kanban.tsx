@@ -1,7 +1,8 @@
-import React, { FC, MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ComponentProps, FC, MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { KanbanColumn, KanbanContainer } from '@taskany/bricks/harmony';
 import { QueryStatus } from '@tanstack/react-query';
 import { nullable, useIntersectionLoader } from '@taskany/bricks';
+import { ReactSortable } from 'react-sortablejs';
 
 import { trpc } from '../../utils/trpcClient';
 import { FilterById, State } from '../../../trpc/inferredTypes';
@@ -24,6 +25,7 @@ type onLoadingStateChange = (state: LoadingState) => void;
 
 interface KanbanStateColumnProps {
     state: State;
+    shownStates: State[];
     projectId: string;
     filterPreset?: FilterById;
     partnershipProject?: string[];
@@ -66,6 +68,7 @@ const intersectionOptions = {
 
 const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
     state,
+    shownStates,
     projectId,
     filterPreset,
     partnershipProject,
@@ -75,22 +78,24 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
         preset: filterPreset,
     });
 
+    const getColumnQuery = useCallback(
+        (stateId: string) => ({
+            id: projectId,
+            goalsQuery: {
+                ...queryState,
+                partnershipProject: partnershipProject || undefined,
+                state: [stateId],
+            },
+        }),
+        [queryState, partnershipProject, projectId],
+    );
+
     const { data, isFetching, fetchNextPage, hasNextPage, status } =
-        trpc.v2.project.getProjectGoalsById.useInfiniteQuery(
-            {
-                id: projectId,
-                goalsQuery: {
-                    ...queryState,
-                    partnershipProject: partnershipProject || undefined,
-                    state: [state.id],
-                },
-            },
-            {
-                keepPreviousData: true,
-                staleTime: refreshInterval,
-                getNextPageParam: ({ pagination }) => pagination.offset,
-            },
-        );
+        trpc.v2.project.getProjectGoalsById.useInfiniteQuery(getColumnQuery(state.id), {
+            keepPreviousData: true,
+            staleTime: refreshInterval,
+            getNextPageParam: ({ pagination }) => pagination.offset,
+        });
 
     const goals = useMemo(() => {
         if (data == null) {
@@ -102,6 +107,12 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
             return acc;
         }, []);
     }, [data]);
+
+    const [list, setList] = useState(goals);
+
+    useEffect(() => {
+        setList(goals);
+    }, [goals]);
 
     const loadingState = useMemo(() => {
         if (isFetching) {
@@ -132,37 +143,130 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
         intersectionOptions,
     );
 
-    return (
-        <KanbanColumn>
-            <KanbanState className={s.KanbanState} state={state} />
+    const stateChangeMutations = trpc.goal.switchState.useMutation();
+    const utils = trpc.useContext();
 
-            {goals.map((goal) => {
-                return (
-                    <NextLink
-                        key={goal.id}
-                        href={routes.goal(goal._shortId)}
-                        onClick={onGoalPreviewShow({
-                            _shortId: goal._shortId,
-                            title: goal.title,
-                        })}
-                        className={s.KanbanLink}
-                    >
-                        <GoalsKanbanCard
+    const onDragEnd = useCallback<NonNullable<ComponentProps<typeof ReactSortable>['onEnd']>>(
+        async (result) => {
+            const goalId = result.item.id;
+            const newStateId = result.to.id;
+            const oldStateId = result.from.id;
+
+            const state = newStateId ? shownStates.find(({ id }) => newStateId === id) : null;
+
+            if (!state) {
+                return;
+            }
+
+            const data = utils.v2.project.getProjectGoalsById.getInfiniteData(getColumnQuery(oldStateId));
+
+            const goals =
+                data?.pages?.reduce<(typeof data)['pages'][number]['goals']>((acc, cur) => {
+                    acc.push(...cur.goals);
+                    return acc;
+                }, []) || [];
+
+            const goal = goals.find((goal) => goal.id === goalId);
+
+            await utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(oldStateId), (data) => {
+                if (!data) {
+                    return {
+                        pages: [],
+                        pageParams: [],
+                    };
+                }
+
+                return {
+                    ...data,
+                    pages: data.pages.map((page) => ({
+                        ...page,
+                        goals: page.goals.filter((goal) => goal.id !== goalId),
+                    })),
+                };
+            });
+
+            if (newStateId && goal) {
+                await utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(newStateId), (data) => {
+                    if (!data) {
+                        return {
+                            pages: [],
+                            pageParams: [],
+                        };
+                    }
+
+                    const [first, ...rest] = data.pages;
+
+                    const updatedFirst = {
+                        ...first,
+                        goals: [goal, ...first.goals],
+                    };
+
+                    return {
+                        ...data,
+                        pages: [updatedFirst, ...rest],
+                    };
+                });
+            }
+
+            await stateChangeMutations.mutate(
+                {
+                    id: goalId,
+                    state,
+                },
+                {
+                    onSettled: () => {
+                        utils.v2.project.getProjectGoalsById.invalidate({
+                            id: projectId,
+                        });
+                    },
+                },
+            );
+        },
+        [stateChangeMutations, utils, getColumnQuery, shownStates, projectId],
+    );
+
+    return (
+        <KanbanColumn className={s.KanbanColumn}>
+            <KanbanState className={s.KanbanState} state={state} />
+            <ReactSortable
+                className={s.KanbanSortableList}
+                id={state.id}
+                animation={150}
+                list={list}
+                setList={setList}
+                group="states"
+                onEnd={onDragEnd}
+                sort={false}
+            >
+                {list.map((goal) => {
+                    return (
+                        <NextLink
                             id={goal.id}
-                            title={goal.title}
-                            commentsCount={goal._count.comments ?? 0}
-                            updatedAt={goal.updatedAt}
-                            owner={goal.owner}
-                            estimate={goal.estimate}
-                            estimateType={goal.estimateType}
-                            tags={goal.tags}
-                            priority={goal.priority}
-                            progress={goal._achivedCriteriaWeight}
-                            onTagClick={setTagsFilterOutside}
-                        />
-                    </NextLink>
-                );
-            })}
+                            key={goal.id}
+                            href={routes.goal(goal._shortId)}
+                            onClick={onGoalPreviewShow({
+                                _shortId: goal._shortId,
+                                title: goal.title,
+                            })}
+                            className={s.KanbanLink}
+                        >
+                            <GoalsKanbanCard
+                                id={goal.id}
+                                title={goal.title}
+                                commentsCount={goal._count.comments ?? 0}
+                                updatedAt={goal.updatedAt}
+                                owner={goal.owner}
+                                estimate={goal.estimate}
+                                estimateType={goal.estimateType}
+                                tags={goal.tags}
+                                priority={goal.priority}
+                                progress={goal._achivedCriteriaWeight}
+                                onTagClick={setTagsFilterOutside}
+                            />
+                        </NextLink>
+                    );
+                })}
+            </ReactSortable>
 
             <div ref={ref} />
         </KanbanColumn>
@@ -197,6 +301,7 @@ export const Kanban = ({ id, filterPreset, partnershipProject }: KanbanProps) =>
             <KanbanContainer>
                 {shownStates.map((state) => (
                     <KanbanStateColumn
+                        shownStates={shownStates}
                         key={state.id}
                         projectId={id}
                         state={state}
