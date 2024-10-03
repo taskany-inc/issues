@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.58.2](https://github.com/taskany-inc/issues/compare/v2.58.1...v2.58.2) (2024-10-03)
+
+
+### Bug Fixes
+
+* add new goal to current page ([919e207](https://github.com/taskany-inc/issues/commit/919e20713798e4e8d3147f5b02da4d78af7ed455))
+* what's new modal is disappearing after page load ([47872d1](https://github.com/taskany-inc/issues/commit/47872d10fb1874497eaf71a08b547a96c53e1804))
+
 ## [2.58.1](https://github.com/taskany-inc/issues/compare/v2.58.0...v2.58.1) (2024-09-30)
 
 
