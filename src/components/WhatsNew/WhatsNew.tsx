@@ -16,11 +16,17 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 const WhatsNew = () => {
     const locale = useLocale();
+    const utils = trpc.useContext();
     const [iframeReady, setIframeReady] = useState(false);
 
-    const { data } = trpc.whatsnew.check.useQuery({
-        locale,
-    });
+    const { data } = trpc.whatsnew.check.useQuery(
+        {
+            locale,
+        },
+        {
+            staleTime: Infinity,
+        },
+    );
 
     useEffect(() => {
         if (data?.releaseNotesExists && data?.version && !data?.read && !data?.delayed) {
@@ -39,10 +45,10 @@ const WhatsNew = () => {
             await markAsReadMutation.mutateAsync({
                 version: data.version,
             });
-
+            utils.whatsnew.check.invalidate();
             dispatchModalEvent(ModalEvent.WhatsNewModal)();
         }
-    }, [markAsReadMutation, data]);
+    }, [data?.version, markAsReadMutation, utils.whatsnew.check]);
 
     const markAsDelayedMutation = trpc.whatsnew.markAsDelayed.useMutation();
     const onDelayClick = useCallback(async () => {
@@ -50,10 +56,10 @@ const WhatsNew = () => {
             await markAsDelayedMutation.mutateAsync({
                 version: data.version,
             });
-
+            utils.whatsnew.check.invalidate();
             dispatchModalEvent(ModalEvent.WhatsNewModal)();
         }
-    }, [markAsDelayedMutation, data]);
+    }, [data?.version, markAsDelayedMutation, utils.whatsnew.check]);
 
     return (
         <ModalOnEvent event={ModalEvent.WhatsNewModal}>
