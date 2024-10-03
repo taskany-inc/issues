@@ -14,6 +14,7 @@ import { getTelemetryInstanceSingleton, useWebTelemetryMonitoringInit } from '..
 import { ThemeSetter } from '../components/ThemeSetter';
 
 import '@taskany/icons/style.css';
+import 'dragula/dist/dragula.min.css';
 
 import './_app.css';
 

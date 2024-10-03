@@ -1,4 +1,4 @@
-import React, { FC, MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ComponentProps, FC, MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { KanbanColumn, KanbanContainer } from '@taskany/bricks/harmony';
 import { QueryStatus } from '@tanstack/react-query';
 import { nullable, useIntersectionLoader } from '@taskany/bricks';
@@ -16,6 +16,7 @@ import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { routes } from '../../hooks/router';
 import { Loader } from '../Loader/Loader';
 import { NoGoalsText } from '../NoGoalsText/NoGoalsText';
+import { Draggable, DraggableContext } from '../Draggable';
 
 import s from './Kanban.module.css';
 
@@ -64,6 +65,36 @@ const intersectionOptions = {
     rootMargin: '0px 0px 300px',
 };
 
+const useColumnQuery = ({
+    partnershipProject,
+    filterPreset,
+    id,
+}: {
+    filterPreset?: FilterById;
+    id: string;
+    partnershipProject?: string[];
+}) => {
+    const { queryState } = useUrlFilterParams({
+        preset: filterPreset,
+    });
+
+    const getColumnQuery = useCallback(
+        (stateId: string) => ({
+            id,
+            goalsQuery: {
+                ...queryState,
+                partnershipProject: partnershipProject || undefined,
+                state: [stateId],
+            },
+        }),
+        [queryState, partnershipProject, id],
+    );
+
+    return {
+        getColumnQuery,
+    };
+};
+
 const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
     state,
     projectId,
@@ -71,26 +102,22 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
     partnershipProject,
     onLoadingStateChange,
 }) => {
-    const { queryState, setTagsFilterOutside } = useUrlFilterParams({
+    const { setTagsFilterOutside } = useUrlFilterParams({
         preset: filterPreset,
     });
 
+    const { getColumnQuery } = useColumnQuery({
+        partnershipProject,
+        filterPreset,
+        id: projectId,
+    });
+
     const { data, isFetching, fetchNextPage, hasNextPage, status } =
-        trpc.v2.project.getProjectGoalsById.useInfiniteQuery(
-            {
-                id: projectId,
-                goalsQuery: {
-                    ...queryState,
-                    partnershipProject: partnershipProject || undefined,
-                    state: [state.id],
-                },
-            },
-            {
-                keepPreviousData: true,
-                staleTime: refreshInterval,
-                getNextPageParam: ({ pagination }) => pagination.offset,
-            },
-        );
+        trpc.v2.project.getProjectGoalsById.useInfiniteQuery(getColumnQuery(state.id), {
+            keepPreviousData: true,
+            staleTime: refreshInterval,
+            getNextPageParam: ({ pagination }) => pagination.offset,
+        });
 
     const goals = useMemo(() => {
         if (data == null) {
@@ -102,6 +129,12 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
             return acc;
         }, []);
     }, [data]);
+
+    const [list, setList] = useState(goals);
+
+    useEffect(() => {
+        setList(goals);
+    }, [goals]);
 
     const loadingState = useMemo(() => {
         if (isFetching) {
@@ -133,36 +166,38 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
     );
 
     return (
-        <KanbanColumn>
+        <KanbanColumn className={s.KanbanColumn}>
             <KanbanState className={s.KanbanState} state={state} />
-
-            {goals.map((goal) => {
-                return (
-                    <NextLink
-                        key={goal.id}
-                        href={routes.goal(goal._shortId)}
-                        onClick={onGoalPreviewShow({
-                            _shortId: goal._shortId,
-                            title: goal.title,
-                        })}
-                        className={s.KanbanLink}
-                    >
-                        <GoalsKanbanCard
+            <Draggable className={s.KanbanSortableList} id={state.id}>
+                {list.map((goal) => {
+                    return (
+                        <NextLink
                             id={goal.id}
-                            title={goal.title}
-                            commentsCount={goal._count.comments ?? 0}
-                            updatedAt={goal.updatedAt}
-                            owner={goal.owner}
-                            estimate={goal.estimate}
-                            estimateType={goal.estimateType}
-                            tags={goal.tags}
-                            priority={goal.priority}
-                            progress={goal._achivedCriteriaWeight}
-                            onTagClick={setTagsFilterOutside}
-                        />
-                    </NextLink>
-                );
-            })}
+                            key={goal.id}
+                            href={routes.goal(goal._shortId)}
+                            onClick={onGoalPreviewShow({
+                                _shortId: goal._shortId,
+                                title: goal.title,
+                            })}
+                            className={s.KanbanLink}
+                        >
+                            <GoalsKanbanCard
+                                id={goal.id}
+                                title={goal.title}
+                                commentsCount={goal._count.comments ?? 0}
+                                updatedAt={goal.updatedAt}
+                                owner={goal.owner}
+                                estimate={goal.estimate}
+                                estimateType={goal.estimateType}
+                                tags={goal.tags}
+                                priority={goal.priority}
+                                progress={goal._achivedCriteriaWeight}
+                                onTagClick={setTagsFilterOutside}
+                            />
+                        </NextLink>
+                    );
+                })}
+            </Draggable>
 
             <div ref={ref} />
         </KanbanColumn>
@@ -192,25 +227,117 @@ export const Kanban = ({ id, filterPreset, partnershipProject }: KanbanProps) =>
 
     const tableLoadingState = useMemo(() => calculateCommonLoadingState(loaders), [loaders]);
 
+    const { getColumnQuery } = useColumnQuery({
+        partnershipProject,
+        filterPreset,
+        id,
+    });
+
+    const stateChangeMutations = trpc.goal.switchState.useMutation();
+    const utils = trpc.useContext();
+
+    const onDrop = useCallback<ComponentProps<typeof DraggableContext>['onDrop']>(
+        async (el, to, from) => {
+            const goalId = el.id;
+            const newStateId = to.id;
+            const oldStateId = from.id;
+
+            console.log('QQQ DROP', goalId, newStateId, oldStateId);
+
+            const state = newStateId ? shownStates.find(({ id }) => newStateId === id) : null;
+
+            if (!state) {
+                return;
+            }
+
+            const data = utils.v2.project.getProjectGoalsById.getInfiniteData(getColumnQuery(oldStateId));
+
+            const goals =
+                data?.pages?.reduce<(typeof data)['pages'][number]['goals']>((acc, cur) => {
+                    acc.push(...cur.goals);
+                    return acc;
+                }, []) || [];
+
+            const goal = goals.find((goal) => goal.id === goalId);
+
+            await utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(oldStateId), (data) => {
+                if (!data) {
+                    return {
+                        pages: [],
+                        pageParams: [],
+                    };
+                }
+
+                return {
+                    ...data,
+                    pages: data.pages.map((page) => ({
+                        ...page,
+                        goals: page.goals.filter((goal) => goal.id !== goalId),
+                    })),
+                };
+            });
+
+            if (newStateId && goal) {
+                await utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(newStateId), (data) => {
+                    if (!data) {
+                        return {
+                            pages: [],
+                            pageParams: [],
+                        };
+                    }
+
+                    const [first, ...rest] = data.pages;
+
+                    const updatedFirst = {
+                        ...first,
+                        goals: [goal, ...first.goals],
+                    };
+
+                    return {
+                        ...data,
+                        pages: [updatedFirst, ...rest],
+                    };
+                });
+            }
+
+            await stateChangeMutations.mutate(
+                {
+                    id: goalId,
+                    state,
+                },
+                {
+                    onSettled: () => {
+                        utils.v2.project.getProjectGoalsById.invalidate({
+                            id,
+                        });
+                    },
+                },
+            );
+        },
+        [stateChangeMutations, utils, getColumnQuery, shownStates, id],
+    );
+
     return (
         <>
             <KanbanContainer>
-                {shownStates.map((state) => (
-                    <KanbanStateColumn
-                        key={state.id}
-                        projectId={id}
-                        state={state}
-                        filterPreset={filterPreset}
-                        partnershipProject={partnershipProject}
-                        onLoadingStateChange={(loadingState) => {
-                            setLoaders((map) => {
-                                map.set(state.id, loadingState);
+                <DraggableContext onDrop={onDrop}>
+                    {shownStates.map((state) => (
+                        <KanbanStateColumn
+                            key={state.id}
+                            projectId={id}
+                            state={state}
+                            filterPreset={filterPreset}
+                            partnershipProject={partnershipProject}
+                            onLoadingStateChange={(loadingState) => {
+                                setLoaders((map) => {
+                                    map.set(state.id, loadingState);
 
-                                return new Map(map);
-                            });
-                        }}
-                    />
-                ))}
+                                    return new Map(map);
+                                });
+                            }}
+                        />
+                    ))}
+                </DraggableContext>
             </KanbanContainer>
 
             {nullable(tableLoadingState === 'loading', () => (
