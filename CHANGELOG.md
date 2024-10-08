@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.58.3](https://github.com/taskany-inc/issues/compare/v2.58.2...v2.58.3) (2024-10-08)
+
+
+### Bug Fixes
+
+* project editable access ([9255290](https://github.com/taskany-inc/issues/commit/92552905326d0298e3980177730984953e94790b))
+
 ## [2.58.2](https://github.com/taskany-inc/issues/compare/v2.58.1...v2.58.2) (2024-10-03)
 
 
