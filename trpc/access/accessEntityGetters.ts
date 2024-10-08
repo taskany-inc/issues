@@ -57,6 +57,12 @@ export const getProject = (id: string) =>
                     ghost: true,
                 },
             },
+            participants: {
+                include: {
+                    user: true,
+                    ghost: true,
+                },
+            },
         },
     });
 
