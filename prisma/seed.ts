@@ -169,5 +169,6 @@ const userPassword = 'taskany';
         prisma.appConfig.create({ data: {} }),
         createSheep(),
         createCronJob('goalPing', '0 0 0 1 * *'),
+        createCronJob('externalTaskCheck', '1/10 * * * *'),
     ]);
 })();
