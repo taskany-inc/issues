@@ -1,6 +1,8 @@
 import { prisma } from '../prisma';
 
+// import { dayDuration } from './externalTasksJob';
 import * as templates from './mail/templates';
+import { log } from './utils';
 
 export const defaultJobDelay = process.env.WORKER_JOBS_DELAY ? parseInt(process.env.WORKER_JOBS_DELAY, 10) : 1000;
 
@@ -14,6 +16,7 @@ export enum jobKind {
     email = 'email',
     cron = 'cron',
     comment = 'comment',
+    criteriaToUpdate = 'criteriaToUpdate',
 }
 
 type Templates = typeof templates;
@@ -25,14 +28,21 @@ export interface JobDataMap {
         data: any;
     };
     cron: {
-        template: 'goalPing';
+        template: 'goalPing' | 'externalTaskCheck';
     };
     comment: {
         goalId: string;
         activityId: string;
         description: string;
     };
+    criteriaToUpdate: {
+        id: string;
+    };
 }
+
+export const castJobData = <Kind extends jobKind>(kind: Kind, data: unknown): data is JobDataMap[Kind] => {
+    return data != null;
+};
 
 export type JobKind = keyof JobDataMap;
 
@@ -43,10 +53,27 @@ interface CreateJobProps<K extends keyof JobDataMap> {
     cron?: string;
 }
 
+export const pickScheduledLastJob = async (kind: JobKind) => {
+    const res = await prisma.job.findMany({
+        where: { kind, state: jobState.scheduled },
+        orderBy: [{ createdAt: 'desc' }, { updatedAt: 'desc' }],
+        take: 1,
+        skip: 0,
+    });
+
+    if (res.length) {
+        return res[0];
+    }
+
+    return null;
+};
+
 export function createJob<K extends keyof JobDataMap>(
     kind: K,
     { data, priority, delay = defaultJobDelay, cron }: CreateJobProps<K>,
 ) {
+    log(`create new ${kind} job`, JSON.stringify(data));
+
     return prisma.job.create({
         data: {
             state: jobState.scheduled,
@@ -86,3 +113,7 @@ export function createCommentJob(data: JobDataMap['comment'], delay?: number) {
         delay,
     });
 }
+
+export const createCriteriaToUpdate = (data: JobDataMap['criteriaToUpdate'], delay?: number) => {
+    return createJob('criteriaToUpdate', { data, delay });
+};
