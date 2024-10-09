@@ -4,13 +4,11 @@ import parser from 'cron-parser';
 
 import { jobKind, jobState, defaultJobDelay } from './create';
 import * as resolve from './resolve';
+import { log } from './utils';
 
 const prisma = new PrismaClient();
 const queueInterval = process.env.WORKER_JOBS_INTERVAL ? parseInt(process.env.WORKER_JOBS_INTERVAL, 10) : 3000;
 const retryLimit = process.env.WORKER_JOBS_RETRY ? parseInt(process.env.WORKER_JOBS_RETRY, 10) : 3;
-
-// eslint-disable-next-line no-console
-const log = (...rest: unknown[]) => console.log('[WORKER]:', ...rest);
 
 log('Worker started successfully');
 
