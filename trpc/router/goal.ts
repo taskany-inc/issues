@@ -1518,18 +1518,33 @@ export const goal = router({
                     const isPositiveStatus = jiraService.positiveStatuses?.includes(updatedTask.status.name) || false;
 
                     if (isPositiveStatus) {
-                        await prisma.goalAchieveCriteria.update({
-                            where: { id: currentCriteria.id },
+                        // needs update all associated criteria
+                        await prisma.goalAchieveCriteria.updateMany({
+                            where: { externalTaskId: currentCriteria.externalTask.id, deleted: { not: true } },
                             data: {
                                 isDone: true,
                             },
                         });
 
-                        await recalculateCriteriaScore(currentCriteria.goalId)
-                            .recalcCurrentGoalScore()
-                            .recalcLinkedGoalsScores()
-                            .recalcAverageProjectScore()
-                            .run();
+                        const goalIdsToUpdate = await prisma.goalAchieveCriteria.findMany({
+                            where: {
+                                externalTaskId: currentCriteria.externalTask.id,
+                                deleted: { not: true },
+                            },
+                            select: {
+                                goalId: true,
+                            },
+                        });
+
+                        await goalIdsToUpdate.reduce((promiseAcc, { goalId }) => {
+                            return promiseAcc.then(
+                                recalculateCriteriaScore(goalId).makeChain(
+                                    'recalcCurrentGoalScore',
+                                    'recalcLinkedGoalsScores',
+                                    'recalcAverageProjectScore',
+                                ).run,
+                            );
+                        }, Promise.resolve());
 
                         returnMessage = tr('Jira task is completed');
                     } else {
