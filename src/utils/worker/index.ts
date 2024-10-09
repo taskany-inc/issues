@@ -44,6 +44,7 @@ const getNextJob = async (state: jobState, exclude: string[]) => {
 const iterateJobQueue = async (state: jobState, cb: (job: Job) => Promise<void>): Promise<number> => {
     const watchedIds: string[] = [];
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
         // eslint-disable-next-line no-await-in-loop
         const job = await getNextJob(state, watchedIds);
@@ -63,6 +64,7 @@ const iterateJobQueue = async (state: jobState, cb: (job: Job) => Promise<void>)
 const worker = async () => {
     try {
         const completedCount = await iterateJobQueue(jobState.completed, async (job) => {
+            log(`completed: ${job.id} - ${job.kind}`);
             setTimeout(async () => {
                 if (job.cron) {
                     log(`plan cron ${job.id}`);
@@ -93,14 +95,21 @@ const worker = async () => {
                     currentDate: new Date(job.updatedAt),
                 });
 
-                if (Number(interval.next().toDate()) > Date.now() && !job.force) {
+                const nextCronIntervalInMinutes = Math.floor(Number(interval.next().toDate()) / 1000 / 60);
+                const nowToMinutes = Math.floor(Date.now() / 1000 / 60);
+
+                if (nextCronIntervalInMinutes > nowToMinutes && !job.force) {
                     await planJob();
 
                     return;
                 }
             }
 
-            if (job.delay && Date.now() - new Date(job.createdAt).valueOf() < job.delay) {
+            if (
+                job.delay &&
+                (Date.now() - new Date(job.createdAt).valueOf() < job.delay ||
+                    Date.now() - new Date(job.updatedAt).valueOf() < job.delay)
+            ) {
                 await planJob();
 
                 return;
