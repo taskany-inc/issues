@@ -1,6 +1,5 @@
 import { prisma } from '../prisma';
 
-// import { dayDuration } from './externalTasksJob';
 import * as templates from './mail/templates';
 import { log } from './utils';
 
