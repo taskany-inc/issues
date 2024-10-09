@@ -4,6 +4,7 @@ import * as emailTemplates from './mail/templates';
 import { sendMail } from './mail';
 import { JobDataMap } from './create';
 import { goalPingJob } from './goalPingJob';
+import { externalTaskCheckJob, externalTasksJob } from './externalTasksJob';
 
 export const email = async ({ template, data }: JobDataMap['email']) => {
     const renderedTemplate = await emailTemplates[template](data);
@@ -11,10 +12,15 @@ export const email = async ({ template, data }: JobDataMap['email']) => {
 };
 
 export const cron = async ({ template }: JobDataMap['cron']) => {
-    if (template === 'goalPing') {
-        goalPingJob();
-    } else {
-        throw new Error('No supported cron jobs');
+    switch (template) {
+        case 'externalTaskCheck':
+            externalTaskCheckJob();
+            break;
+        case 'goalPing':
+            goalPingJob();
+            break;
+        default:
+            throw new Error('No supported cron jobs');
     }
 };
 
@@ -26,4 +32,8 @@ export const comment = async ({ activityId, description, goalId }: JobDataMap['c
         role: 'USER',
         shouldUpdateGoal: false,
     });
+};
+
+export const criteriaToUpdate = async ({ id }: JobDataMap['criteriaToUpdate']) => {
+    await externalTasksJob(id);
 };
