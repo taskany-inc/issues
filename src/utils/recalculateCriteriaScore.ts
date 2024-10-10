@@ -97,10 +97,24 @@ type GoalCalculateScore = Goal & {
  *    then for all goals needs recalculate score and parents project's average score
  */
 
+interface CriteriaScoreUpdateBaseApi {
+    recalcCurrentGoalScore: () => CriteriaScoreUpdateApi & CriteriaScoreUpdateBaseApi;
+    recalcAverageProjectScore: () => CriteriaScoreUpdateApi & CriteriaScoreUpdateBaseApi;
+    recalcLinkedGoalsScores: () => CriteriaScoreUpdateApi & CriteriaScoreUpdateBaseApi;
+}
+
+interface CriteriaScoreUpdateApi {
+    run: () => Promise<void>;
+    makeChain: (
+        ...names: Array<keyof CriteriaScoreUpdateBaseApi>
+    ) => CriteriaScoreUpdateApi & CriteriaScoreUpdateBaseApi;
+}
+
 export const recalculateCriteriaScore = (goalId: string) => {
     let currentGoal: GoalCalculateScore;
     let countsToUpdate: number;
     let count = 0;
+
     const getCurrentGoal = async () => {
         if (!currentGoal || countsToUpdate > count++) {
             currentGoal = await prisma.goal.findUniqueOrThrow({
@@ -118,7 +132,7 @@ export const recalculateCriteriaScore = (goalId: string) => {
     let prismaCtx: Omit<PrismaClient, ITXClientDenyList>;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const promisesChain: (() => Promise<any>)[] = [];
+    const promisesChain: (() => Promise<void>)[] = [];
 
     const updateGoalScore = ({ id, score }: { id: string; score: number | null }) => {
         return prismaCtx.goal.update({
@@ -127,7 +141,16 @@ export const recalculateCriteriaScore = (goalId: string) => {
         });
     };
 
-    const methods = {
+    const run = () => {
+        return prisma.$transaction((ctx) => {
+            prismaCtx = ctx;
+            countsToUpdate = promisesChain.length;
+
+            return promisesChain.reduce((promise, getter) => promise.then(getter), Promise.resolve());
+        });
+    };
+
+    const methods: CriteriaScoreUpdateApi & CriteriaScoreUpdateBaseApi = {
         recalcCurrentGoalScore: () => {
             promisesChain.push(async () => {
                 const goal = await getCurrentGoal();
@@ -181,7 +204,7 @@ export const recalculateCriteriaScore = (goalId: string) => {
                     group by 1
                 `;
 
-                return prismaCtx.$executeRaw`
+                await prismaCtx.$executeRaw`
                     update "Project" as project
                     set "averageScore" = scoreByProject.score
                     from (${countsRequests}) as scoreByProject(projectId, score)
@@ -252,13 +275,13 @@ export const recalculateCriteriaScore = (goalId: string) => {
 
             return methods;
         },
-        async run() {
-            return prisma.$transaction((ctx) => {
-                prismaCtx = ctx;
-                countsToUpdate = promisesChain.length;
-
-                return promisesChain.reduce((promise, getter) => promise.then(getter), Promise.resolve());
+        run,
+        makeChain(...names) {
+            names.forEach((name) => {
+                methods[name]();
             });
+
+            return methods;
         },
     };
     return methods;
