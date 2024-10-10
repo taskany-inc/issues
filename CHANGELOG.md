@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.59.0](https://github.com/taskany-inc/issues/compare/v2.58.3...v2.59.0) (2024-10-10)
+
+
+### Features
+
+* support drag n drop ([484681c](https://github.com/taskany-inc/issues/commit/484681cc1d150d608a548b49236c62df5371ec66))
+* support drag n drop ([5170702](https://github.com/taskany-inc/issues/commit/51707023658865b02140851ae007c51a16d8bfc2))
+
 ## [2.58.3](https://github.com/taskany-inc/issues/compare/v2.58.2...v2.58.3) (2024-10-08)
 
 
