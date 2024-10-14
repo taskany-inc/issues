@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
-import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { ProjectByIdReturnTypeV2 } from '../../../trpc/inferredTypes';
 
-export const ProjectContext = createContext<{ project: ProjectByIdReturnType }>({
+export const ProjectContext = createContext<{ project?: ProjectByIdReturnTypeV2 | null }>({
     project: null,
 });

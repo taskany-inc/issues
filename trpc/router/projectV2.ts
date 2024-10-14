@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Role } from '@prisma/client';
+import { TRPCError } from '@trpc/server';
 
 import { router, protectedProcedure } from '../trpcBackend';
 import { projectsChildrenIdsSchema, projectSuggestionsSchema, userProjectsSchema } from '../../src/schema/project';
@@ -13,6 +14,7 @@ import {
     getDeepChildrenProjectsId,
     getAllProjectsQuery,
     getProjectChildrenTreeQuery,
+    getProjectById,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema, sortableProjectsPropertiesArraySchema } from '../../src/schema/common';
 import {
@@ -29,6 +31,7 @@ import {
 import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
+import { projectAccessMiddleware } from '../access/accessMiddlewares';
 
 type ProjectActivity = ExtractTypeFromGenerated<Activity> & {
     user: ExtractTypeFromGenerated<User> | null;
@@ -106,6 +109,11 @@ export interface ProjectTreeRow {
     chain: string[];
     deep: number;
 }
+
+type ProjectById = Omit<ProjectResponse, 'goals'> &
+    Pick<DashboardProject, '_count'> & {
+        parent: Array<{ id: string; title: string }>;
+    };
 
 export const project = router({
     suggestions: protectedProcedure
@@ -344,6 +352,34 @@ export const project = router({
             },
         ),
 
+    getById: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                goalsQuery: queryWithFiltersSchema.optional(),
+            }),
+        )
+        .use(projectAccessMiddleware)
+        .query(async ({ input, ctx }) => {
+            const { id } = input;
+
+            const project = await getProjectById({
+                ...ctx.session.user,
+                id,
+            })
+                .$castTo<ProjectById>()
+                .executeTakeFirst();
+
+            if (project == null) {
+                throw new TRPCError({ code: 'NOT_FOUND' });
+            }
+
+            return {
+                ...project,
+                parent: pickUniqueValues(project.parent, 'id'),
+            };
+        }),
+
     getProjectGoalsById: protectedProcedure
         .input(
             z.object({
@@ -371,7 +407,7 @@ export const project = router({
                 if (goal.criteria != null) {
                     const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<ProjectGoal['criteria']>;
                     goal._achivedCriteriaWeight = baseCalcCriteriaWeight(uniqCriteria);
-                    delete goal.criteria;
+                    goal.criteria = uniqCriteria;
                 }
             }
 
