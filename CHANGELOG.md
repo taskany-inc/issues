@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.59.1](https://github.com/taskany-inc/issues/compare/v2.59.0...v2.59.1) (2024-10-14)
+
+
+### Bug Fixes
+
+* **INTERNAL-1206:** editable props for dnd ([035000c](https://github.com/taskany-inc/issues/commit/035000c1c65f48f2ab3ec6b480a5e5cd13947729))
+
 ## [2.59.0](https://github.com/taskany-inc/issues/compare/v2.58.3...v2.59.0) (2024-10-10)
 
 
