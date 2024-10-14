@@ -32,48 +32,45 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         preset,
     });
 
-    const { data: project } = trpc.project.getById.useQuery(
-        {
-            id,
-            goalsQuery: queryState,
-        },
-        { enabled: Boolean(id) },
-    );
-
-    const { data: projectDeepInfo } = trpc.project.getDeepInfo.useQuery(
-        {
-            id,
-            goalsQuery: queryState,
-        },
-        {
-            keepPreviousData: true,
-            staleTime: refreshInterval,
-            enabled: Boolean(id),
-        },
-    );
-
-    const { data: projectTree } = trpc.v2.project.getProjectChildrenTree.useQuery({
-        id,
-        goalsQuery: queryState,
-    });
+    const [projectQuery, projectDeepInfoQuery, projectTreeQuery] = trpc.useQueries((ctx) => [
+        ctx.v2.project.getById({ id }, { enabled: Boolean(id) }),
+        ctx.v2.project.getProjectGoalsById(
+            { id, goalsQuery: queryState },
+            {
+                keepPreviousData: true,
+                staleTime: refreshInterval,
+                enabled: Boolean(id),
+            },
+        ),
+        ctx.v2.project.getProjectChildrenTree(
+            {
+                id,
+                goalsQuery: queryState,
+            },
+            {
+                keepPreviousData: true,
+                staleTime: refreshInterval,
+                enabled: Boolean(id),
+            },
+        ),
+    ]);
 
     const { setPreview, on } = useGoalPreview();
 
+    const invalidateFnsCallback = useCallback(() => {
+        utils.v2.project.getById.invalidate();
+        utils.v2.project.getProjectGoalsById.invalidate();
+    }, [utils.v2.project.getProjectGoalsById, utils.v2.project.getById]);
+
     useEffect(() => {
-        const unsubUpdate = on('on:goal:update', () => {
-            utils.project.getById.invalidate();
-            utils.project.getDeepInfo.invalidate();
-        });
-        const unsubDelete = on('on:goal:delete', () => {
-            utils.project.getById.invalidate();
-            utils.project.getDeepInfo.invalidate();
-        });
+        const unsubUpdate = on('on:goal:update', invalidateFnsCallback);
+        const unsubDelete = on('on:goal:delete', invalidateFnsCallback);
 
         return () => {
             unsubUpdate();
             unsubDelete();
         };
-    }, [on, utils.project.getDeepInfo, utils.project.getById]);
+    }, [on, invalidateFnsCallback]);
 
     const handleItemEnter = useCallback(
         (goal: NonNullable<GoalByIdReturnType>) => {
@@ -82,7 +79,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         [setPreview],
     );
 
-    const ctx = useMemo(() => ({ project: project ?? null }), [project]);
+    const ctx = useMemo(() => ({ project: projectQuery.data ?? null }), [projectQuery.data]);
 
     return (
         <ProjectContext.Provider value={ctx}>
@@ -92,25 +89,25 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 scrollerShadow={view === 'kanban' ? 70 : 0}
                 title={tr
                     .raw('title', {
-                        project: project?.title,
+                        project: ctx.project?.title,
                     })
                     .join('')}
                 header={
                     <FiltersPanel
-                        title={project?.title || tr('Projects')}
-                        total={projectDeepInfo?.meta?.count}
-                        counter={projectDeepInfo?.goals?.length}
+                        title={ctx.project?.title || tr('Projects')}
+                        total={ctx.project?._count?.goals ?? 0}
+                        counter={projectDeepInfoQuery.data?.goals?.length}
                         filterPreset={preset}
                         enableLayoutToggle
                         enableHideProjectToggle
                     >
                         <FiltersBarItem>
-                            <ProjectPageTabs id={id} editable={project?._isEditable} />
+                            <ProjectPageTabs id={id} editable={ctx.project?._isEditable} />
                         </FiltersBarItem>
                     </FiltersPanel>
                 }
             >
-                {nullable(project?.parent, (p) => (
+                {nullable(ctx.project?.parent, (p) => (
                     <Breadcrumbs className={s.Breadcrumbs}>
                         {p.map((item) => (
                             <Breadcrumb key={item.id}>
@@ -123,14 +120,14 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 ))}
 
                 <ListView onKeyboardClick={handleItemEnter}>
-                    {nullable(project, (p) => (
+                    {nullable(ctx.project, (p) => (
                         <ProjectListItemConnected
                             key={p.id}
                             mainProject
                             visible
                             project={p}
                             filterPreset={preset}
-                            subTree={projectTree?.[p.id]}
+                            subTree={projectTreeQuery.data?.[p.id]}
                         />
                     ))}
                 </ListView>

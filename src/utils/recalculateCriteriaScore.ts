@@ -29,7 +29,7 @@ export const baseCalcCriteriaWeight = <
     criteriaList: T[],
 ): number => {
     let achivedWithWeight = 0;
-    let comletedWithoutWeight = 0;
+    let completedWithoutWeight = 0;
     let anyWithoutWeight = 0;
     let allWeight = 0;
 
@@ -47,7 +47,7 @@ export const baseCalcCriteriaWeight = <
             achivedWithWeight += weight;
 
             if (!weight) {
-                comletedWithoutWeight += 1;
+                completedWithoutWeight += 1;
             }
         }
     }
@@ -67,7 +67,7 @@ export const baseCalcCriteriaWeight = <
     }
 
     return Math.min(
-        achivedWithWeight + Math.ceil(quantityByWeightlessCriteria * comletedWithoutWeight),
+        achivedWithWeight + Math.ceil(quantityByWeightlessCriteria * completedWithoutWeight),
         maxPossibleCriteriaWeight,
     );
 };

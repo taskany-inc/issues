@@ -21,8 +21,8 @@ export const useProjectResource = (id: string) => {
     const removeParticipants = trpc.project.removeParticipants.useMutation();
 
     const invalidate = useCallback(() => {
-        utils.project.getById.invalidate({ id });
-    }, [id, utils.project.getById]);
+        utils.v2.project.getById.invalidate({ id });
+    }, [id, utils.v2.project.getById]);
 
     const createProject = useCallback(
         (cb: Callback<string>) => async (form: ProjectCreate) => {

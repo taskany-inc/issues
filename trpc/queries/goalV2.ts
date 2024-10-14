@@ -91,7 +91,7 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                     ({ selectFrom }) =>
                         selectFrom('GoalAchieveCriteria')
                             .distinctOn('GoalAchieveCriteria.id')
-                            .leftJoin('Goal as criteriaGoal', 'GoalAchieveCriteria.criteriaGoalId', 'Goal.id')
+                            .leftJoin('Goal as criteriaGoal', 'GoalAchieveCriteria.criteriaGoalId', 'criteriaGoal.id')
                             .selectAll('GoalAchieveCriteria')
                             .select([sql`"criteriaGoal"`.as('criteriaGoal')])
                             .where('GoalAchieveCriteria.deleted', 'is not', true)

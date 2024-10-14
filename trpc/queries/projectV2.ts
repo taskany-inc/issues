@@ -755,3 +755,88 @@ export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; go
         .groupBy(['Project.id', 'ch.level', 'ch.parent_chain'])
         .orderBy('ch.level asc');
 };
+
+export const getProjectById = ({ id, ...user }: { id: string; activityId: string; role: Role }) => {
+    return db
+        .with('parentProjectIds', () => getParentProjectsId({ in: [{ id }] }))
+        .with('parentProjects', (qb) =>
+            qb
+                .selectFrom('Project')
+                .select(['Project.id', 'Project.title'])
+                .where('Project.id', 'in', ({ selectFrom }) => selectFrom('parentProjectIds').select('id')),
+        )
+        .with('calculatedFields', (qb) =>
+            qb
+                .selectFrom('Project')
+                .leftJoinLateral(
+                    ({ selectFrom }) => selectFrom('parentProjects').distinctOn('Project.id').selectAll().as('parent'),
+                    (join) => join.onTrue(),
+                )
+                .leftJoinLateral(
+                    () => getUserActivity().distinctOn('Activity.id').as('participant'),
+                    (join) =>
+                        join.onRef('participant.id', 'in', (qb) =>
+                            qb.selectFrom('_projectParticipants').select('A').whereRef('B', '=', 'Project.id'),
+                        ),
+                )
+                .selectAll('Project')
+                .select(({ fn, exists, selectFrom, val, case: caseFn }) => [
+                    caseFn()
+                        .when(fn.count('parent.id'), '>', 0)
+                        .then(fn.agg('array_agg', [fn.toJson('parent')]))
+                        .else(null)
+                        .end()
+                        .as('parent'),
+                    caseFn()
+                        .when(fn.count('participant.id'), '>', 0)
+                        .then(fn.agg('array_agg', [fn.toJson('participant')]))
+                        .else(null)
+                        .end()
+                        .as('participants'),
+                    sql<boolean>`("Project"."activityId" = ${val(user.activityId)})`.as('_isOwner'),
+                    exists(
+                        selectFrom('_projectParticipants')
+                            .select('A')
+                            .whereRef('B', '=', 'Project.id')
+                            .where('A', '=', user.activityId),
+                    )
+                        .$castTo<boolean>()
+                        .as('_isParticipant'),
+                    exists(
+                        selectFrom('_projectWatchers')
+                            .select('B')
+                            .where('A', '=', user.activityId)
+                            .whereRef('B', '=', 'Project.id'),
+                    )
+                        .$castTo<boolean>()
+                        .as('_isWatching'),
+                    exists(
+                        selectFrom('_projectStargizers')
+                            .select('B')
+                            .where('A', '=', user.activityId)
+                            .whereRef('B', '=', 'Project.id'),
+                    )
+                        .$castTo<boolean>()
+                        .as('_isStarred'),
+                    sql<boolean>`((${val(user.role === Role.ADMIN)} or "Project"."activityId" = ${val(
+                        user.activityId,
+                    )}) and not "Project"."personal")`.as('_isEditable'),
+                    jsonBuildObject({
+                        stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
+                        watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
+                        children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
+                        participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
+                        goals: sql<number>`(select count("Goal".id) from "Goal" where "Goal"."projectId" = "Project".id and "Goal"."archived" is not true)`,
+                    }).as('_count'),
+                ])
+                .where('Project.id', '=', id)
+                .groupBy('Project.id'),
+        )
+        .selectFrom('calculatedFields as project')
+        .innerJoinLateral(
+            () => getUserActivity().as('activity'),
+            (join) => join.onRef('activity.id', '=', 'project.activityId'),
+        )
+        .selectAll('project')
+        .select(({ fn }) => [fn.toJson('activity').as('activity')]);
+};
