@@ -116,6 +116,22 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                         .$castTo<boolean>()
                         .as('_isParticipant'),
                     exists(
+                        selectFrom('_projectParticipants')
+                            .select('A')
+                            .whereRef('B', '=', 'Goal.projectId')
+                            .where('A', '=', params.activityId),
+                    )
+                        .$castTo<boolean>()
+                        .as('_isParentParticipant'),
+                    exists(
+                        selectFrom('Project')
+                            .select('Project.activityId')
+                            .whereRef('Project.id', '=', 'Goal.projectId')
+                            .where('Project.activityId', '=', params.activityId),
+                    )
+                        .$castTo<boolean>()
+                        .as('_isParentOwner'),
+                    exists(
                         selectFrom('_goalWatchers')
                             .select('B')
                             .where('A', '=', params.activityId)
@@ -132,9 +148,6 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                         .$castTo<boolean>()
                         .as('_isStarred'),
                     sql`(count(criteria.id) > 0)`.as('_hasAchievementCriteria'),
-                    sql<boolean>`((${val(params.role === Role.ADMIN)} or "Goal"."activityId" = ${val(
-                        params.activityId,
-                    )}) and not "Goal"."personal")`.as('_isEditable'),
                     caseFn()
                         .when(fn.count('criteria.id'), '>', 0)
                         .then(fn.agg('array_agg', [sql`"criteria"`]).distinct())
@@ -276,13 +289,18 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
         )
         .innerJoin('Project', 'Project.id', 'proj_goals.projectId')
         .selectAll('proj_goals')
-        .select(({ selectFrom, fn }) => [
+        .select(({ selectFrom, fn, val }) => [
             sql<string>`concat("proj_goals"."projectId", '-', "proj_goals"."scopeId")::text`.as('_shortId'),
             jsonBuildObject({
                 comments: selectFrom('Comment')
                     .select(({ fn }) => [fn.count('Comment.id').as('count')])
                     .whereRef('Comment.goalId', '=', 'proj_goals.id'),
             }).as('_count'),
+            sql<boolean>`${val(
+                params.role === Role.ADMIN,
+            )} or proj_goals."_isOwner" or proj_goals."_isIssuer" or proj_goals."_isParentOwner" or proj_goals."_isParentParticipant"`.as(
+                '_isEditable',
+            ),
             sql`to_jsonb(proj_goals.tags)`.as('tags'),
             sql`to_jsonb(proj_goals.criteria)`.as('criteria'),
             sql`to_jsonb(proj_goals.participants)`.as('participants'),

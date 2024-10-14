@@ -3,6 +3,7 @@ import { KanbanColumn, KanbanContainer } from '@taskany/bricks/harmony';
 import { QueryStatus } from '@tanstack/react-query';
 import { nullable, useIntersectionLoader } from '@taskany/bricks';
 import { ReactSortable } from 'react-sortablejs';
+import cn from 'classnames';
 
 import { trpc } from '../../utils/trpcClient';
 import { FilterById, State } from '../../../trpc/inferredTypes';
@@ -36,7 +37,7 @@ const calculateCommonLoadingState = (map: Map<unknown, LoadingState>): LoadingSt
     const loadingStates = new Set(map.values());
 
     if (loadingStates.size === 1) {
-        return loadingStates.values().next().value;
+        return loadingStates.values().next().value || 'success';
     }
 
     if (loadingStates.has('loading')) {
@@ -64,6 +65,13 @@ const useOnChangeRef = <T extends string>(value: T, onChange?: (value: T) => voi
 const intersectionOptions = {
     root: null,
     rootMargin: '0px 0px 300px',
+};
+
+const onSortableMove: ComponentProps<typeof ReactSortable>['onMove'] = (event) => {
+    if (event.dragged.classList.contains(s.KanbanSortableListItem_disable)) {
+        return false;
+    }
+    return -1;
 };
 
 const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
@@ -234,9 +242,11 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
                 animation={150}
                 list={list}
                 setList={setList}
+                ghostClass={s.KanbanSortableListItem_ghost}
+                filter={`.${s.KanbanLink}.${s.KanbanSortableListItem_disable}`}
                 group="states"
                 onEnd={onDragEnd}
-                sort={false}
+                onMove={onSortableMove}
             >
                 {list.map((goal) => {
                     return (
@@ -248,7 +258,9 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
                                 _shortId: goal._shortId,
                                 title: goal.title,
                             })}
-                            className={s.KanbanLink}
+                            className={cn(s.KanbanLink, {
+                                [s.KanbanSortableListItem_disable]: !goal._isEditable,
+                            })}
                         >
                             <GoalsKanbanCard
                                 id={goal.id}

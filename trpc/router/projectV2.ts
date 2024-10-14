@@ -87,6 +87,8 @@ type ProjectGoal = ExtractTypeFromGenerated<Goal> & {
     _isEditable: boolean;
     _isIssuer: boolean;
     _isParticipant: boolean;
+    _isParentParticipant: boolean;
+    _isParentOwner: boolean;
     _hasAchievementCriteria: boolean;
 };
 
