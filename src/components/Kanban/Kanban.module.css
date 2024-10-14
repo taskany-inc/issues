@@ -15,6 +15,14 @@
     flex: 1;
 }
 
+.KanbanSortableListItem_disable {
+    cursor: default;
+}
+
+.KanbanSortableListItem_ghost {
+    opacity: 0.2;
+}
+
 .KanbanLink {
     display: block;
 }
