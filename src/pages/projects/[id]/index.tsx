@@ -29,6 +29,10 @@ export const getServerSideProps = declareSsrProps(
                 ssrHelpers.v2.project.getProjectChildren.fetch({
                     id,
                 }),
+                ssrHelpers.v2.project.getProjectChildrenTree.fetch({
+                    id,
+                    goalsQuery: queryState,
+                }),
                 projectCollapsableItemInit({
                     project,
                     queryState,

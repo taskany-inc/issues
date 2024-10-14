@@ -14,6 +14,9 @@ import {
     getDeepChildrenProjectsId,
     getAllProjectsQuery,
     getChildrenProjectQuery,
+    getProjectChildrenTreeQuery,
+    ProjectTreeRow,
+    ProjectTree,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema, sortableProjectsPropertiesArraySchema } from '../../src/schema/common';
 import {
@@ -30,6 +33,7 @@ import {
 import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
+import { db } from '../connection/kysely';
 
 type ProjectActivity = ExtractTypeFromGenerated<Activity> & {
     user: ExtractTypeFromGenerated<User> | null;
@@ -258,11 +262,52 @@ export const project = router({
                 },
             };
         }),
-    getProjectChildren: protectedProcedure
+
+    getProjectChildrenTree: protectedProcedure
         .input(
             z.object({
                 id: z.string(),
                 goalsQuery: queryWithFiltersSchema.optional(),
+            }),
+        )
+        .query(async ({ input }) => {
+            const { rows } = await getProjectChildrenTreeQuery(input).$castTo<ProjectTreeRow>().execute(db);
+            const map: ProjectTree = {};
+
+            rows.forEach(({ id, chain, goal_count: count, deep }) => {
+                const path = Array.from(chain);
+
+                path.reduce((acc, key, i) => {
+                    if (!acc[key]) {
+                        acc[key] = {
+                            children: {
+                                [id]: {
+                                    count,
+                                    children: null,
+                                },
+                            },
+                        };
+                    } else if (i + 1 === deep) {
+                        acc[key].children = {
+                            ...acc[key].children,
+                            [id]: {
+                                count,
+                                children: null,
+                            },
+                        };
+                    }
+
+                    return acc[key].children as ProjectTree;
+                }, map);
+            });
+
+            return map;
+        }),
+
+    getProjectChildren: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
             }),
         )
         .query(async ({ input, ctx }) => {

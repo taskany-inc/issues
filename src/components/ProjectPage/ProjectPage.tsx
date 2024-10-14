@@ -52,6 +52,11 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         },
     );
 
+    const { data: projectTree } = trpc.v2.project.getProjectChildrenTree.useQuery({
+        id,
+        goalsQuery: queryState,
+    });
+
     const { setPreview, on } = useGoalPreview();
 
     useEffect(() => {
@@ -119,7 +124,14 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
                 <ListView onKeyboardClick={handleItemEnter}>
                     {nullable(project, (p) => (
-                        <ProjectListItemConnected key={p.id} visible project={p} filterPreset={preset} />
+                        <ProjectListItemConnected
+                            key={p.id}
+                            mainProject
+                            visible
+                            project={p}
+                            filterPreset={preset}
+                            subTree={projectTree?.[p.id]}
+                        />
                     ))}
                 </ListView>
 

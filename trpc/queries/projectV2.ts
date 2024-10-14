@@ -684,17 +684,89 @@ export const getAllProjectsQuery = ({
         ]);
 };
 
-export const getChildrenProjectQuery = ({
-    id,
-    role,
-    activityId,
-    goalsQuery,
-}: {
+export interface ProjectTree {
+    [key: string]: {
+        count?: number;
+        children: ProjectTree | null;
+    };
+}
+
+export interface ProjectTreeRow {
     id: string;
-    role: Role;
-    activityId: string;
-    goalsQuery?: QueryWithFilters;
-}) =>
+    title: string;
+    goal_count: number;
+    chain: string[];
+    deep: number;
+}
+
+export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; goalsQuery?: QueryWithFilters }) => {
+    return sql`with recursive childs as (
+    select
+      "_parentChildren"."B" as id,
+      1::int as "level",
+      array_agg("_parentChildren"."A") as parent_chain
+    from "_parentChildren"
+    where "A" = ${id}
+    group by 1
+    union (
+      select
+        inner_childs."B" as id,
+        childs."level"::int + 1 as "level",
+        array_append(childs.parent_chain, inner_childs."A") as parent_chain
+      from "_parentChildren" as inner_childs
+      inner join childs on childs.id = inner_childs."A"
+    )
+  )
+  select
+    "Project".id,
+    "Project".title,
+    count(goal)::int as goal_count,
+    to_json(ch.parent_chain) as chain,
+    ch.level as deep
+  from "Project"
+  inner join lateral (
+    select parent_chain, level from childs
+    where childs.id = "Project".id
+  ) as ch on true
+  left join lateral ( select * from "Goal"
+  left join lateral (
+    select
+      "Activity".*,
+      "User" as "user",
+      "Ghost" as "ghost"
+    from
+      "Activity"
+      inner join "User" on "User"."activityId" = "Activity"."id"
+      left join "Ghost" on "Ghost"."id" = "Activity"."ghostId"
+  ) as "participant" on "participant"."id" in (
+    select
+      "A"
+    from
+      "_goalParticipants"
+    where
+      "B" = "Goal"."id"
+  )
+  left join lateral (
+    select
+      "Tag".*
+    from
+      "_GoalToTag"
+      inner join "Tag" on "Tag"."id" = "B"
+    where
+      "A" = "Goal"."id"
+  ) as "tag" on true
+  
+  where ( 
+    "Goal"."projectId" = "Project".id and "Goal"."archived" is not true and ${getGoalsFiltersWhereExpressionBuilder(
+        goalsQuery,
+    )} 
+  )) as "goal" on true
+  group by "Project".id, ch."level", ch.parent_chain
+  order by ch."level" asc 
+  `;
+};
+
+export const getChildrenProjectQuery = ({ id, role, activityId }: { id: string; role: Role; activityId: string }) =>
     db
         .selectFrom(({ selectFrom }) =>
             selectFrom('Project')
@@ -742,29 +814,6 @@ export const getChildrenProjectQuery = ({
                     )}) and not "Project"."personal")`.as('_isEditable'),
                 ])
                 .where('Project.id', 'in', () => getChildrenProjectsId({ in: [{ id }] }))
-                .$if(!!goalsQuery?.hideEmptyProjects, (qb) =>
-                    qb.where('Project.id', 'in', ({ selectFrom }) =>
-                        selectFrom('Goal')
-                            .select('Goal.projectId')
-                            .leftJoinLateral(
-                                () => getUserActivity().as('participant'),
-                                (join) =>
-                                    join.onRef('participant.id', 'in', (qb) =>
-                                        qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
-                                    ),
-                            )
-                            .leftJoinLateral(
-                                ({ selectFrom }) =>
-                                    selectFrom('_GoalToTag')
-                                        .innerJoin('Tag', 'Tag.id', 'B')
-                                        .selectAll('Tag')
-                                        .whereRef('A', '=', 'Goal.id')
-                                        .as('tag'),
-                                (join) => join.onTrue(),
-                            )
-                            .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery)),
-                    ),
-                )
                 .groupBy('Project.id')
                 .as('projects'),
         )

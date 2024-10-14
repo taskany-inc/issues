@@ -1,4 +1,4 @@
-import { FC, ComponentProps, useReducer, useMemo } from 'react';
+import { FC, ComponentProps, useReducer, useMemo, useState, useEffect } from 'react';
 import { nullable } from '@taskany/bricks';
 import { TreeViewElement } from '@taskany/bricks/harmony';
 
@@ -10,12 +10,15 @@ import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/Projec
 import { ProjectGoalList } from '../ProjectGoalList/ProjectGoalList';
 import { Kanban } from '../Kanban/Kanban';
 import { Loader } from '../Loader/Loader';
+import { ProjectTree } from '../../../trpc/queries/projectV2';
 
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     parent?: ComponentProps<typeof ProjectListItemCollapsable>['project'];
+    subTree?: ProjectTree[string] | null;
     partnershipProject?: string[];
     filterPreset?: FilterById;
     firstLevel?: boolean;
+    mainProject?: boolean;
 }
 
 const onProjectClickHandler = (e: React.MouseEvent) => {
@@ -32,10 +35,33 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     parent,
     project,
     firstLevel,
+    subTree,
+    mainProject,
     ...props
 }) => {
-    const { view, queryState } = useUrlFilterParams({
+    const { view, hideEmptyProjects } = useUrlFilterParams({
         preset: filterPreset,
+    });
+    const [isProjectEmpty, setIsProjectEmpty] = useState(() => {
+        if (subTree) {
+            if (Number(subTree.count) > 0) return false;
+
+            const nodes = [subTree.children];
+            let i = 0;
+            let current = subTree.children;
+            while (current) {
+                const keys = Object.keys(current);
+                for (const key of keys) {
+                    if (Number(current[key].count) > 0) return false;
+                    if (current[key].children) {
+                        nodes.push(current[key].children);
+                    }
+                }
+                i++;
+                current = nodes[i];
+            }
+        }
+        return true;
     });
 
     const [isOpen, setIsOpen] = useReducer((isOpen) => !isOpen, !!props.visible);
@@ -43,7 +69,6 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     const { data: childrenProjects = [], isLoading: isChildrenLoading } = trpc.v2.project.getProjectChildren.useQuery(
         {
             id: project.id,
-            goalsQuery: queryState,
         },
         {
             enabled: isOpen && !firstLevel,
@@ -52,10 +77,13 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
 
     const isKanbanView = view === 'kanban';
 
+    const isNeedRender = !(isProjectEmpty && hideEmptyProjects) || mainProject;
+
     const subNodes = useMemo(
         () =>
             childrenProjects.map((p) => (
                 <ProjectListItemConnected
+                    subTree={subTree?.children?.[p.id]}
                     key={p.id}
                     project={p}
                     parent={project}
@@ -65,13 +93,38 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                     actionButtonView={isKanbanView ? 'default' : 'icons'}
                 />
             )),
-        [childrenProjects, isKanbanView, filterPreset, project, partnershipProject],
+        [childrenProjects, subTree, project, filterPreset, partnershipProject, isKanbanView],
     );
 
     const isLoading = isChildrenLoading && !firstLevel;
-    const showNoGoals = firstLevel || (!isChildrenLoading && !childrenProjects.length);
+    const showNoGoals =
+        firstLevel || (!isChildrenLoading && (!childrenProjects.length || subTree?.count === undefined));
 
-    return (
+    useEffect(() => {
+        setIsProjectEmpty(() => {
+            if (subTree) {
+                if (Number(subTree.count) > 0) return false;
+
+                const nodes = [subTree.children];
+                let i = 0;
+                let current = subTree.children;
+                while (current) {
+                    const keys = Object.keys(current);
+                    for (const key of keys) {
+                        if (Number(current[key].count) > 0) return false;
+                        if (current[key].children) {
+                            nodes.push(current[key].children);
+                        }
+                    }
+                    i++;
+                    current = nodes[i];
+                }
+            }
+            return true;
+        });
+    }, [subTree]);
+
+    return nullable(isNeedRender, () => (
         <>
             <ProjectListItemCollapsable
                 href={routes.project(project.id, view ? `view=${view}` : undefined)}
@@ -112,5 +165,5 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
             </ProjectListItemCollapsable>
             {nullable(isKanbanView, () => subNodes)}
         </>
-    );
+    ));
 };
