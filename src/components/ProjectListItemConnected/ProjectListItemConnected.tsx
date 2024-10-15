@@ -29,6 +29,28 @@ const onProjectClickHandler = (e: React.MouseEvent) => {
     }
 };
 
+const getIsProjectEmptySetter = (subTree?: ProjectTree[string] | null) => () => {
+    if (subTree) {
+        if (Number(subTree.count) > 0) return false;
+
+        const nodes = [subTree.children];
+        let i = 0;
+        let current = nodes[0];
+        while (current) {
+            const keys = Object.keys(current);
+            for (const key of keys) {
+                if (Number(current[key].count) > 0) return false;
+                if (current[key].children) {
+                    nodes.push(current[key].children);
+                }
+            }
+            i++;
+            current = nodes[i];
+        }
+    }
+    return true;
+};
+
 export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     partnershipProject,
     filterPreset,
@@ -42,27 +64,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     const { view, hideEmptyProjects } = useUrlFilterParams({
         preset: filterPreset,
     });
-    const [isProjectEmpty, setIsProjectEmpty] = useState(() => {
-        if (subTree) {
-            if (Number(subTree.count) > 0) return false;
-
-            const nodes = [subTree.children];
-            let i = 0;
-            let current = subTree.children;
-            while (current) {
-                const keys = Object.keys(current);
-                for (const key of keys) {
-                    if (Number(current[key].count) > 0) return false;
-                    if (current[key].children) {
-                        nodes.push(current[key].children);
-                    }
-                }
-                i++;
-                current = nodes[i];
-            }
-        }
-        return true;
-    });
+    const [isProjectEmpty, setIsProjectEmpty] = useState(getIsProjectEmptySetter(subTree));
 
     const [isOpen, setIsOpen] = useReducer((isOpen) => !isOpen, !!props.visible);
 
@@ -101,27 +103,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
         firstLevel || (!isChildrenLoading && (!childrenProjects.length || subTree?.count === undefined));
 
     useEffect(() => {
-        setIsProjectEmpty(() => {
-            if (subTree) {
-                if (Number(subTree.count) > 0) return false;
-
-                const nodes = [subTree.children];
-                let i = 0;
-                let current = subTree.children;
-                while (current) {
-                    const keys = Object.keys(current);
-                    for (const key of keys) {
-                        if (Number(current[key].count) > 0) return false;
-                        if (current[key].children) {
-                            nodes.push(current[key].children);
-                        }
-                    }
-                    i++;
-                    current = nodes[i];
-                }
-            }
-            return true;
-        });
+        setIsProjectEmpty(getIsProjectEmptySetter(subTree));
     }, [subTree]);
 
     return nullable(isNeedRender, () => (

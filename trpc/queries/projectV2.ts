@@ -700,70 +700,67 @@ export interface ProjectTreeRow {
 }
 
 export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; goalsQuery?: QueryWithFilters }) => {
-    return sql`with recursive childs as (
-    select
-      "_parentChildren"."B" as id,
-      1::int as "level",
-      array_agg("_parentChildren"."A") as parent_chain
-    from "_parentChildren"
-    where "A" = ${id}
-    group by 1
-    union (
-      select
-        inner_childs."B" as id,
-        childs."level"::int + 1 as "level",
-        array_append(childs.parent_chain, inner_childs."A") as parent_chain
-      from "_parentChildren" as inner_childs
-      inner join childs on childs.id = inner_childs."A"
-    )
-  )
-  select
-    "Project".id,
-    "Project".title,
-    count(goal)::int as goal_count,
-    to_json(ch.parent_chain) as chain,
-    ch.level as deep
-  from "Project"
-  inner join lateral (
-    select parent_chain, level from childs
-    where childs.id = "Project".id
-  ) as ch on true
-  left join lateral ( select * from "Goal"
-  left join lateral (
-    select
-      "Activity".*,
-      "User" as "user",
-      "Ghost" as "ghost"
-    from
-      "Activity"
-      inner join "User" on "User"."activityId" = "Activity"."id"
-      left join "Ghost" on "Ghost"."id" = "Activity"."ghostId"
-  ) as "participant" on "participant"."id" in (
-    select
-      "A"
-    from
-      "_goalParticipants"
-    where
-      "B" = "Goal"."id"
-  )
-  left join lateral (
-    select
-      "Tag".*
-    from
-      "_GoalToTag"
-      inner join "Tag" on "Tag"."id" = "B"
-    where
-      "A" = "Goal"."id"
-  ) as "tag" on true
-  
-  where ( 
-    "Goal"."projectId" = "Project".id and "Goal"."archived" is not true and ${getGoalsFiltersWhereExpressionBuilder(
-        goalsQuery,
-    )} 
-  )) as "goal" on true
-  group by "Project".id, ch."level", ch.parent_chain
-  order by ch."level" asc 
-  `;
+    return db
+        .withRecursive('childs', (qb) => {
+            return qb
+                .selectFrom('_parentChildren')
+                .select(({ fn }) => [
+                    '_parentChildren.B as id',
+                    sql<number>`1::int`.as('level'),
+                    fn.agg<string[]>('array_agg', ['_parentChildren.A']).as('parent_chain'),
+                ])
+                .where('A', '=', id)
+                .groupBy('id')
+                .union(
+                    qb
+                        .selectFrom('_parentChildren as inner_children')
+                        .innerJoin('childs', 'childs.id', 'inner_children.A')
+                        .select(({ fn, ref }) => [
+                            ref('inner_children.B').as('id'),
+                            sql<number>`childs."level"::int + 1`.as('level'),
+                            fn
+                                .agg<string[]>('array_append', ['childs.parent_chain', 'inner_children.A'])
+                                .as('parent_chain'),
+                        ]),
+                );
+        })
+        .selectFrom('Project')
+        .innerJoin('childs as ch', 'ch.id', 'Project.id')
+        .leftJoinLateral(
+            ({ selectFrom }) =>
+                selectFrom('Goal')
+                    .selectAll('Goal')
+                    .leftJoinLateral(
+                        () => getUserActivity().as('participant'),
+                        (join) =>
+                            join.onRef('participant.id', 'in', (qb) =>
+                                qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
+                            ),
+                    )
+                    .leftJoinLateral(
+                        ({ selectFrom }) =>
+                            selectFrom('_GoalToTag')
+                                .innerJoin('Tag', 'Tag.id', 'B')
+                                .selectAll('Tag')
+                                .whereRef('A', '=', 'Goal.id')
+                                .as('tag'),
+                        (join) => join.onTrue(),
+                    )
+                    .whereRef('Goal.projectId', '=', 'Project.id')
+                    .where('Goal.archived', 'is not', true)
+                    .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery))
+                    .as('goal'),
+            (join) => join.onRef('goal.projectId', '=', 'Project.id'),
+        )
+        .select(({ fn, cast }) => [
+            'Project.id',
+            'Project.title',
+            cast(fn.count('goal.id'), 'integer').as('goal_count'),
+            sql`to_json(ch.parent_chain)`.as('chain'),
+            'ch.level as deep',
+        ])
+        .groupBy(['Project.id', 'ch.level', 'ch.parent_chain'])
+        .orderBy('ch.level asc');
 };
 
 export const getChildrenProjectQuery = ({ id, role, activityId }: { id: string; role: Role; activityId: string }) =>
