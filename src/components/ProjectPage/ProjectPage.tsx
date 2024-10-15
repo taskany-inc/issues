@@ -119,8 +119,8 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                     </Breadcrumbs>
                 ))}
 
-                <ListView onKeyboardClick={handleItemEnter}>
-                    {nullable(ctx.project, (p) => (
+                {nullable(ctx.project, (p) => (
+                    <ListView onKeyboardClick={handleItemEnter}>
                         <ProjectListItemConnected
                             key={p.id}
                             mainProject
@@ -129,8 +129,8 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                             filterPreset={preset}
                             subTree={projectTreeQuery.data?.[p.id]}
                         />
-                    ))}
-                </ListView>
+                    </ListView>
+                ))}
 
                 <PresetModals preset={preset} />
             </Page>

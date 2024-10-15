@@ -7,7 +7,7 @@ import { declareSsrProps } from '../../../utils/declareSsrProps';
 export const getServerSideProps = declareSsrProps(
     async ({ ssrHelpers, params: { id } }) => {
         try {
-            const project = await ssrHelpers.v2.project.getById.fetch({ id });
+            const project = await ssrHelpers.v2.project.getById.fetch({ id, includeChildren: true });
             await ssrHelpers.v2.project.deepChildrenIds.fetch({ in: [{ id }] });
 
             if (!project) {
