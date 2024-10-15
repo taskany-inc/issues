@@ -777,18 +777,15 @@ export const getChildrenProjectQuery = ({
 
 export const getProjectById = ({ id, ...user }: { id: string; activityId: string; role: Role }) => {
     return db
-        .with('parentProjectIds', () => getParentProjectsId({ in: [{ id }] }))
-        .with('parentProjects', (qb) =>
-            qb
-                .selectFrom('Project')
-                .select(['Project.id', 'Project.title'])
-                .where('Project.id', 'in', ({ selectFrom }) => selectFrom('parentProjectIds').select('id')),
-        )
         .with('calculatedFields', (qb) =>
             qb
                 .selectFrom('Project')
                 .leftJoinLateral(
-                    ({ selectFrom }) => selectFrom('parentProjects').distinctOn('Project.id').selectAll().as('parent'),
+                    ({ selectFrom }) =>
+                        selectFrom('Project')
+                            .selectAll('Project')
+                            .where('Project.id', 'in', () => getParentProjectsId({ in: [{ id }] }))
+                            .as('parent'),
                     (join) => join.onTrue(),
                 )
                 .leftJoinLateral(
