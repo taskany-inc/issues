@@ -9,11 +9,11 @@ import { tr } from './ProjectParticipants.i18n';
 
 interface ProjectParticipantsProps {
     id: string;
-    participants: ComponentProps<typeof UserEditableList>['users'];
+    participants: ComponentProps<typeof UserEditableList>['users'] | null;
 }
 
 export const ProjectParticipants: FC<ProjectParticipantsProps> = ({ id, participants }) => {
-    const filterIds = useMemo(() => participants.map(({ id }) => id), [participants]);
+    const filterIds = useMemo(() => (participants ?? []).map(({ id }) => id), [participants]);
     const { onProjectParticipantAdd, onProjectParticipantRemove } = useProjectResource(id);
 
     const onAdd = useCallback(
