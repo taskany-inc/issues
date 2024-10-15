@@ -779,6 +779,19 @@ export const getProjectById = ({ id, ...user }: { id: string; activityId: string
                             qb.selectFrom('_projectParticipants').select('A').whereRef('B', '=', 'Project.id'),
                         ),
                 )
+                .leftJoinLateral(
+                    (qb) =>
+                        qb
+                            .selectFrom('Team')
+                            .selectAll('Team')
+                            .where('Team.id', 'in', ({ selectFrom }) =>
+                                selectFrom('_projects')
+                                    .select('_projects.B')
+                                    .whereRef('_projects.A', '=', 'Project.id'),
+                            )
+                            .as('teams'),
+                    (join) => join.onTrue(),
+                )
                 .selectAll('Project')
                 .select(({ fn, exists, selectFrom, val, case: caseFn }) => [
                     caseFn()
@@ -787,6 +800,12 @@ export const getProjectById = ({ id, ...user }: { id: string; activityId: string
                         .else(null)
                         .end()
                         .as('parent'),
+                    caseFn()
+                        .when(fn.count('teams.id'), '>', 0)
+                        .then(fn.agg('array_agg', [fn.toJson('teams')]))
+                        .else(null)
+                        .end()
+                        .as('teams'),
                     caseFn()
                         .when(fn.count('participant.id'), '>', 0)
                         .then(fn.agg('array_agg', [fn.toJson('participant')]))
@@ -818,9 +837,6 @@ export const getProjectById = ({ id, ...user }: { id: string; activityId: string
                     )
                         .$castTo<boolean>()
                         .as('_isStarred'),
-                    sql<boolean>`((${val(user.role === Role.ADMIN)} or "Project"."activityId" = ${val(
-                        user.activityId,
-                    )}) and not "Project"."personal")`.as('_isEditable'),
                     jsonBuildObject({
                         stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
                         watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
@@ -838,5 +854,10 @@ export const getProjectById = ({ id, ...user }: { id: string; activityId: string
             (join) => join.onRef('activity.id', '=', 'project.activityId'),
         )
         .selectAll('project')
-        .select(({ fn }) => [fn.toJson('activity').as('activity')]);
+        .select(({ fn, val }) => [
+            fn.toJson('activity').as('activity'),
+            sql<boolean>`((${val(user.role === Role.ADMIN)} or "project"."activityId" = ${val(
+                user.activityId,
+            )} or "project"."_isParticipant") and not "project"."personal")`.as('_isEditable'),
+        ]);
 };

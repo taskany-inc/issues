@@ -4,14 +4,14 @@ import { IconPlusCircleOutline } from '@taskany/icons';
 
 import { trpc } from '../../utils/trpcClient';
 import { useProjectResource } from '../../hooks/useProjectResource';
-import { ProjectByIdReturnType, TeamSuggetionsReturnType } from '../../../trpc/inferredTypes';
+import { ProjectByIdReturnTypeV2, TeamSuggetionsReturnType } from '../../../trpc/inferredTypes';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 
 interface TeamComboBoxProps {
     text?: React.ComponentProps<typeof Button>['text'];
     placeholder?: string;
     disabled?: boolean;
-    project: NonNullable<ProjectByIdReturnType>;
+    project: NonNullable<ProjectByIdReturnTypeV2>;
 }
 
 export const TeamComboBox: FC<TeamComboBoxProps & React.HTMLAttributes<HTMLDivElement>> = ({
