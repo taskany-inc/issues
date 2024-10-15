@@ -70,7 +70,7 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
-    const project = trpc.v2.project.getById.useQuery({ id });
+    const project = trpc.v2.project.getById.useQuery({ id, includeChildren: true });
 
     const { updateProject, deleteProject, transferOwnership } = useProjectResource(id);
     const { data: childrenIds = [] } = trpc.v2.project.deepChildrenIds.useQuery({ in: [{ id }] });
@@ -86,6 +86,14 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: true,
+        values: {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            id: project.data!.id,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            title: project.data!.title,
+            description: project.data?.description,
+            parent: project.data?.parent,
+        },
         defaultValues: {
             id: project.data?.id,
             title: project.data?.title,

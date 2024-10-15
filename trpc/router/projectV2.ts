@@ -15,6 +15,7 @@ import {
     getAllProjectsQuery,
     getProjectChildrenTreeQuery,
     getProjectById,
+    getChildrenProjectByParentProjectId,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema, sortableProjectsPropertiesArraySchema } from '../../src/schema/common';
 import {
@@ -117,6 +118,7 @@ type ProjectById = Omit<ProjectResponse, 'goals'> &
         parent: Array<{ id: string; title: string }>;
         accessUsers: Array<ProjectActivity>;
         teams: Array<Team>;
+        children?: Array<{ id: string; title: string }>;
     };
 
 export const project = router({
@@ -360,6 +362,7 @@ export const project = router({
         .input(
             z.object({
                 id: z.string(),
+                includeChildren: z.boolean().optional(),
                 goalsQuery: queryWithFiltersSchema.optional(),
             }),
         )
@@ -367,7 +370,7 @@ export const project = router({
         .query(async ({ input, ctx }) => {
             const { id } = input;
 
-            const [project, accessUsers] = await Promise.all([
+            const [project, accessUsers, children = null] = await Promise.all([
                 getProjectById({
                     ...ctx.session.user,
                     id,
@@ -375,6 +378,7 @@ export const project = router({
                     .$castTo<ProjectById>()
                     .executeTakeFirst(),
                 getAccessUsersByProjectId({ projectId: id }).execute(),
+                input.includeChildren ? getChildrenProjectByParentProjectId({ id }).execute() : Promise.resolve(null),
             ]);
 
             if (project == null) {
@@ -383,6 +387,7 @@ export const project = router({
 
             return {
                 ...project,
+                ...(children != null ? { children } : undefined),
                 parent: pickUniqueValues(project.parent, 'id'),
                 accessUsers,
             };
