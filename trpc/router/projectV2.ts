@@ -33,7 +33,6 @@ import {
 import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
-import { db } from '../connection/kysely';
 
 type ProjectActivity = ExtractTypeFromGenerated<Activity> & {
     user: ExtractTypeFromGenerated<User> | null;
@@ -271,7 +270,7 @@ export const project = router({
             }),
         )
         .query(async ({ input }) => {
-            const { rows } = await getProjectChildrenTreeQuery(input).$castTo<ProjectTreeRow>().execute(db);
+            const rows = await getProjectChildrenTreeQuery(input).$castTo<ProjectTreeRow>().execute();
             const map: ProjectTree = {};
 
             rows.forEach(({ id, chain, goal_count: count, deep }) => {
