@@ -16,7 +16,7 @@ interface CommentViewHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 export const CommentViewHeader: React.FC<CommentViewHeaderProps> = ({ name, timeAgo, href, state, ...attrs }) => {
     return (
         <div className={s.CommentViewHeader} {...attrs}>
-            <Text size="s" weight="bold">
+            <Text size="s" weight="semiBold">
                 {name}
             </Text>
             <span>—</span>

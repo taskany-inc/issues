@@ -231,9 +231,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                     <form onSubmit={handleSubmit(updateUser)}>
                         <Fieldset title={tr('General')}>
                             <FormControl className={s.FormControl}>
-                                <FormControlLabel weight="bold" className={s.FormControlLabel}>
-                                    {tr('Email')}:
-                                </FormControlLabel>
+                                <FormControlLabel className={s.FormControlLabel}>{tr('Email')}:</FormControlLabel>
                                 <FormControlInput
                                     disabled
                                     defaultValue={user.email}
@@ -244,9 +242,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             </FormControl>
 
                             <FormControl className={s.FormControl}>
-                                <FormControlLabel weight="bold" className={s.FormControlLabel}>
-                                    {tr('Name')}:
-                                </FormControlLabel>
+                                <FormControlLabel className={s.FormControlLabel}>{tr('Name')}:</FormControlLabel>
                                 <FormControlInput
                                     {...register('name')}
                                     size="m"
@@ -259,9 +255,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                             </FormControl>
 
                             <FormControl className={s.FormControl}>
-                                <FormControlLabel weight="bold" className={s.FormControlLabel}>
-                                    {tr('Nickname')}:
-                                </FormControlLabel>
+                                <FormControlLabel className={s.FormControlLabel}>{tr('Nickname')}:</FormControlLabel>
                                 <FormControlInput
                                     {...register('nickname')}
                                     size="m"
@@ -318,7 +312,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 <SettingsCard>
                     <Fieldset title={tr('Subscription settings')}>
                         <FormControl className={s.FormControl}>
-                            <FormControlLabel weight="bold" className={s.FormControlLabel}>
+                            <FormControlLabel className={s.FormControlLabel}>
                                 {tr('Allow notifications')}:
                             </FormControlLabel>
                             <Checkbox checked={allowNotifyFlag} onChange={onChangeAllowNotifies} />
@@ -329,9 +323,7 @@ export const UserSettingsPage = ({ user, ssrTime }: ExternalPageProps) => {
                 <SettingsCard>
                     <Fieldset title={tr('You are hero')}>
                         <FormControl className={s.FormControl}>
-                            <FormControlLabel weight="bold" className={s.FormControlLabel}>
-                                {tr('Beta features')}:
-                            </FormControlLabel>
+                            <FormControlLabel className={s.FormControlLabel}>{tr('Beta features')}:</FormControlLabel>
                             <Checkbox checked={betaUser} onChange={onBetaUserChange} />
                         </FormControl>
                     </Fieldset>

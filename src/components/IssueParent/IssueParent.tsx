@@ -22,7 +22,7 @@ export const IssueParent = ({ parent, size = 'l', ...props }: IssueParentProps) 
     const normalizedParent = ([] as Array<Parent | undefined>).concat(parent).filter(Boolean) as Array<Parent>;
 
     return (
-        <Text className={s.IssueParentTitle} size={size} weight="bold" as="span" {...props}>
+        <Text className={s.IssueParentTitle} size={size} weight="semiBold" as="span" {...props}>
             {normalizedParent.map((p, i) =>
                 nullable(p.id, (id) => (
                     <span key={id} {...goalPageHeaderParent.attr}>

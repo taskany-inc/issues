@@ -6,8 +6,7 @@
 
 .CommentFormWrapper {
     position: relative;
-    transition: 200ms ease-in;
-    transition-property: background-color;
+    background-color: var(--input-fill);
 }
 
 .CommentFormWrapper::before {
@@ -19,7 +18,7 @@
     width: 14px;
     height: 14px;
 
-    background-color: var(--background);
+    background-color: var(--input-fill);
 
     border-left: 1px solid var(--input-border);
     border-top: 1px solid var(--input-border);
@@ -34,5 +33,6 @@
 }
 
 .CommentFormWrapper_focused::before {
-    background-color: var(--input-fill-focused-borderless);
+    background-color: var(--input-fill-focused);
+    border-color: var(--input-border-focused);
 }

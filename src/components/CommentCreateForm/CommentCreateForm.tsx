@@ -90,11 +90,14 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
 
     const onCancelCreate = useCallback(() => {
         setBusy(false);
-        setFocused(false);
         setPushState(stateId ? statesMap[stateId] : undefined);
         setDescription('');
         onCancel?.();
     }, [onCancel, stateId, statesMap]);
+
+    const onBlur = useCallback(() => {
+        setFocused(false);
+    }, []);
 
     const onStateSelect = useCallback(
         (state: StateDataType) => {
@@ -138,6 +141,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
                 onChange={onCommentChange}
                 onSubmit={onCommentFormSubmit('pushState')}
                 onCancel={onCancelCreate}
+                onBlur={onBlur}
                 onFocus={onCommentFocus}
                 passedError={error}
                 actionButton={

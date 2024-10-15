@@ -95,7 +95,7 @@ export const TagDropdown = ({
                 setInputState={setInputState}
                 onChange={onChange}
                 renderItem={(props) => (
-                    <Text size="s" weight="bold" as="span">
+                    <Text size="s" weight="semiBold" as="span">
                         {props.item.title}
                     </Text>
                 )}

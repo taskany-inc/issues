@@ -23,6 +23,7 @@ interface CommentFormProps {
     onSubmit: (form: CommentSchema) => void | Promise<void>;
     onChange?: (form: CommentSchema) => void;
     onFocus?: () => void;
+    onBlur?: () => void;
     onCancel?: () => void;
 }
 
@@ -35,6 +36,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     onChange,
     onSubmit,
     onFocus,
+    onBlur,
     onCancel,
     passedError,
 }) => {
@@ -80,6 +82,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                         placeholder={tr('Leave a comment')}
                         height={focused ? 120 : 80}
                         onCancel={onCommentCancel}
+                        onBlur={onBlur}
                         onFocus={onFocus}
                         onUploadFail={onUploadFail}
                         autoFocus={autoFocus}

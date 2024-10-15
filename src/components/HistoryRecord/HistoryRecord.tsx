@@ -274,7 +274,7 @@ const HistoryRecordEstimate: React.FC<HistoryChangeProps<string>> = ({ from, to 
                 </HistoryRecordText>
             ))}
             to={nullable(to ? decodeHistoryEstimate(to) : null, (te) => (
-                <HistoryRecordText className={s.HistoryRecordTextPrimary} weight="bold" size="s">
+                <HistoryRecordText className={s.HistoryRecordTextPrimary} weight="semiBold" size="s">
                     {formateEstimate(te.date, { locale, type: te.type })}
                 </HistoryRecordText>
             ))}
@@ -359,12 +359,12 @@ const HistoryRecordTextChange: React.FC<HistoryChangeProps<string>> = ({ from, t
 const HistoryRecordPriority: React.FC<HistoryChangeProps<Priority>> = ({ from, to }) => (
     <HistorySimplifyRecord
         from={nullable(from, (f) => (
-            <HistoryRecordText weight="bold" strike size="s" className={s.HistoryRecordTextPrimary}>
+            <HistoryRecordText weight="semiBold" strike size="s" className={s.HistoryRecordTextPrimary}>
                 {getPriorityText(f.title)}
             </HistoryRecordText>
         ))}
         to={nullable(to, (t) => (
-            <HistoryRecordText weight="bold" size="s" className={s.HistoryRecordTextPrimary}>
+            <HistoryRecordText weight="semiBold" size="s" className={s.HistoryRecordTextPrimary}>
                 {getPriorityText(t.title)}
             </HistoryRecordText>
         ))}
@@ -443,7 +443,7 @@ const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, exter
     }
 
     return (
-        <HistoryRecordText weight="bold" size="s" strike={strike} className={s.HistoryRecordTextPrimary}>
+        <HistoryRecordText weight="semiBold" size="s" strike={strike} className={s.HistoryRecordTextPrimary}>
             {title}
         </HistoryRecordText>
     );
