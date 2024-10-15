@@ -17,7 +17,7 @@ interface ProjectListItemProps {
     flowId: string;
     title: string;
     owner?: ActivityByIdReturnType;
-    participants?: ActivityByIdReturnType[];
+    participants: ActivityByIdReturnType[] | null;
     starred?: boolean;
     watching?: boolean;
     averageScore: number | null;

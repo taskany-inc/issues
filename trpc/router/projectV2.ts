@@ -28,6 +28,7 @@ import {
     Ghost,
     Activity,
     Priority,
+    Team,
 } from '../../generated/kysely/types';
 import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
@@ -100,6 +101,7 @@ type ProjectById = Omit<ProjectResponse, 'goals'> &
     Pick<DashboardProject, '_count'> & {
         parent: Array<{ id: string; title: string }>;
         accessUsers: Array<ProjectActivity>;
+        teams: Array<Team>;
     };
 
 export const project = router({
