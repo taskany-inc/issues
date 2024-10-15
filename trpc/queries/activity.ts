@@ -18,3 +18,14 @@ export const getUserActivity = () => {
         .select([sql`"User"`.as('user'), sql`"Ghost"`.as('ghost')])
         .$castTo<Activity>();
 };
+
+export const getAccessUsersByProjectId = ({ projectId }: { projectId: string }) => {
+    return db
+        .selectFrom('_projectAccess')
+        .innerJoinLateral(
+            () => getUserActivity().as('activity'),
+            (join) => join.onRef('activity.id', '=', '_projectAccess.A'),
+        )
+        .selectAll('activity')
+        .where('_projectAccess.B', '=', projectId);
+};

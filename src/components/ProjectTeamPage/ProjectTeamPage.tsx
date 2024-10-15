@@ -20,7 +20,7 @@ import { tr } from './ProjectTeamPage.i18n';
 import s from './ProjectTeamPage.module.css';
 
 export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
-    const { data: project } = trpc.project.getById.useQuery({ id });
+    const { data: project } = trpc.v2.project.getById.useQuery({ id });
     const { updateProjectTeams } = useProjectResource(id);
 
     const ids = useMemo(() => project?.teams.map(({ externalTeamId }) => externalTeamId) ?? [], [project]);

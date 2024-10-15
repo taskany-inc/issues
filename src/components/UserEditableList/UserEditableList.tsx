@@ -13,7 +13,7 @@ import { tr } from './UserEditableList.i18n';
 
 export const UserEditableList: FC<{
     editable?: boolean;
-    users: { id: string; user: User | null }[];
+    users: { id: string; user: User | null }[] | null;
     filterIds: string[];
     onRemove: (id: string) => void;
     onAdd: (id: string) => void;

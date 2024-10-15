@@ -6,7 +6,7 @@ import { declareSsrProps } from '../../../utils/declareSsrProps';
 export const getServerSideProps = declareSsrProps(
     async ({ ssrHelpers, params: { id } }) => {
         try {
-            const project = await ssrHelpers.project.getById.fetch({ id });
+            const project = await ssrHelpers.v2.project.getById.fetch({ id });
 
             if (!project || !process.env.NEXT_PUBLIC_CREW_URL) {
                 throw new TRPCError({ code: 'NOT_FOUND' });

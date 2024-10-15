@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { sql } from 'kysely';
 import { jsonBuildObject } from 'kysely/helpers/postgres';
+import { TRPCError } from '@trpc/server';
 
 import { router, protectedProcedure } from '../trpcBackend';
 import { projectsChildrenIdsSchema, projectSuggestionsSchema, userProjectsSchema } from '../../src/schema/project';
@@ -14,6 +15,7 @@ import {
     getDeepChildrenProjectsId,
     getAllProjectsQuery,
     getChildrenProjectQuery,
+    getProjectById,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema, sortableProjectsPropertiesArraySchema } from '../../src/schema/common';
 import {
@@ -26,10 +28,13 @@ import {
     Ghost,
     Activity,
     Priority,
+    Team,
 } from '../../generated/kysely/types';
 import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
+import { projectAccessMiddleware } from '../access/accessMiddlewares';
+import { getAccessUsersByProjectId } from '../queries/activity';
 
 type ProjectActivity = ExtractTypeFromGenerated<Activity> & {
     user: ExtractTypeFromGenerated<User> | null;
@@ -42,7 +47,7 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
     _isOwner: boolean;
     _isEditable: boolean;
     activity: ProjectActivity;
-    participants: ProjectActivity[];
+    participants: ProjectActivity[] | null;
     goals?: any[]; // this prop is overrides below
     children: ExtractTypeFromGenerated<Project>[] | null;
 };
@@ -91,6 +96,13 @@ type ProjectGoal = ExtractTypeFromGenerated<Goal> & {
     _isParentOwner: boolean;
     _hasAchievementCriteria: boolean;
 };
+
+type ProjectById = Omit<ProjectResponse, 'goals'> &
+    Pick<DashboardProject, '_count'> & {
+        parent: Array<{ id: string; title: string }>;
+        accessUsers: Array<ProjectActivity>;
+        teams: Array<Team>;
+    };
 
 export const project = router({
     suggestions: protectedProcedure
@@ -278,6 +290,45 @@ export const project = router({
             return res;
         }),
 
+    getById: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                goalsQuery: queryWithFiltersSchema.optional(),
+            }),
+        )
+        .use(projectAccessMiddleware)
+        .query(async ({ input, ctx }) => {
+            const { id } = input;
+
+            const [project, children, accessUsers] = await Promise.all([
+                getProjectById({
+                    ...ctx.session.user,
+                    id,
+                })
+                    .$castTo<ProjectById>()
+                    .executeTakeFirst(),
+                getChildrenProjectQuery({
+                    ...ctx.session.user,
+                    ...input,
+                })
+                    .$castTo<Omit<ProjectResponse, 'goals'> & Pick<DashboardProject, '_count'>>()
+                    .execute(),
+                getAccessUsersByProjectId({ projectId: id }).execute(),
+            ]);
+
+            if (project == null) {
+                throw new TRPCError({ code: 'NOT_FOUND' });
+            }
+
+            return {
+                ...project,
+                parent: pickUniqueValues(project.parent, 'id'),
+                accessUsers,
+                children,
+            };
+        }),
+
     getProjectGoalsById: protectedProcedure
         .input(
             z.object({
@@ -305,7 +356,7 @@ export const project = router({
                 if (goal.criteria != null) {
                     const uniqCriteria = pickUniqueValues(goal.criteria, 'id') as NonNullable<ProjectGoal['criteria']>;
                     goal._achivedCriteriaWeight = baseCalcCriteriaWeight(uniqCriteria);
-                    delete goal.criteria;
+                    goal.criteria = uniqCriteria;
                 }
             }
 

@@ -70,7 +70,7 @@ const ModalOnEvent = dynamic(() => import('../ModalOnEvent'));
 
 export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalPageProps) => {
     const router = useRouter();
-    const project = trpc.project.getById.useQuery({ id });
+    const project = trpc.v2.project.getById.useQuery({ id });
 
     const { updateProject, deleteProject, transferOwnership } = useProjectResource(id);
     const { data: childrenIds = [] } = trpc.v2.project.deepChildrenIds.useQuery({ in: [{ id }] });

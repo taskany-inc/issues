@@ -15,19 +15,16 @@ export const getServerSideProps = declareSsrProps(
         } = props;
 
         try {
-            const project = await ssrHelpers.project.getById.fetch({ id, goalsQuery: queryState });
+            const project = await ssrHelpers.v2.project.getById.fetch({ id });
 
             if (!project) {
                 throw new TRPCError({ code: 'NOT_FOUND' });
             }
 
             await Promise.all([
-                ssrHelpers.project.getDeepInfo.fetch({
+                ssrHelpers.v2.project.getProjectGoalsById.fetch({
                     id,
                     goalsQuery: queryState,
-                }),
-                ssrHelpers.v2.project.getProjectChildren.fetch({
-                    id,
                 }),
                 projectCollapsableItemInit({
                     project,
