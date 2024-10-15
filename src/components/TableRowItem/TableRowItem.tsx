@@ -4,10 +4,10 @@ import { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 
 import s from './TableRowItem.module.css';
 
-export const TableRowItemTitle = (props: ComponentProps<typeof Text>) => <Text weight="bold" {...props} />;
+export const TableRowItemTitle = (props: ComponentProps<typeof Text>) => <Text weight="semiBold" {...props} />;
 
 export const TableRowItemText = ({ className, ...props }: ComponentProps<typeof Text>) => (
-    <Text className={cn(s.TableRowItemText, className)} size="s" weight="bold" {...props} />
+    <Text className={cn(s.TableRowItemText, className)} size="s" weight="semiBold" {...props} />
 );
 
 interface TableRowItemProps extends Omit<React.ComponentProps<typeof TableRow>, 'title'> {

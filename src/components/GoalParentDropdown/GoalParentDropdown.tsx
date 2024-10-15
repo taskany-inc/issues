@@ -132,7 +132,7 @@ export const GoalParentDropdown = ({
                 onChange={onChange}
                 renderItem={(props) => (
                     <div className={s.DropdownPanelItem}>
-                        <Text size="s" weight="bold" as="span" ellipsis>
+                        <Text size="s" weight="semiBold" as="span" ellipsis>
                             {props.item.title}
                         </Text>
                         <Text size="s" as="span" className={s.DropdownPanelItem_id}>

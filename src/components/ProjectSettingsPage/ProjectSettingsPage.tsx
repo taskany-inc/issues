@@ -172,9 +172,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                         <form onSubmit={handleSubmit(updateProject(onProjectUpdate))}>
                             <Fieldset title={tr('General')}>
                                 <FormControl className={s.FormControl}>
-                                    <FormControlLabel className={s.FormControlLabel} weight="bold">
-                                        {tr('key')}:
-                                    </FormControlLabel>
+                                    <FormControlLabel className={s.FormControlLabel}>{tr('key')}:</FormControlLabel>
                                     <FormControlInput
                                         size="m"
                                         brick="bottom"
@@ -186,9 +184,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 </FormControl>
 
                                 <FormControl className={s.FormControl}>
-                                    <FormControlLabel className={s.FormControlLabel} weight="bold">
-                                        {tr('Title')}:
-                                    </FormControlLabel>
+                                    <FormControlLabel className={s.FormControlLabel}>{tr('Title')}:</FormControlLabel>
                                     <FormControlInput
                                         size="m"
                                         brick="center"
@@ -203,7 +199,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 </FormControl>
 
                                 <FormControl className={s.FormControl}>
-                                    <FormControlLabel className={s.FormControlLabel} weight="bold">
+                                    <FormControlLabel className={s.FormControlLabel}>
                                         {tr('Description')}:
                                     </FormControlLabel>
                                     <FormControlInput
@@ -221,9 +217,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                                 </FormControl>
 
                                 <FormControl className={s.FormControl}>
-                                    <FormControlLabel className={s.FormControlLabel} weight="bold">
-                                        {tr('Parent')}:
-                                    </FormControlLabel>
+                                    <FormControlLabel className={s.FormControlLabel}>{tr('Parent')}:</FormControlLabel>
 
                                     <Controller
                                         name="parent"
@@ -337,7 +331,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                     <ModalContent>
                         <SettingsCard view="warning">
                             <Tip className={s.Tip} view="warning" icon={<IconExclamationCircleSolid size="s" />}>
-                                <Text as="span" weight="bold" size="s">
+                                <Text as="span" weight="semiBold" size="s">
                                     {tr('What happens when you delete a project')}:
                                 </Text>
                             </Tip>

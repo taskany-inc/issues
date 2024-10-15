@@ -88,7 +88,7 @@ export const AddFilterDropdown = <T extends { id: string; title: string }>({
 
 export const FiltersBarDropdownTitle: FC<ComponentProps<typeof Text>> = ({ children }) => {
     return (
-        <Text className={s.FiltersBarDropdownTitle} weight="bold">
+        <Text className={s.FiltersBarDropdownTitle} weight="semiBold">
             {children}
         </Text>
     );

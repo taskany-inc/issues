@@ -10,7 +10,7 @@ interface IssueKeyProps {
 
 export const IssueKey: React.FC<IssueKeyProps> = ({ id, size = 'm', children }) => {
     return (
-        <Text size={size} weight="bold" className={s.IssuesKey}>
+        <Text size={size} weight="semiBold" className={s.IssuesKey}>
             #{id} {children}
         </Text>
     );
