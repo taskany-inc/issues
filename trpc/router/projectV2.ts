@@ -32,6 +32,7 @@ import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
 import { projectAccessMiddleware } from '../access/accessMiddlewares';
+import { getAccessUsersByProjectId } from '../queries/activity';
 
 type ProjectActivity = ExtractTypeFromGenerated<Activity> & {
     user: ExtractTypeFromGenerated<User> | null;
@@ -44,7 +45,7 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
     _isOwner: boolean;
     _isEditable: boolean;
     activity: ProjectActivity;
-    participants: ProjectActivity[];
+    participants: ProjectActivity[] | null;
     goals?: any[]; // this prop is overrides below
     children: ExtractTypeFromGenerated<Project>[] | null;
 };
@@ -113,6 +114,7 @@ export interface ProjectTreeRow {
 type ProjectById = Omit<ProjectResponse, 'goals'> &
     Pick<DashboardProject, '_count'> & {
         parent: Array<{ id: string; title: string }>;
+        accessUsers: Array<ProjectActivity>;
     };
 
 export const project = router({
@@ -363,12 +365,15 @@ export const project = router({
         .query(async ({ input, ctx }) => {
             const { id } = input;
 
-            const project = await getProjectById({
-                ...ctx.session.user,
-                id,
-            })
-                .$castTo<ProjectById>()
-                .executeTakeFirst();
+            const [project, accessUsers] = await Promise.all([
+                getProjectById({
+                    ...ctx.session.user,
+                    id,
+                })
+                    .$castTo<ProjectById>()
+                    .executeTakeFirst(),
+                getAccessUsersByProjectId({ projectId: id }).execute(),
+            ]);
 
             if (project == null) {
                 throw new TRPCError({ code: 'NOT_FOUND' });
@@ -377,6 +382,7 @@ export const project = router({
             return {
                 ...project,
                 parent: pickUniqueValues(project.parent, 'id'),
+                accessUsers,
             };
         }),
 

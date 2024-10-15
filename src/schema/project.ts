@@ -72,7 +72,7 @@ export const projectUpdateSchema = z.object({
                 title: z.string(),
             }),
         )
-        .optional(),
+        .nullish(),
     accessUsers: z
         .array(
             z.object({

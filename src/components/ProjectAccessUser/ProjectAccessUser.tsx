@@ -2,7 +2,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { nullable } from '@taskany/bricks';
 import { Fieldset, Switch, SwitchControl } from '@taskany/bricks/harmony';
 
-import { ProjectByIdReturnType } from '../../../trpc/inferredTypes';
+import { ProjectByIdReturnTypeV2 } from '../../../trpc/inferredTypes';
 import { useProjectResource } from '../../hooks/useProjectResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { SettingsCard, SettingsCardItem } from '../SettingsContent/SettingsContent';
@@ -12,7 +12,7 @@ import s from './ProjectAccessUser.module.css';
 import { tr } from './ProjectAccessUser.i18n';
 
 interface ProjectAccessUserProps {
-    project: NonNullable<ProjectByIdReturnType>;
+    project: NonNullable<ProjectByIdReturnTypeV2>;
 }
 
 export const ProjectAccessUser: FC<ProjectAccessUserProps> = ({ project }) => {
