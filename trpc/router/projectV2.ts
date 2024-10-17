@@ -15,8 +15,6 @@ import {
     getAllProjectsQuery,
     getChildrenProjectQuery,
     getProjectChildrenTreeQuery,
-    ProjectTreeRow,
-    ProjectTree,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema, sortableProjectsPropertiesArraySchema } from '../../src/schema/common';
 import {
@@ -94,6 +92,22 @@ type ProjectGoal = ExtractTypeFromGenerated<Goal> & {
     _isParentOwner: boolean;
     _hasAchievementCriteria: boolean;
 };
+
+export interface ProjectTree {
+    [key: string]: {
+        project: ProjectResponse & Pick<DashboardProject, '_count'>;
+        count?: number;
+        children: ProjectTree | null;
+    };
+}
+
+export interface ProjectTreeRow {
+    id: string;
+    title: string;
+    goal_count: number;
+    chain: string[];
+    deep: number;
+}
 
 export const project = router({
     suggestions: protectedProcedure
@@ -271,8 +285,25 @@ export const project = router({
                 goalsQuery: queryWithFiltersSchema.optional(),
             }),
         )
-        .query(async ({ input }) => {
+        .query(async ({ input, ctx }) => {
             const rows = await getProjectChildrenTreeQuery(input).$castTo<ProjectTreeRow>().execute();
+            const projects = await getProjectsByIds({
+                in: rows.map(({ id }) => ({ id })),
+                ...ctx.session.user,
+            })
+                .select([
+                    jsonBuildObject({
+                        stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
+                        watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
+                        children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
+                        participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
+                    }).as('_count'),
+                ])
+                .$castTo<ProjectResponse & Pick<DashboardProject, '_count'>>()
+                .execute();
+
+            const projectMap = new Map(projects.map((project) => [project.id, project]));
+
             const map: ProjectTree = {};
 
             rows.forEach(({ id, chain, goal_count: count, deep }) => {
@@ -281,8 +312,10 @@ export const project = router({
                 path.reduce((acc, key, i) => {
                     if (!acc[key]) {
                         acc[key] = {
+                            project: projectMap.get(key) as ProjectResponse & Pick<DashboardProject, '_count'>,
                             children: {
                                 [id]: {
+                                    project: projectMap.get(id) as ProjectResponse & Pick<DashboardProject, '_count'>,
                                     count,
                                     children: null,
                                 },
@@ -292,6 +325,7 @@ export const project = router({
                         acc[key].children = {
                             ...acc[key].children,
                             [id]: {
+                                project: projectMap.get(id) as ProjectResponse & Pick<DashboardProject, '_count'>,
                                 count,
                                 children: null,
                             },

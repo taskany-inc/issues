@@ -684,21 +684,6 @@ export const getAllProjectsQuery = ({
         ]);
 };
 
-export interface ProjectTree {
-    [key: string]: {
-        count?: number;
-        children: ProjectTree | null;
-    };
-}
-
-export interface ProjectTreeRow {
-    id: string;
-    title: string;
-    goal_count: number;
-    chain: string[];
-    deep: number;
-}
-
 export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; goalsQuery?: QueryWithFilters }) => {
     return db
         .withRecursive('childs', (qb) => {
