@@ -61,6 +61,14 @@ export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId
                 `.as('participants'),
         ])
         .groupBy(['Project.id', 'user.id'])
+        .select([
+            jsonBuildObject({
+                stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
+                watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
+                children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
+                participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
+            }).as('_count'),
+        ])
         .$if(params.in.length > 0, (qb) =>
             qb.where((eb) =>
                 eb.or([
@@ -684,93 +692,66 @@ export const getAllProjectsQuery = ({
         ]);
 };
 
-export const getChildrenProjectQuery = ({
-    id,
-    role,
-    activityId,
-    goalsQuery,
-}: {
-    id: string;
-    role: Role;
-    activityId: string;
-    goalsQuery?: QueryWithFilters;
-}) =>
-    db
-        .selectFrom(({ selectFrom }) =>
-            selectFrom('Project')
-                .leftJoinLateral(
-                    () => getUserActivity().distinctOn('Activity.id').as('participants'),
-                    (join) =>
-                        join.onRef('participants.id', 'in', ({ selectFrom }) =>
-                            selectFrom('_projectParticipants').select('A').whereRef('B', '=', 'Project.id'),
-                        ),
-                )
-                .selectAll('Project')
-                .select(({ val, cast, case: caseFn, fn, exists }) => [
-                    caseFn()
-                        .when(fn.count('participants.id'), '>', 0)
-                        .then(fn.agg('array_agg', [fn.toJson('participants')]))
-                        .else(null)
-                        .end()
-                        .as('participants'),
-                    jsonBuildObject({
-                        stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
-                        watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
-                        children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
-                        participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
-                        goals: cast(val(0), 'integer'),
-                    }).as('_count'),
-                    exists(
-                        selectFrom('_projectWatchers')
-                            .select('B')
-                            .where('A', '=', activityId)
-                            .whereRef('B', '=', 'Project.id'),
-                    )
-                        .$castTo<boolean>()
-                        .as('_isWatching'),
-                    exists(
-                        selectFrom('_projectStargizers')
-                            .select('B')
-                            .where('A', '=', activityId)
-                            .whereRef('B', '=', 'Project.id'),
-                    )
-                        .$castTo<boolean>()
-                        .as('_isStarred'),
-                    sql<boolean>`("Project"."activityId" = ${val(activityId)})`.as('_isOwner'),
-                    sql<boolean>`((${val(role === Role.ADMIN)} or "Project"."activityId" = ${val(
-                        activityId,
-                    )}) and not "Project"."personal")`.as('_isEditable'),
+export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; goalsQuery?: QueryWithFilters }) => {
+    return db
+        .withRecursive('childs', (qb) => {
+            return qb
+                .selectFrom('_parentChildren')
+                .select(({ fn }) => [
+                    '_parentChildren.B as id',
+                    sql<number>`1::int`.as('level'),
+                    fn.agg<string[]>('array_agg', ['_parentChildren.A']).as('parent_chain'),
                 ])
-                .where('Project.id', 'in', () => getChildrenProjectsId({ in: [{ id }] }))
-                .$if(!!goalsQuery?.hideEmptyProjects, (qb) =>
-                    qb.where('Project.id', 'in', ({ selectFrom }) =>
-                        selectFrom('Goal')
-                            .select('Goal.projectId')
-                            .leftJoinLateral(
-                                () => getUserActivity().as('participant'),
-                                (join) =>
-                                    join.onRef('participant.id', 'in', (qb) =>
-                                        qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
-                                    ),
-                            )
-                            .leftJoinLateral(
-                                ({ selectFrom }) =>
-                                    selectFrom('_GoalToTag')
-                                        .innerJoin('Tag', 'Tag.id', 'B')
-                                        .selectAll('Tag')
-                                        .whereRef('A', '=', 'Goal.id')
-                                        .as('tag'),
-                                (join) => join.onTrue(),
-                            )
-                            .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery)),
-                    ),
-                )
-                .groupBy('Project.id')
-                .as('projects'),
+                .where('A', '=', id)
+                .groupBy('id')
+                .union(
+                    qb
+                        .selectFrom('_parentChildren as inner_children')
+                        .innerJoin('childs', 'childs.id', 'inner_children.A')
+                        .select(({ fn, ref }) => [
+                            ref('inner_children.B').as('id'),
+                            sql<number>`childs."level"::int + 1`.as('level'),
+                            fn
+                                .agg<string[]>('array_append', ['childs.parent_chain', 'inner_children.A'])
+                                .as('parent_chain'),
+                        ]),
+                );
+        })
+        .selectFrom('Project')
+        .innerJoin('childs as ch', 'ch.id', 'Project.id')
+        .leftJoinLateral(
+            ({ selectFrom }) =>
+                selectFrom('Goal')
+                    .selectAll('Goal')
+                    .leftJoinLateral(
+                        () => getUserActivity().as('participant'),
+                        (join) =>
+                            join.onRef('participant.id', 'in', (qb) =>
+                                qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
+                            ),
+                    )
+                    .leftJoinLateral(
+                        ({ selectFrom }) =>
+                            selectFrom('_GoalToTag')
+                                .innerJoin('Tag', 'Tag.id', 'B')
+                                .selectAll('Tag')
+                                .whereRef('A', '=', 'Goal.id')
+                                .as('tag'),
+                        (join) => join.onTrue(),
+                    )
+                    .whereRef('Goal.projectId', '=', 'Project.id')
+                    .where('Goal.archived', 'is not', true)
+                    .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery))
+                    .as('goal'),
+            (join) => join.onRef('goal.projectId', '=', 'Project.id'),
         )
-        .innerJoin(
-            () => getUserActivity().as('activity'),
-            (join) => join.onRef('projects.activityId', '=', 'activity.id'),
-        )
-        .selectAll('projects')
-        .select(({ fn }) => [fn.toJson('activity').as('activity')]);
+        .select(({ fn, cast }) => [
+            'Project.id',
+            'Project.title',
+            cast(fn.count('goal.id'), 'integer').as('goal_count'),
+            sql`to_json(ch.parent_chain)`.as('chain'),
+            'ch.level as deep',
+        ])
+        .groupBy(['Project.id', 'ch.level', 'ch.parent_chain'])
+        .orderBy('ch.level asc');
+};

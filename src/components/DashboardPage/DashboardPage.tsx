@@ -95,7 +95,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
             <ListView onKeyboardClick={handleItemEnter}>
                 {groupsOnScreen?.map(({ ...project }, i) => (
                     <ProjectListItemConnected
-                        firstLevel
+                        mainProject
                         key={project.id}
                         project={project}
                         filterPreset={preset}
