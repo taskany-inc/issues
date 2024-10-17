@@ -80,6 +80,7 @@ export const CommentView: FC<CommentViewProps> = ({
 
     const [editMode, setEditMode] = useState(false);
     const [focused, setFocused] = useState(false);
+    const [controls, setControls] = useState(focused);
     const [busy, setBusy] = useState(false);
     const [commentDescription, setCommentDescription] = useState({ description });
     const { reactionsProps } = useReactionsResource(reactions);
@@ -100,7 +101,7 @@ export const CommentView: FC<CommentViewProps> = ({
             setEditMode(false);
             setBusy(true);
             setFocused(false);
-
+            setControls(false);
             onChange?.({ description: form.description });
 
             // optimistic update
@@ -118,10 +119,19 @@ export const CommentView: FC<CommentViewProps> = ({
 
     const onCommentCancel = useCallback(() => {
         setEditMode(false);
-        setFocused(false);
+        setControls(false);
         setCommentDescription({ description });
         onCancel?.();
     }, [description, onCancel]);
+
+    const onCommentFocus = useCallback(() => {
+        setFocused(true);
+        setControls(true);
+    }, []);
+
+    const onCommentBlur = useCallback(() => {
+        setFocused(false);
+    }, []);
 
     const dropdownItems = useMemo(() => {
         const items = [
@@ -142,6 +152,7 @@ export const CommentView: FC<CommentViewProps> = ({
                     onClick: () => {
                         setEditMode(true);
                         setFocused(true);
+                        setControls(true);
                     },
                 },
                 {
@@ -187,9 +198,12 @@ export const CommentView: FC<CommentViewProps> = ({
                 <CommentForm
                     description={commentDescription.description}
                     focused={focused}
+                    controls={controls}
                     busy={busy}
                     autoFocus
                     onChange={setCommentDescription}
+                    onFocus={onCommentFocus}
+                    onBlur={onCommentBlur}
                     onSubmit={onCommentSubmit}
                     onCancel={onCommentCancel}
                     actionButton={

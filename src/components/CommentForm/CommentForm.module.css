@@ -6,7 +6,6 @@
 
 .CommentFormWrapper {
     position: relative;
-    background-color: var(--input-fill);
 }
 
 .CommentFormWrapper::before {

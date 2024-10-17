@@ -15,6 +15,7 @@ import s from './CommentForm.module.css';
 interface CommentFormProps {
     actionButton: React.ReactNode;
     focused?: boolean;
+    controls?: boolean;
     autoFocus?: boolean;
     busy?: boolean;
     description?: string;
@@ -31,6 +32,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     description = '',
     autoFocus,
     focused,
+    controls,
     busy,
     actionButton,
     onChange,
@@ -80,7 +82,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                     <FormControlEditor
                         disabled={busy}
                         placeholder={tr('Leave a comment')}
-                        height={focused ? 120 : 80}
+                        height={controls ? 120 : 80}
                         onCancel={onCommentCancel}
                         onBlur={onBlur}
                         onFocus={onFocus}
@@ -96,7 +98,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({
                     ))}
                 </FormControl>
 
-                {nullable(focused, () => (
+                {nullable(controls, () => (
                     <FormActions>
                         <div className={s.FormHelpButton}>
                             <HelpButton slug="comments" />
