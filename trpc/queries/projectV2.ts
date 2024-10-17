@@ -61,6 +61,14 @@ export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId
                 `.as('participants'),
         ])
         .groupBy(['Project.id', 'user.id'])
+        .select([
+            jsonBuildObject({
+                stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
+                watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
+                children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
+                participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
+            }).as('_count'),
+        ])
         .$if(params.in.length > 0, (qb) =>
             qb.where((eb) =>
                 eb.or([
@@ -747,61 +755,3 @@ export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; go
         .groupBy(['Project.id', 'ch.level', 'ch.parent_chain'])
         .orderBy('ch.level asc');
 };
-
-export const getChildrenProjectQuery = ({ id, role, activityId }: { id: string; role: Role; activityId: string }) =>
-    db
-        .selectFrom(({ selectFrom }) =>
-            selectFrom('Project')
-                .leftJoinLateral(
-                    () => getUserActivity().distinctOn('Activity.id').as('participants'),
-                    (join) =>
-                        join.onRef('participants.id', 'in', ({ selectFrom }) =>
-                            selectFrom('_projectParticipants').select('A').whereRef('B', '=', 'Project.id'),
-                        ),
-                )
-                .selectAll('Project')
-                .select(({ val, cast, case: caseFn, fn, exists }) => [
-                    caseFn()
-                        .when(fn.count('participants.id'), '>', 0)
-                        .then(fn.agg('array_agg', [fn.toJson('participants')]))
-                        .else(null)
-                        .end()
-                        .as('participants'),
-                    jsonBuildObject({
-                        stargizers: sql<number>`(select count("A") from "_projectStargizers" where "B" = "Project".id)`,
-                        watchers: sql<number>`(select count("A") from "_projectWatchers" where "B" = "Project".id)`,
-                        children: sql<number>`(select count("B") from "_parentChildren" where "A" = "Project".id)`,
-                        participants: sql<number>`(select count("A") from "_projectParticipants"  where "B" = "Project".id)`,
-                        goals: cast(val(0), 'integer'),
-                    }).as('_count'),
-                    exists(
-                        selectFrom('_projectWatchers')
-                            .select('B')
-                            .where('A', '=', activityId)
-                            .whereRef('B', '=', 'Project.id'),
-                    )
-                        .$castTo<boolean>()
-                        .as('_isWatching'),
-                    exists(
-                        selectFrom('_projectStargizers')
-                            .select('B')
-                            .where('A', '=', activityId)
-                            .whereRef('B', '=', 'Project.id'),
-                    )
-                        .$castTo<boolean>()
-                        .as('_isStarred'),
-                    sql<boolean>`("Project"."activityId" = ${val(activityId)})`.as('_isOwner'),
-                    sql<boolean>`((${val(role === Role.ADMIN)} or "Project"."activityId" = ${val(
-                        activityId,
-                    )}) and not "Project"."personal")`.as('_isEditable'),
-                ])
-                .where('Project.id', 'in', () => getChildrenProjectsId({ in: [{ id }] }))
-                .groupBy('Project.id')
-                .as('projects'),
-        )
-        .innerJoin(
-            () => getUserActivity().as('activity'),
-            (join) => join.onRef('projects.activityId', '=', 'activity.id'),
-        )
-        .selectAll('projects')
-        .select(({ fn }) => [fn.toJson('activity').as('activity')]);
