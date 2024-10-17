@@ -96,7 +96,6 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 {groupsOnScreen?.map(({ ...project }, i) => (
                     <ProjectListItemConnected
                         mainProject
-                        firstLevel
                         key={project.id}
                         project={project}
                         filterPreset={preset}
