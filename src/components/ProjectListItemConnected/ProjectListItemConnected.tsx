@@ -15,7 +15,6 @@ interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectLis
     subTree?: ProjectTree[string] | null;
     partnershipProject?: string[];
     filterPreset?: FilterById;
-    firstLevel?: boolean;
     mainProject?: boolean;
 }
 
@@ -54,7 +53,6 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     filterPreset,
     parent,
     project,
-    firstLevel,
     subTree,
     mainProject,
     ...props
@@ -70,7 +68,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
 
     const subNodes = useMemo(
         () =>
-            subTree?.children && !firstLevel
+            subTree?.children
                 ? Object.values(subTree.children).map(({ project: p }) => (
                       <ProjectListItemConnected
                           subTree={subTree?.children?.[p.id]}
@@ -84,10 +82,10 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                       />
                   ))
                 : [],
-        [filterPreset, firstLevel, isKanbanView, partnershipProject, project, subTree?.children],
+        [filterPreset, isKanbanView, partnershipProject, project, subTree?.children],
     );
 
-    const showNoGoals = firstLevel || (!subNodes.length && subTree?.count !== undefined);
+    const showNoGoals = !subNodes.length && subTree?.count === undefined;
 
     useEffect(() => {
         setIsProjectEmpty(getIsProjectEmptySetter(subTree));
