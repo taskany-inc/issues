@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.60.0](https://github.com/taskany-inc/issues/compare/v2.59.1...v2.60.0) (2024-10-17)
+
+
+### Features
+
+* **INTERNAL-1208:** update deps ([e0c1541](https://github.com/taskany-inc/issues/commit/e0c1541e9d9f5518c6e975c5890cda791ae5ee40))
+
 ## [2.59.1](https://github.com/taskany-inc/issues/compare/v2.59.0...v2.59.1) (2024-10-14)
 
 
