@@ -50,11 +50,13 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
     const [description, setDescription] = useState(currentDescription);
     const descriptionRef = useLatest(description);
     const [focused, setFocused] = useState(Boolean(currentDescription));
+    const [controls, setControls] = useState(focused);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<{ message: string } | undefined>();
 
     const onCommentFocus = useCallback(() => {
         setFocused(true);
+        setControls(true);
         onFocus?.();
     }, [onFocus]);
 
@@ -76,6 +78,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
 
             setBusy(true);
             setFocused(false);
+            setControls(false);
 
             await onSubmit?.(form);
 
@@ -83,12 +86,13 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
             setPushState(form.stateId ? statesMap[form.stateId] : undefined);
 
             setBusy(false);
-            setFocused(true);
+            setControls(true);
         },
         [onSubmit, statesMap],
     );
 
     const onCancelCreate = useCallback(() => {
+        setControls(false);
         setBusy(false);
         setPushState(stateId ? statesMap[stateId] : undefined);
         setDescription('');
@@ -137,6 +141,7 @@ const CommentCreateForm: React.FC<CommentCreateFormProps> = ({
             <CommentForm
                 description={description}
                 focused={focused}
+                controls={controls}
                 busy={busy}
                 onChange={onCommentChange}
                 onSubmit={onCommentFormSubmit('pushState')}
