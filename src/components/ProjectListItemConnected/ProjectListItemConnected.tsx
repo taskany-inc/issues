@@ -1,16 +1,14 @@
-import { FC, ComponentProps, useReducer, useMemo, useState, useEffect } from 'react';
+import { FC, ComponentProps, useMemo, useState, useEffect } from 'react';
 import { nullable } from '@taskany/bricks';
 import { TreeViewElement } from '@taskany/bricks/harmony';
 
 import { FilterById } from '../../../trpc/inferredTypes';
-import { trpc } from '../../utils/trpcClient';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { routes } from '../../hooks/router';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { ProjectGoalList } from '../ProjectGoalList/ProjectGoalList';
 import { Kanban } from '../Kanban/Kanban';
-import { Loader } from '../Loader/Loader';
-import { ProjectTree } from '../../../trpc/queries/projectV2';
+import { ProjectTree } from '../../../trpc/router/projectV2';
 
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     parent?: ComponentProps<typeof ProjectListItemCollapsable>['project'];
@@ -66,41 +64,30 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     });
     const [isProjectEmpty, setIsProjectEmpty] = useState(getIsProjectEmptySetter(subTree));
 
-    const [isOpen, setIsOpen] = useReducer((isOpen) => !isOpen, !!props.visible);
-
-    const { data: childrenProjects = [], isLoading: isChildrenLoading } = trpc.v2.project.getProjectChildren.useQuery(
-        {
-            id: project.id,
-        },
-        {
-            enabled: isOpen && !firstLevel,
-        },
-    );
-
     const isKanbanView = view === 'kanban';
 
     const isNeedRender = !(isProjectEmpty && hideEmptyProjects) || mainProject;
 
     const subNodes = useMemo(
         () =>
-            childrenProjects.map((p) => (
-                <ProjectListItemConnected
-                    subTree={subTree?.children?.[p.id]}
-                    key={p.id}
-                    project={p}
-                    parent={project}
-                    filterPreset={filterPreset}
-                    partnershipProject={partnershipProject}
-                    titleSize={isKanbanView ? 'l' : 'm'}
-                    actionButtonView={isKanbanView ? 'default' : 'icons'}
-                />
-            )),
-        [childrenProjects, subTree, project, filterPreset, partnershipProject, isKanbanView],
+            subTree?.children && !firstLevel
+                ? Object.values(subTree.children).map(({ project: p }) => (
+                      <ProjectListItemConnected
+                          subTree={subTree?.children?.[p.id]}
+                          key={p.id}
+                          project={p}
+                          parent={project}
+                          filterPreset={filterPreset}
+                          partnershipProject={partnershipProject}
+                          titleSize={isKanbanView ? 'l' : 'm'}
+                          actionButtonView={isKanbanView ? 'default' : 'icons'}
+                      />
+                  ))
+                : [],
+        [filterPreset, firstLevel, isKanbanView, partnershipProject, project, subTree?.children],
     );
 
-    const isLoading = isChildrenLoading && !firstLevel;
-    const showNoGoals =
-        firstLevel || (!isChildrenLoading && (!childrenProjects.length || subTree?.count === undefined));
+    const showNoGoals = firstLevel || (!subNodes.length && subTree?.count !== undefined);
 
     useEffect(() => {
         setIsProjectEmpty(getIsProjectEmptySetter(subTree));
@@ -117,30 +104,23 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                 goals={
                     <TreeViewElement>
                         {nullable(
-                            !isLoading,
-                            () =>
-                                nullable(
-                                    isKanbanView,
-                                    () => (
-                                        <Kanban
-                                            id={project.id}
-                                            filterPreset={filterPreset}
-                                            partnershipProject={partnershipProject}
-                                        />
-                                    ),
-                                    <ProjectGoalList
-                                        id={project.id}
-                                        filterPreset={filterPreset}
-                                        partnershipProject={partnershipProject}
-                                        showNoGoals={showNoGoals}
-                                    />,
-                                ),
-                            <Loader />,
+                            isKanbanView,
+                            () => (
+                                <Kanban
+                                    id={project.id}
+                                    filterPreset={filterPreset}
+                                    partnershipProject={partnershipProject}
+                                />
+                            ),
+                            <ProjectGoalList
+                                id={project.id}
+                                filterPreset={filterPreset}
+                                partnershipProject={partnershipProject}
+                                showNoGoals={showNoGoals}
+                            />,
                         )}
                     </TreeViewElement>
                 }
-                onShow={setIsOpen}
-                onHide={setIsOpen}
                 {...props}
             >
                 {nullable(!isKanbanView, () => subNodes)}
