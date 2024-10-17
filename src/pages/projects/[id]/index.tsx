@@ -26,9 +26,6 @@ export const getServerSideProps = declareSsrProps(
                     id,
                     goalsQuery: queryState,
                 }),
-                ssrHelpers.v2.project.getProjectChildren.fetch({
-                    id,
-                }),
                 ssrHelpers.v2.project.getProjectChildrenTree.fetch({
                     id,
                     goalsQuery: queryState,
