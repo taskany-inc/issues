@@ -23,7 +23,7 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
     const { data: project } = trpc.v2.project.getById.useQuery({ id });
     const { updateProjectTeams } = useProjectResource(id);
 
-    const ids = useMemo(() => project?.teams.map(({ externalTeamId }) => externalTeamId) ?? [], [project]);
+    const ids = useMemo(() => project?.teams?.map(({ externalTeamId }) => externalTeamId) ?? [], [project]);
 
     const enabledTeamsRequest = Boolean(ids.length);
 
@@ -40,12 +40,13 @@ export const ProjectTeamPage = ({ user, ssrTime, params: { id } }: ExternalPageP
             if (project) {
                 updateProjectTeams({
                     id: project.id,
-                    teams: project.teams.reduce<string[]>((acum, { externalTeamId }) => {
-                        if (externalTeamId !== id) {
-                            acum.push(externalTeamId);
-                        }
-                        return acum;
-                    }, []),
+                    teams:
+                        project.teams?.reduce<string[]>((acum, { externalTeamId }) => {
+                            if (externalTeamId !== id) {
+                                acum.push(externalTeamId);
+                            }
+                            return acum;
+                        }, []) ?? [],
                 });
             }
         },

@@ -117,7 +117,7 @@ type ProjectById = Omit<ProjectResponse, 'goals'> &
     Pick<DashboardProject, '_count'> & {
         parent: Array<{ id: string; title: string }>;
         accessUsers: Array<ProjectActivity>;
-        teams: Array<Team>;
+        teams: Array<Team> | null;
         children?: Array<{ id: string; title: string }>;
     };
 

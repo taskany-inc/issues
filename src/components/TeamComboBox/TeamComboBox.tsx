@@ -42,7 +42,7 @@ export const TeamComboBox: FC<TeamComboBoxProps & React.HTMLAttributes<HTMLDivEl
             if (item) {
                 updateProjectTeams({
                     id: project.id,
-                    teams: [...project.teams.map(({ externalTeamId }) => externalTeamId), item.id],
+                    teams: [...(project.teams?.map(({ externalTeamId }) => externalTeamId) ?? []), item.id],
                 });
             }
         },
