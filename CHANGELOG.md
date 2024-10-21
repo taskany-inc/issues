@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.60.1](https://github.com/taskany-inc/issues/compare/v2.60.0...v2.60.1) (2024-10-21)
+
+
+### Bug Fixes
+
+* **INTERNAL-1264:** fix command page 500 ([0b22b9d](https://github.com/taskany-inc/issues/commit/0b22b9db9f554daf68833f2b05b24b8019c7cb8f))
+
 ## [2.60.0](https://github.com/taskany-inc/issues/compare/v2.59.1...v2.60.0) (2024-10-18)
 
 
