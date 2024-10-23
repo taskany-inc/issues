@@ -48,6 +48,7 @@ import { AppliedUsersFilter } from '../AppliedUsersFilter/AppliedUsersFilter';
 import { PageUserMenu } from '../PageUserMenu';
 import { AppliedTagFilter } from '../AppliedTagFilter/AppliedTagFilter';
 import { SortList } from '../SortList/SortList';
+import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './FiltersPanel.i18n';
 
@@ -75,6 +76,7 @@ export const FiltersPanel: FC<{
     }) => {
         const { toggleFilterStar } = useFilterResource();
         const { user } = usePageContext();
+        const locale = useLocale();
 
         const {
             currentPreset,
@@ -188,15 +190,17 @@ export const FiltersPanel: FC<{
                 { id: 'project', title: tr('Project') },
                 { id: 'tag', title: tr('Tag') },
                 { id: 'issuer', title: tr('Issuer') },
-                { id: 'owner', title: tr('Owner') },
+                { id: 'owner', title: tr('Assignee') },
                 { id: 'participant', title: tr('Participant') },
             ];
-        }, []);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [locale]);
 
         const restFilterItems = useMemo(() => {
             if (filterQuery && filterQuery.stateType) {
                 filterQuery.state = [];
             }
+
             return filterItems.filter(({ id }) => !filterQuery?.[id]);
         }, [filterQuery, filterItems]);
 
@@ -369,7 +373,7 @@ export const FiltersPanel: FC<{
                         ))}
                         {nullable(Boolean(filterQuery?.owner), () => (
                             <AppliedUsersFilter
-                                label={tr('Owner')}
+                                label={tr('Assignee')}
                                 value={filterQuery?.owner}
                                 onChange={handleChange('owner')}
                                 onClose={onApplyClick}

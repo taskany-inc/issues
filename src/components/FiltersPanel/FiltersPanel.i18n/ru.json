@@ -1,7 +1,6 @@
 {
     "Priority": "Приоритет",
     "State": "Статус",
-    "Owner": "Ответственный",
     "Project": "Проект",
     "Tag": "Тег",
     "Estimate": "Срок",
@@ -16,5 +15,6 @@
     "Grouping": "Группировка",
     "Visibility": "Видимость",
     "Criteria": "Критерии",
-    "Empty Projects": "Пустые Проекты"
+    "Empty Projects": "Пустые Проекты",
+    "Assignee": "Ответственный"
 }
