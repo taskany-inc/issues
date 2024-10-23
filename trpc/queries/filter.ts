@@ -21,7 +21,19 @@ export const filterQuery = ({ activityId = '', id = '', isDefault }: FilterQuery
             ).as('_isStarred'),
             sql<boolean>`("Filter"."activityId" = ${val(activityId)})`.as('_isOwner'),
         ])
-        .$if(activityId.length > 0 && !isDefault, (qb) => qb.where('Filter.activityId', '=', activityId))
+        .$if(activityId.length > 0 && !isDefault && !id.length, (qb) =>
+            qb.where(({ or, eb, exists }) =>
+                or([
+                    eb('Filter.activityId', '=', activityId),
+                    exists(({ selectFrom }) =>
+                        selectFrom('_filterStargizers')
+                            .select(['_filterStargizers.A as id', '_filterStargizers.B as filterId'])
+                            .whereRef('_filterStargizers.B', '=', 'Filter.id')
+                            .$if(activityId.length > 0, (qb) => qb.where('_filterStargizers.A', '=', activityId)),
+                    ),
+                ]),
+            ),
+        )
         .$if(!!isDefault, (qb) => qb.where('Filter.default', 'is', true))
         .$if(id.length > 0, (qb) => qb.where('Filter.id', '=', id));
 };
