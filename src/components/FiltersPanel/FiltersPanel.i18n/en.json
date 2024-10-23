@@ -1,7 +1,6 @@
 {
     "Priority": "Priority",
     "State": "State",
-    "Owner": "Owner",
     "Project": "Project",
     "Tag": "Tag",
     "Estimate": "Estimate",
@@ -16,5 +15,7 @@
     "Grouping": "Grouping",
     "Visibility": "Visibility",
     "Criteria": "Criteria",
-    "Empty Projects": "Empty Projects"
+    "Empty Projects": "Empty Projects",
+    "Assignee": "",
+    "Owner": ""
 }

@@ -22,7 +22,7 @@ export const filtersPanelSsrInit = async ({ query, ssrHelpers, req }: SSRProps) 
         : browserQueryState;
 
     await Promise.all([
-        ssrHelpers.user.getFilterUsersByIds.fetch(queryState.owner ?? []),
+        ssrHelpers.user.getFilterUsersByIds.fetch(queryState.assignee ?? []),
         ssrHelpers.user.getFilterUsersByIds.fetch(queryState.participant ?? []),
         ssrHelpers.user.getFilterUsersByIds.fetch(queryState.issuer ?? []),
         ssrHelpers.project.getByIds.fetch({ ids: queryState.project ?? [] }),

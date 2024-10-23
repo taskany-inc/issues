@@ -48,6 +48,7 @@ import { AppliedUsersFilter } from '../AppliedUsersFilter/AppliedUsersFilter';
 import { PageUserMenu } from '../PageUserMenu';
 import { AppliedTagFilter } from '../AppliedTagFilter/AppliedTagFilter';
 import { SortList } from '../SortList/SortList';
+import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './FiltersPanel.i18n';
 
@@ -75,6 +76,7 @@ export const FiltersPanel: FC<{
     }) => {
         const { toggleFilterStar } = useFilterResource();
         const { user } = usePageContext();
+        const locale = useLocale();
 
         const {
             currentPreset,
@@ -188,10 +190,11 @@ export const FiltersPanel: FC<{
                 { id: 'project', title: tr('Project') },
                 { id: 'tag', title: tr('Tag') },
                 { id: 'issuer', title: tr('Issuer') },
-                { id: 'owner', title: tr('Owner') },
+                { id: 'assignee', title: tr('Assignee') },
                 { id: 'participant', title: tr('Participant') },
             ];
-        }, []);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [locale]);
 
         const restFilterItems = useMemo(() => {
             if (filterQuery && filterQuery.stateType) {
@@ -367,13 +370,13 @@ export const FiltersPanel: FC<{
                                 onClearFilter={onClearFilter('issuer')}
                             />
                         ))}
-                        {nullable(Boolean(filterQuery?.owner), () => (
+                        {nullable(Boolean(filterQuery?.assignee), () => (
                             <AppliedUsersFilter
-                                label={tr('Owner')}
-                                value={filterQuery?.owner}
-                                onChange={handleChange('owner')}
+                                label={tr('Assignee')}
+                                value={filterQuery?.assignee}
+                                onChange={handleChange('assignee')}
                                 onClose={onApplyClick}
-                                onClearFilter={onClearFilter('owner')}
+                                onClearFilter={onClearFilter('assignee')}
                             />
                         ))}
                         {nullable(Boolean(filterQuery?.participant), () => (
