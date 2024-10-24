@@ -31,7 +31,7 @@ export interface FilterQueryState {
     tag: string[];
     estimate: string[];
     issuer: string[];
-    owner: string[];
+    assignee: string[];
     participant: string[];
     project: string[];
     partnershipProject: string[];
@@ -112,7 +112,7 @@ export const buildURLSearchParams = ({
     stateType = [],
     tag = [],
     estimate = [],
-    owner = [],
+    assignee = [],
     issuer = [],
     participant = [],
     project = [],
@@ -140,7 +140,7 @@ export const buildURLSearchParams = ({
 
     estimate.length > 0 ? urlParams.set('estimate', Array.from(estimate).toString()) : urlParams.delete('estimate');
 
-    owner.length > 0 ? urlParams.set('owner', Array.from(owner).toString()) : urlParams.delete('owner');
+    assignee.length > 0 ? urlParams.set('owner', Array.from(assignee).toString()) : urlParams.delete('owner');
 
     issuer.length > 0 ? urlParams.set('issuer', Array.from(issuer).toString()) : urlParams.delete('issuer');
 
@@ -198,7 +198,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
     if (query.tag) queryMap.tag = parseQueryParam(query.tag?.toString());
     if (query.estimate) queryMap.estimate = parseQueryParam(query.estimate?.toString());
     if (query.issuer) queryMap.issuer = parseQueryParam(query.issuer?.toString());
-    if (query.owner) queryMap.owner = parseQueryParam(query.owner?.toString());
+    if (query.owner) queryMap.assignee = parseQueryParam(query.owner?.toString());
     if (query.participant) queryMap.participant = parseQueryParam(query.participant?.toString());
     if (query.project) queryMap.project = parseQueryParam(query.project?.toString());
     if (query.partnershipProject) queryMap.partnershipProject = parseQueryParam(query.partnershipProject?.toString());
@@ -321,7 +321,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             state: [],
             stateType: [],
             issuer: [],
-            owner: [],
+            assignee: [],
             participant: [],
             project: [],
             partnershipProject: [],
@@ -381,7 +381,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             setTagsFilter: pushStateProvider.key('tag'),
             setEstimateFilter: pushStateProvider.key('estimate'),
             setIssuerFilter: pushStateProvider.key('issuer'),
-            setOwnerFilter: pushStateProvider.key('owner'),
+            setOwnerFilter: pushStateProvider.key('assignee'),
             setParticipantFilter: pushStateProvider.key('participant'),
             setProjectFilter: pushStateProvider.key('project'),
             setPartnershipProjectFilter: pushStateProvider.key('partnershipProject'),

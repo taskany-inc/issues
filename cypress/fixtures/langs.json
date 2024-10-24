@@ -116,6 +116,10 @@
             "ru": "Заголовок критерия",
             "en": ""
         },
+        "Place link here": {
+            "ru": "Ссылка на задачу или ее название или ключ",
+            "en": "Insert task link or type title or jira task key"
+        },
         "Simple": {
             "ru": "Критерий",
             "en": "Todo"
@@ -123,6 +127,10 @@
         "Goal": {
             "ru": "Цель",
             "en": ""
+        },
+        "Jira task": {
+            "ru": "Задача из Jira",
+            "en": "Jira task"
         },
         "Add weight": {
             "ru": "Добавить вес",
@@ -338,9 +346,9 @@
             "ru": "Автор",
             "en": "Issuer"
         },
-        "Owner": {
+        "Assignee": {
             "ru": "Ответственный",
-            "en": "Owner"
+            "en": ""
         },
         "Participant": {
             "ru": "Участник",
@@ -354,9 +362,13 @@
             "ru": "Группировка",
             "en": "Grouping"
         },
-        "Sort": {
-            "ru": "Сортировка",
-            "en": "Sort"
+        "Goals sort": {
+            "ru": "Сортировка целей",
+            "en": "Goals sort"
+        },
+        "Projects sort": {
+            "ru": "Сортировка проектов",
+            "en": "Projects sort"
         },
         "Visibility": {
             "ru": "Видимость",
@@ -365,6 +377,10 @@
         "Criteria": {
             "ru": "Критерии",
             "en": "Criteria"
+        },
+        "Empty Projects": {
+            "ru": "Пустые Проекты",
+            "en": "Empty Projects"
         }
     },
     "FlowDropdown": {
@@ -477,6 +493,10 @@
         "Create as goal": {
             "ru": "Создать, как цель",
             "en": "Create as goal"
+        },
+        "Check the task status": {
+            "ru": "Проверить статус задачи",
+            "en": "Check the task status"
         },
         "Delete": {
             "ru": "Удалить",
@@ -776,13 +796,13 @@
             "ru": "партнерский проект",
             "en": ""
         },
-        "goal as criteria": {
-            "ru": "цель",
-            "en": "goal"
-        },
         "marked criteria": {
             "ru": "отметил(а) критерий",
             "en": ""
+        },
+        "goal as criteria": {
+            "ru": "цель",
+            "en": "goal"
         },
         "goal complete": {
             "ru": "выполнил(а) цель",
@@ -791,6 +811,18 @@
         "goal in progress": {
             "ru": "вернул(а) цель в работу",
             "en": "returns goal to work"
+        },
+        "task as criteria": {
+            "ru": "задачу",
+            "en": "task"
+        },
+        "task complete": {
+            "ru": "выполнил(а) задачу",
+            "en": "completed task"
+        },
+        "task in progress": {
+            "ru": "вернул(а) задачу в работу",
+            "en": "returns task to work"
         },
         "as criteria": {
             "ru": "как критерий",
@@ -861,7 +893,7 @@
     },
     "Loader": {
         "Loading ...": {
-            "ru": "",
+            "ru": "Загрузка...",
             "en": ""
         }
     },
@@ -1059,18 +1091,6 @@
         "Create": {
             "ru": "Создать",
             "en": "Create"
-        }
-    },
-    "ProjectGoalList": {
-        "Loading ...": {
-            "ru": "Загрузка...",
-            "en": "Loading ..."
-        }
-    },
-    "ProjectListItemConnected": {
-        "Loading ...": {
-            "ru": "Загрузка ...",
-            "en": "Loading ..."
         }
     },
     "ProjectPage": {
@@ -1302,22 +1322,6 @@
             "ru": "Название",
             "en": "Title"
         },
-        "State": {
-            "ru": "Статус",
-            "en": "State"
-        },
-        "Priority": {
-            "ru": "Приоритет",
-            "en": "Priority"
-        },
-        "Project": {
-            "ru": "Проект",
-            "en": "Project"
-        },
-        "Activity": {
-            "ru": "Автор",
-            "en": "Activity"
-        },
         "Owner": {
             "ru": "Ответственный",
             "en": "Owner"
@@ -1329,6 +1333,34 @@
         "CreatedAt": {
             "ru": "Создано",
             "en": "Created"
+        },
+        "State": {
+            "ru": "Статус",
+            "en": "State"
+        },
+        "Activity": {
+            "ru": "Автор",
+            "en": "Activity"
+        },
+        "Priority": {
+            "ru": "Приоритет",
+            "en": "Priority"
+        },
+        "Project": {
+            "ru": "Проект",
+            "en": "Project"
+        },
+        "Stargizers": {
+            "ru": "В избранном",
+            "en": "Stargizers"
+        },
+        "Watchers": {
+            "ru": "Отслеживается",
+            "en": "Watchers"
+        },
+        "Goals": {
+            "ru": "Цели",
+            "en": "Goals"
         }
     },
     "StarButton": {
