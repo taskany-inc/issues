@@ -21,7 +21,7 @@ export const filterQuery = ({ activityId = '', id = '', isDefault }: FilterQuery
             ).as('_isStarred'),
             sql<boolean>`("Filter"."activityId" = ${val(activityId)})`.as('_isOwner'),
         ])
-        .$if(activityId.length > 0 && !isDefault && !id.length, (qb) =>
+        .$if(activityId.length > 0 && !isDefault && id.length === 0, (qb) =>
             qb.where(({ or, eb, exists }) =>
                 or([
                     eb('Filter.activityId', '=', activityId),
@@ -29,7 +29,7 @@ export const filterQuery = ({ activityId = '', id = '', isDefault }: FilterQuery
                         selectFrom('_filterStargizers')
                             .select(['_filterStargizers.A as id', '_filterStargizers.B as filterId'])
                             .whereRef('_filterStargizers.B', '=', 'Filter.id')
-                            .$if(activityId.length > 0, (qb) => qb.where('_filterStargizers.A', '=', activityId)),
+                            .where('_filterStargizers.A', '=', activityId),
                     ),
                 ]),
             ),
