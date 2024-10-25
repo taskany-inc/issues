@@ -180,13 +180,16 @@ export const project = router({
                 session: { user },
             } = ctx;
 
-            const dashboardProjects = await getUserDashboardProjects({
-                ...user,
-                goalsQuery,
-                projectsSort,
-                limit: limit + 1,
-                offset,
-            })
+            const dashboardProjects = await getUserDashboardProjects(
+                {
+                    ...user,
+                    goalsQuery,
+                    projectsSort,
+                    limit: limit + 1,
+                    offset,
+                },
+                ctx.session.user.id,
+            )
                 .$castTo<DashboardProject>()
                 .execute();
 
@@ -289,13 +292,16 @@ export const project = router({
         )
         .query(async ({ input, ctx }) => {
             const { limit = 10, cursor: offset = 0, goalsQuery, id } = input;
-            const goalsByProjectQuery = getGoalsQuery({
-                ...ctx.session.user,
-                projectId: id,
-                limit: limit + 1,
-                offset,
-                goalsQuery,
-            });
+            const goalsByProjectQuery = getGoalsQuery(
+                {
+                    ...ctx.session.user,
+                    projectId: id,
+                    limit: limit + 1,
+                    offset,
+                    goalsQuery,
+                },
+                ctx.session.user.id,
+            );
 
             const goals = await goalsByProjectQuery.$castTo<ProjectGoal>().execute();
 

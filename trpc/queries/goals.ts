@@ -225,6 +225,7 @@ export const goalsFilter = (
                 asc: { user: { name: 'asc' } },
                 desc: { user: { name: 'desc' } },
             },
+            rank: undefined,
         };
         data.sort.forEach(({ key, dir }) => {
             const sortField = mapToSortedField[key];

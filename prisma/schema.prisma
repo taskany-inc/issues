@@ -101,6 +101,8 @@ model User {
   activity      Activity? @relation(fields: [activityId], references: [id])
   activityId    String?   @unique
 
+  goalRankings GoalRanking[]
+
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
 }
@@ -172,6 +174,8 @@ model Project {
   archived     Boolean?   @default(false)
   sharedGoals  Goal[]     @relation("partnershipProjects")
   teams        Team[]     @relation("projects")
+
+  goalRankings GoalRanking[]
 
   createdAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamp()
   updatedAt DateTime @default(dbgenerated("timezone('utc'::text, now())")) @updatedAt
@@ -451,4 +455,16 @@ model ExternalTask {
 
   @@index([externalId])
   @@index([title])
+}
+
+model GoalRanking {
+  id        String  @id @default(cuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  /// Format: [ "goaldId:rank", ... ]
+  goalRanks Json
+
+  @@unique([userId, projectId])
 }

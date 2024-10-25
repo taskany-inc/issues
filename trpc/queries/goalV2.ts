@@ -12,12 +12,28 @@ import { getUserActivity } from './activity';
 export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R = T[K]>(
     sort: QueryWithFilters['sort'],
     key: K,
+    currentUserId: string,
 ): Array<OrderByExpression<T, K, R>> => {
     const dbKey = db.dynamic.ref(key as string);
 
     if (sort == null || !sort.length) {
         return [sql`${dbKey}."updatedAt" desc`];
     }
+
+    // const ranksRecords: { goalId: string; rank: number }[] = [];
+    // if (sort.some(({ key }) => key === 'rank')) {
+    //     const dbRanks = await db
+    //         .selectFrom('GoalRanking')
+    //         .where('userId', '=', currentUserId)
+    //         .select('goalRanks')
+    //         .executeTakeFirst();
+    //     if (Array.isArray(dbRanks?.goalRanks)) {
+    //         dbRanks.goalRanks.forEach((value: string) => {
+    //             const [goalId, rank] = value.split(':');
+    //             ranksRecords.push({ goalId, rank: Number(rank) });
+    //         });
+    //     }
+    // }
 
     const mapToTableColumn: Record<
         NonNullable<QueryWithFilters['sort']>[number]['key'],
@@ -55,9 +71,29 @@ export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R =
             asc: sql`(select name from "User" where "User"."activityId" = ${dbKey}."ownerId") asc`,
             desc: sql`(select name from "User" where "User"."activityId" = ${dbKey}."ownerId") desc`,
         },
+        rank: {
+            asc: sql`(select rank from "") asc`,
+            desc: sql`${dbKey}.title desc`,
+        },
     };
 
     return sort.map<OrderByExpression<T, K, R>>(({ key, dir }) => mapToTableColumn[key][dir]);
+
+    // if (key === 'rank') {
+    //     const exp = sql`
+    //         with ranks as (
+    //             select jsonb_array_elements(j)->>'goalId' as "goalId", jsonb_array_elements(j)->>'rank' as rank
+    //             from (
+    //                 select ${ranksRecords}::jsonb as j
+    //             ) as t
+    //         )
+    //         select ranks.rank from ranks where "goalId" = ${dbKey}.id
+    //     `;
+    //     return {
+    //         asc: sql`(${exp}) asc`,
+    //         desc: sql`(${exp}) desc`,
+    //     }[dir];
+    // }
 };
 
 interface GetGoalsQueryParams {
@@ -69,8 +105,13 @@ interface GetGoalsQueryParams {
     goalsQuery?: QueryWithFilters;
 }
 
-export const getGoalsQuery = (params: GetGoalsQueryParams) =>
+export const getGoalsQuery = (params: GetGoalsQueryParams, currentUserId: string) =>
     db
+        .with(
+            'goalRanks',
+            () => db.with('json_value', (db) => db.selectFrom('GoalRanking').as('json_val')),
+            // .where('userId', '=', currentUserId).where('projectId', '=', params.projectId),
+        )
         .with('proj_goals', () =>
             db
                 .selectFrom('Goal')
@@ -315,6 +356,7 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
             mapSortParamsToTableColumns<DB & { proj_goals: DB['Goal'] }, 'proj_goals'>(
                 params.goalsQuery?.sort,
                 'proj_goals',
+                currentUserId,
             ),
         )
         .limit(params.limit ?? 10)

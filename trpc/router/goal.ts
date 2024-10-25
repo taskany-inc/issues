@@ -66,6 +66,7 @@ import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
 import { getOrCreateExternalTask, updateExternalTask } from '../queries/external';
 import { jiraService, searchIssue } from '../../src/utils/integration/jira';
+import { getMiddleRank, getRankSeries } from '../../src/utils/ranking';
 
 import { tr } from './router.i18n';
 
@@ -1992,6 +1993,84 @@ export const goal = router({
                     cause: error,
                 });
             }
+        }),
+    updateRank: protectedProcedure
+        .input(z.object({ id: z.string(), low: z.string().optional(), high: z.string().optional() }))
+        .use(goalEditAccessMiddleware)
+        .mutation(async ({ input, ctx }) => {
+            const goal = await prisma.goal.findUniqueOrThrow({ where: { id: input.id } });
+            const { projectId } = goal;
+            if (!projectId) throw new Error('No project id');
+            const goalCount = await prisma.goal.count({ where: { projectId } });
+            const ranking = await prisma.goalRanking.findUniqueOrThrow({
+                where: { userId_projectId: { userId: ctx.session.user.id, projectId } },
+            });
+            const rankCount = Object.keys(ranking.goalRanks).length;
+            if (rankCount < goalCount) {
+                console.log(`creating ${goalCount - rankCount}/${goalCount} rank records`);
+                const goals = await prisma.goal.findMany({
+                    where: { projectId },
+                    orderBy: [
+                        // TODO: order by existing rank
+                        { updatedAt: 'desc' },
+                    ],
+                    select: { id: true },
+                });
+                const ranks = getRankSeries(goalCount);
+                const goalRanks: Record<string, number> = {};
+                goals.forEach((g, i) => {
+                    goalRanks[g.id] = ranks[i];
+                });
+                await prisma.goalRanking.upsert({
+                    create: {
+                        userId: ctx.session.user.id,
+                        projectId,
+                        goalRanks,
+                    },
+                    update: {
+                        goalRanks,
+                    },
+                    where: {
+                        userId_projectId: {
+                            userId: ctx.session.user.id,
+                            projectId,
+                        },
+                    },
+                });
+            }
+            const low = input.low
+                ? await prisma.goalRanking.findUniqueOrThrow({
+                      where: {
+                          userId_projectId: {
+                              userId: ctx.session.user.id,
+                              projectId,
+                          },
+                      },
+                      select: { goalRanks: true },
+                  })
+                : undefined;
+            const high = input.high
+                ? await prisma.goalRanking.findUniqueOrThrow({
+                      where: {
+                          userId_projectId: {
+                              userId: ctx.session.user.id,
+                              projectId,
+                          },
+                      },
+                      select: { goalRanks: true },
+                  })
+                : undefined;
+            const newRank = getMiddleRank({ low: low?.goalRanks[goal.id], high: high?.goalRanks[goal.id] });
+            // TODO: update JSON field
+            return prisma.goalRanking.update({
+                where: {
+                    userId_projectId: {
+                        userId: ctx.session.user.id,
+                        projectId,
+                    },
+                },
+                data: { goalRanks: newRank },
+            });
         }),
     getGoalCriteriaList: protectedProcedure
         .input(z.object({ id: z.string().optional() }))

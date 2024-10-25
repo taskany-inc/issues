@@ -152,6 +152,7 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
     );
 
     const stateChangeMutations = trpc.goal.switchState.useMutation();
+    const updateGoalRankMutation = trpc.goal.updateRank.useMutation();
     const utils = trpc.useContext();
 
     const onDragEnd = useCallback<NonNullable<ComponentProps<typeof ReactSortable>['onEnd']>>(
@@ -162,10 +163,6 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
 
             const state = newStateId ? shownStates.find(({ id }) => newStateId === id) : null;
 
-            if (!state) {
-                return;
-            }
-
             const data = utils.v2.project.getProjectGoalsById.getInfiniteData(getColumnQuery(oldStateId));
 
             const goals =
@@ -175,6 +172,60 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
                 }, []) || [];
 
             const goal = goals.find((goal) => goal.id === goalId);
+
+            const sameColumnReorder = result.to.id === result.from.id && result.oldIndex !== result.newIndex;
+
+            if (sameColumnReorder && goal && result.oldIndex !== undefined && result.newIndex !== undefined) {
+                const lowGoal = result.newIndex < result.oldIndex ? goals[result.newIndex - 1] : goals[result.newIndex];
+                const highGoal =
+                    result.newIndex < result.oldIndex ? goals[result.newIndex] : goals[result.newIndex + 1];
+
+                console.log({
+                    id: result.item.id,
+                    oldIndex: result.oldIndex,
+                    newIndex: result.newIndex,
+                    movedGoal: goal?.title,
+                    lowGoal: lowGoal?.title,
+                    highGoal: highGoal?.title,
+                });
+
+                await updateGoalRankMutation.mutateAsync({
+                    id: goal.id,
+                    low: lowGoal?.id,
+                    high: highGoal?.id,
+                });
+
+                utils.v2.project.getProjectGoalsById.invalidate({
+                    id: projectId,
+                });
+
+                // Optimistic update
+
+                // utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(oldStateId), (data) => {
+                //     if (!data) {
+                //         return {
+                //             pages: [],
+                //             pageParams: [],
+                //         };
+                //     }
+                //     return {
+                //         ...data,
+                //         pages: data.pages.map((page) => ({
+                //             ...page,
+                //             goals: page.goals.map((g) => {
+                //                 if (g.id === goal.id) return swappedGoal;
+                //                 if (g.id === swappedGoal.id) return goal;
+                //                 return g;
+                //             }),
+                //         })),
+                //     };
+                // });
+                return;
+            }
+
+            if (!state) {
+                return;
+            }
 
             await utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(oldStateId), (data) => {
                 if (!data) {
@@ -230,7 +281,7 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
                 },
             );
         },
-        [stateChangeMutations, utils, getColumnQuery, shownStates, projectId],
+        [stateChangeMutations, updateGoalRankMutation, utils, getColumnQuery, shownStates, projectId],
     );
 
     return (

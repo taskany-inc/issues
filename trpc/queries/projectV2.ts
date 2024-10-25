@@ -386,7 +386,7 @@ const getGoalsFiltersWhereExpressionBuilder =
         return and(filterToApply);
     };
 
-export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams) => {
+export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams, currentUserId: string) => {
     return db
         .with('subs_projects', (db) =>
             db
@@ -459,7 +459,7 @@ export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams)
                 .where(getGoalsFiltersWhereExpressionBuilder(params.goalsQuery))
                 .where('Goal.archived', 'is not', true)
                 .groupBy('Goal.id')
-                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort, 'Goal')),
+                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort, 'Goal', currentUserId)),
         )
         .selectFrom('Project')
         .leftJoinLateral(
