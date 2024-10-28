@@ -95,6 +95,12 @@ export type ExternalTask = {
     ownerEmail: string;
     ownerName: string;
     ownerId: string;
+    creatorEmail: string | null;
+    creatorName: string | null;
+    creatorId: string | null;
+    assigneeEmail: string | null;
+    assigneeName: string | null;
+    assigneeId: string | null;
     resolution: string | null;
     resolutionId: string | null;
     createdAt: Generated<Timestamp>;

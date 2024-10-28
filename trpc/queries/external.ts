@@ -37,6 +37,8 @@ export const getOrCreateExternalTask = async ({ id }: { id: string }) => {
         issuetype,
         status: state,
         project,
+        creator,
+        assignee,
         reporter,
         resolution,
     } = externalIssue;
@@ -59,6 +61,12 @@ export const getOrCreateExternalTask = async ({ id }: { id: string }) => {
         ownerName: reporter.displayName,
         ownerEmail: reporter.emailAddress,
         ownerId: reporter.key,
+        creatorName: creator.displayName,
+        creatorEmail: creator.emailAddress,
+        creatorId: creator.key,
+        assigneeName: assignee?.displayName ?? null,
+        assigneeEmail: assignee?.emailAddress ?? null,
+        assigneeId: assignee?.key ?? null,
         resolution: resolution?.name ?? null,
         resolutionId: resolution?.id ?? null,
     }).executeTakeFirstOrThrow();

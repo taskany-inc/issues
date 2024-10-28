@@ -1488,6 +1488,8 @@ export const goal = router({
                     status: state,
                     project,
                     reporter,
+                    creator,
+                    assignee,
                     resolution,
                 } = updatedTask;
 
@@ -1510,6 +1512,12 @@ export const goal = router({
                     ownerName: reporter.displayName,
                     ownerEmail: reporter.emailAddress,
                     ownerId: reporter.key,
+                    creatorName: creator.displayName,
+                    creatorEmail: creator.emailAddress,
+                    creatorId: creator.key,
+                    assigneeName: assignee?.displayName ?? null,
+                    assigneeEmail: assignee?.emailAddress ?? null,
+                    assigneeId: assignee?.key ?? null,
                     resolution: resolution?.name ?? null,
                     resolutionId: resolution?.id ?? null,
                 }).executeTakeFirstOrThrow();

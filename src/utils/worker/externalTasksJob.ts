@@ -13,7 +13,7 @@ export const dayDuration = 24 * 60 * 60 * 1000;
 
 const createSQLValues = (sources: JiraIssue[]) =>
     Prisma.join(
-        sources.map(({ key, id, status, summary, issuetype, reporter, project, resolution }) =>
+        sources.map(({ key, id, status, summary, issuetype, reporter, project, resolution, creator, assignee }) =>
             Prisma.join(
                 [
                     id,
@@ -33,6 +33,12 @@ const createSQLValues = (sources: JiraIssue[]) =>
                     reporter.emailAddress,
                     reporter.key,
                     reporter.displayName || reporter.name || null,
+                    creator.emailAddress,
+                    creator.key,
+                    creator.displayName || creator.name || null,
+                    assignee?.emailAddress,
+                    assignee?.key,
+                    assignee?.displayName || assignee?.name || null,
                     resolution?.name || null,
                     resolution?.id || null,
                 ],
@@ -100,6 +106,8 @@ const updateExternalTasks = (tasks: JiraIssue[]) => {
         "project", "projectKey",
         "type", "typeIcon", "typeId",
         "ownerEmail", "ownerKey", "ownerName",
+        "creatorEmail", "creatorKey", "creatorName",
+        "assigneeEmail", "assigneeKey", "assigneeName",
         "resolution", "resolutionId"
     )`;
 
@@ -123,6 +131,12 @@ const updateExternalTasks = (tasks: JiraIssue[]) => {
             "ownerName" = task."ownerName",
             "ownerEmail" = task."ownerEmail",
             "ownerId" = task."ownerKey",
+            "creatorName" = task."creatorName",
+            "creatorEmail" = task."creatorEmail",
+            "creatorId" = task."creatorKey",
+            "assigneeName" = task."assigneeName",
+            "assigneeEmail" = task."assigneeEmail",
+            "assigneeId" = task."assigneeKey",
             "resolution" = task."resolution",
             "resolutionId" = task."resolutionId"
         FROM ${valuesToUpdate}

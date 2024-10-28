@@ -80,8 +80,8 @@ interface ExternalTaskCriteriaProps extends CriteriaProps {
             color: string | null;
             title: string;
         };
-        ownerEmail: string;
-        ownerName: string;
+        assigneeEmail: string | null;
+        assigneeName: string | null;
     };
 }
 
@@ -126,9 +126,9 @@ export function mapCriteria<
         id: string;
         project: string;
         projectId: string;
-        ownerEmail: string;
         externalKey: string;
-        ownerName: string;
+        assigneeName: string | null;
+        assigneeEmail: string | null;
     },
 >(criteria: T, connectedGoal: G | null, task: Et | null): UnionCriteria {
     if (connectedGoal) {
@@ -216,13 +216,18 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
 );
 
 const ExternalTaskCriteria = ({ title, externalTask, weight, isDone }: Omit<ExternalTaskCriteriaProps, 'id'>) => {
-    const ownerData = safeUserData({
-        user: {
-            email: externalTask.ownerEmail,
-            name: externalTask.ownerName,
-        },
-        ghost: null,
-    });
+    const { assigneeEmail, assigneeName } = externalTask;
+    let ownerData: ReturnType<typeof safeUserData> | null = null;
+
+    if (assigneeEmail && assigneeName) {
+        ownerData = safeUserData({
+            user: {
+                email: assigneeEmail,
+                name: assigneeName,
+            },
+            ghost: null,
+        });
+    }
 
     return (
         <>
