@@ -442,6 +442,12 @@ model ExternalTask {
   ownerEmail        String
   ownerName         String
   ownerId           String
+  creatorEmail      String?
+  creatorName       String?
+  creatorId         String?
+  assigneeEmail     String?
+  assigneeName      String?
+  assigneeId        String?
   resolution        String?
   resolutionId      String?
   criteria          GoalAchieveCriteria[] @relation("taskToCriteria")

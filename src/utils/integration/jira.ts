@@ -78,7 +78,7 @@ export interface JiraIssue {
     summary: string;
     description: string;
     creator: JiraUser;
-    assignee: JiraUser;
+    assignee: JiraUser | null;
     reporter: JiraUser;
     status: JiraIssueStatus;
     project: JiraProject;
