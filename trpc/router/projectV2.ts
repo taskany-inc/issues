@@ -389,6 +389,7 @@ export const project = router({
                 ...project,
                 ...(children != null ? { children } : undefined),
                 parent: pickUniqueValues(project.parent, 'id'),
+                participants: pickUniqueValues(project.participants, 'id'),
                 accessUsers,
             };
         }),
