@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.61.0](https://github.com/taskany-inc/issues/compare/v2.60.1...v2.61.0) (2024-10-28)
+
+
+### Features
+
+* **INTERNAL-1232:** user filter access ([d2ebf92](https://github.com/taskany-inc/issues/commit/d2ebf92f1edf93a99d9221f030400e33f3f5b301))
+
+
+### Bug Fixes
+
+* **INTERNAL-1233:** goals invalidation ([1fbef73](https://github.com/taskany-inc/issues/commit/1fbef73e80776f200d5646b70f92a7f86d1e5f4c))
+
 ## [2.60.1](https://github.com/taskany-inc/issues/compare/v2.60.0...v2.60.1) (2024-10-21)
 
 
