@@ -8,5 +8,6 @@
     "Criteria haven't the associated Jira task": "Критерий не имеет связаной Jira задачи",
     "Jira task isn't completed yet": "Jira задача еще не выполнена",
     "Jira task is closed, criteria isn't completed": "Jira задача закрыта, критерий не выполнен",
-    "Jira task is completed": "Jira задача выполнена, критерий выполнен"
+    "Jira task is completed": "Jira задача выполнена, критерий выполнен",
+    "Goal doesn't have a project": "Задача не привязана к проекту"
 }

@@ -30,7 +30,7 @@ import {
     Priority,
     Team,
 } from '../../generated/kysely/types';
-import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
+import { ExtractTypeFromGenerated, pickUniqueValues, recalculateGoalRanksIfNeeded } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
 import { projectAccessMiddleware } from '../access/accessMiddlewares';
@@ -405,6 +405,9 @@ export const project = router({
         )
         .query(async ({ input, ctx }) => {
             const { limit = 10, cursor: offset = 0, goalsQuery, id } = input;
+            if (input.goalsQuery?.sort?.some(({ key }) => key === 'rank')) {
+                await recalculateGoalRanksIfNeeded(id, ctx.session.user.activityId);
+            }
             const goalsByProjectQuery = getGoalsQuery({
                 ...ctx.session.user,
                 projectId: id,

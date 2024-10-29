@@ -183,6 +183,12 @@ export type goalParticipants = {
     A: string;
     B: string;
 };
+export type GoalRank = {
+    id: Generated<string>;
+    activityId: string;
+    goalId: string;
+    value: number;
+};
 export type goalStargizers = {
     A: string;
     B: string;
@@ -374,6 +380,7 @@ export type DB = {
     Goal: Goal;
     GoalAchieveCriteria: GoalAchieveCriteria;
     GoalHistory: GoalHistory;
+    GoalRank: GoalRank;
     Job: Job;
     Priority: Priority;
     Project: Project;

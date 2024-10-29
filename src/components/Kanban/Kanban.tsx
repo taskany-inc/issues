@@ -91,6 +91,7 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
             id: projectId,
             goalsQuery: {
                 ...queryState,
+                sort: [{ key: 'rank', dir: 'asc' } as const],
                 partnershipProject: partnershipProject || undefined,
                 state: [stateId],
             },
@@ -152,31 +153,80 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
     );
 
     const stateChangeMutations = trpc.goal.switchState.useMutation();
+    const updateGoalRankMutation = trpc.v2.goal.updateRank.useMutation();
     const utils = trpc.useContext();
 
     const onDragEnd = useCallback<NonNullable<ComponentProps<typeof ReactSortable>['onEnd']>>(
         async (result) => {
-            const goalId = result.item.id;
-            const newStateId = result.to.id;
-            const oldStateId = result.from.id;
+            const {
+                item: { id: goalId },
+                to: { id: newStateId },
+                from: { id: oldStateId },
+                oldIndex,
+                newIndex,
+            } = result;
 
-            const state = newStateId ? shownStates.find(({ id }) => newStateId === id) : null;
-
-            if (!state) {
+            if (oldIndex === undefined || newIndex === undefined) {
                 return;
             }
 
-            const data = utils.v2.project.getProjectGoalsById.getInfiniteData(getColumnQuery(oldStateId));
+            const newState = newStateId ? shownStates.find(({ id }) => newStateId === id) : null;
 
-            const goals =
-                data?.pages?.reduce<(typeof data)['pages'][number]['goals']>((acc, cur) => {
+            const oldStateData = utils.v2.project.getProjectGoalsById.getInfiniteData(getColumnQuery(oldStateId));
+
+            const oldStateGoals =
+                oldStateData?.pages?.reduce<(typeof oldStateData)['pages'][number]['goals']>((acc, cur) => {
                     acc.push(...cur.goals);
                     return acc;
                 }, []) || [];
 
-            const goal = goals.find((goal) => goal.id === goalId);
+            const goal = oldStateGoals.find((goal) => goal.id === goalId);
 
-            await utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(oldStateId), (data) => {
+            if (!goal) {
+                return;
+            }
+
+            const sameColumnReorder = goal !== undefined && newStateId === oldStateId && oldIndex !== newIndex;
+
+            if (sameColumnReorder) {
+                const lowGoal = newIndex < oldIndex ? oldStateGoals[newIndex - 1] : oldStateGoals[newIndex];
+                const highGoal = newIndex < oldIndex ? oldStateGoals[newIndex] : oldStateGoals[newIndex + 1];
+
+                await updateGoalRankMutation.mutateAsync({
+                    id: goal.id,
+                    low: lowGoal?.id,
+                    high: highGoal?.id,
+                });
+
+                utils.v2.project.getProjectGoalsById.invalidate({
+                    id: projectId,
+                });
+
+                return;
+            }
+
+            if (!newState) {
+                return;
+            }
+
+            const newStateData = utils.v2.project.getProjectGoalsById.getInfiniteData(getColumnQuery(newStateId));
+
+            const newStateGoals =
+                newStateData?.pages?.reduce<(typeof newStateData)['pages'][number]['goals']>((acc, cur) => {
+                    acc.push(...cur.goals);
+                    return acc;
+                }, []) || [];
+
+            const lowGoal = newStateGoals[newIndex - 1];
+            const highGoal = newStateGoals[newIndex];
+
+            await updateGoalRankMutation.mutateAsync({
+                id: goal.id,
+                low: lowGoal?.id,
+                high: highGoal?.id,
+            });
+
+            utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(oldStateId), (data) => {
                 if (!data) {
                     return {
                         pages: [],
@@ -193,33 +243,10 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
                 };
             });
 
-            if (newStateId && goal) {
-                await utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(newStateId), (data) => {
-                    if (!data) {
-                        return {
-                            pages: [],
-                            pageParams: [],
-                        };
-                    }
-
-                    const [first, ...rest] = data.pages;
-
-                    const updatedFirst = {
-                        ...first,
-                        goals: [goal, ...first.goals],
-                    };
-
-                    return {
-                        ...data,
-                        pages: [updatedFirst, ...rest],
-                    };
-                });
-            }
-
-            await stateChangeMutations.mutate(
+            stateChangeMutations.mutate(
                 {
                     id: goalId,
-                    state,
+                    state: newState,
                 },
                 {
                     onSettled: () => {
@@ -230,7 +257,7 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
                 },
             );
         },
-        [stateChangeMutations, utils, getColumnQuery, shownStates, projectId],
+        [stateChangeMutations, updateGoalRankMutation, utils, getColumnQuery, shownStates, projectId],
     );
 
     return (
