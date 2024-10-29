@@ -20,7 +20,6 @@ import { FilterAutoCompleteInput } from '../FilterAutoCompleteInput/FilterAutoCo
 import { AddInlineTrigger } from '../AddInlineTrigger/AddInlineTrigger';
 import { StateDot } from '../StateDot/StateDot';
 import { JiraTaskBadge, JiraTaskBadgeIcon } from '../JiraTaskBadge/JiraTaskBadge';
-import { BetaLiteral } from '../BetaLiteral';
 
 import { tr } from './CriteriaForm.i18n';
 import s from './CriteriaForm.module.css';
@@ -341,7 +340,7 @@ export const CriteriaForm = ({
         ];
 
         if (externalAllowed) {
-            base.push({ title: tr('Jira task'), value: 'task', iconRight: <BetaLiteral size="s" /> });
+            base.push({ title: tr('Jira task'), value: 'task' });
         }
 
         return base;
