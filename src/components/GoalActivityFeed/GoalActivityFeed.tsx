@@ -226,7 +226,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                                     validateGoalCriteriaBindings={validateGoalCriteriaBindings}
                                     validityData={criteriaValidityData}
                                     filter={[goal.id, ...parentGoalIds.map((id) => id.id)]}
-                                    externalAllowed={(user?.settings?.beta && allowedServices?.jira) || false}
+                                    externalAllowed={allowedServices?.jira}
                                 />
                             </GoalFormPopupTrigger>
                         ))}
