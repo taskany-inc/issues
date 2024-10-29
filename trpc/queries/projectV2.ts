@@ -467,7 +467,7 @@ export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams)
                 .where(getGoalsFiltersWhereExpressionBuilder(params.goalsQuery))
                 .where('Goal.archived', 'is not', true)
                 .groupBy('Goal.id')
-                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort, 'Goal')),
+                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort, 'Goal', params.activityId)),
         )
         .selectFrom('Project')
         .leftJoinLateral(

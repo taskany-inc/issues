@@ -8,5 +8,6 @@
     "Criteria haven't the associated Jira task": "Criteria haven't the associated Jira task",
     "Jira task isn't completed yet": "Jira task isn't completed yet",
     "Jira task is closed, criteria isn't completed": "Jira task is closed, criteria isn't completed",
-    "Jira task is completed": "Jira task is completed"
+    "Jira task is completed": "Jira task is completed",
+    "Goal doesn't have a project": "Goal doesn't have a project"
 }

@@ -12,6 +12,7 @@ import { getUserActivity } from './activity';
 export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R = T[K]>(
     sort: QueryWithFilters['sort'],
     key: K,
+    activityId: string,
 ): Array<OrderByExpression<T, K, R>> => {
     const dbKey = db.dynamic.ref(key as string);
 
@@ -54,6 +55,10 @@ export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R =
         owner: {
             asc: sql`(select name from "User" where "User"."activityId" = ${dbKey}."ownerId") asc`,
             desc: sql`(select name from "User" where "User"."activityId" = ${dbKey}."ownerId") desc`,
+        },
+        rank: {
+            asc: sql`(select value from "GoalRank" where "activityId" = ${activityId} and "goalId" = ${dbKey}.id) asc`,
+            desc: sql`(select value from "GoalRank" where "activityId" = ${activityId} and "goalId" = ${dbKey}.id) desc`,
         },
     };
 
@@ -315,6 +320,7 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
             mapSortParamsToTableColumns<DB & { proj_goals: DB['Goal'] }, 'proj_goals'>(
                 params.goalsQuery?.sort,
                 'proj_goals',
+                params.activityId,
             ),
         )
         .limit(params.limit ?? 10)

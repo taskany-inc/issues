@@ -100,6 +100,8 @@ export const FiltersPanel: FC<{
             preset: filterPreset,
         });
 
+        const enableGoalsSort = view !== 'kanban';
+
         const [filterQuery, setFilterQuery] = useState<Partial<FilterQueryState> | undefined>(queryFilterState);
         const filterQueryRef = useLatest(filterQuery);
 
@@ -256,32 +258,39 @@ export const FiltersPanel: FC<{
                                 </>
                             ))}
 
-                            <FiltersBarDropdownTitle>{tr('Goals sort')}</FiltersBarDropdownTitle>
-                            <FiltersBarDropdownContent>
-                                <SortList
-                                    value={filterQuery?.sort}
-                                    onChange={(key, dir) => {
-                                        let sortParams = (filterQuery?.sort ?? []).slice();
+                            {nullable(enableGoalsSort, () => (
+                                <>
+                                    <FiltersBarDropdownTitle>{tr('Goals sort')}</FiltersBarDropdownTitle>
+                                    <FiltersBarDropdownContent>
+                                        <SortList
+                                            value={filterQuery?.sort}
+                                            onChange={(key, dir) => {
+                                                let sortParams = (filterQuery?.sort ?? []).slice();
 
-                                        if (!dir) {
-                                            sortParams = sortParams.filter(({ key: k }) => key !== k);
-                                        } else {
-                                            const paramExistingIndex = sortParams.findIndex(({ key: k }) => key === k);
+                                                if (!dir) {
+                                                    sortParams = sortParams.filter(({ key: k }) => key !== k);
+                                                } else {
+                                                    const paramExistingIndex = sortParams.findIndex(
+                                                        ({ key: k }) => key === k,
+                                                    );
 
-                                            if (paramExistingIndex > -1) {
-                                                sortParams[paramExistingIndex] = {
-                                                    key: key as SortableGoalsProps,
-                                                    dir,
-                                                };
-                                            } else {
-                                                sortParams.push({ key: key as SortableGoalsProps, dir });
-                                            }
-                                        }
+                                                    if (paramExistingIndex > -1) {
+                                                        sortParams[paramExistingIndex] = {
+                                                            key: key as SortableGoalsProps,
+                                                            dir,
+                                                        };
+                                                    } else {
+                                                        sortParams.push({ key: key as SortableGoalsProps, dir });
+                                                    }
+                                                }
 
-                                        setSortFilter(sortParams);
-                                    }}
-                                />
-                            </FiltersBarDropdownContent>
+                                                setSortFilter(sortParams);
+                                            }}
+                                        />
+                                    </FiltersBarDropdownContent>
+                                </>
+                            ))}
+
                             {nullable(enableProjectsSort, () => (
                                 <>
                                     <FiltersBarDropdownTitle>{tr('Projects sort')}</FiltersBarDropdownTitle>
