@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.61.0](https://github.com/taskany-inc/issues/compare/v2.60.1...v2.61.0) (2024-10-31)
+
+
+### Features
+
+* goal kanban ranking ([fdcec4a](https://github.com/taskany-inc/issues/commit/fdcec4a84e41d99264eefadcdaa80ce6bd4134b9))
+* **INTERNAL-1232:** user filter access ([d2ebf92](https://github.com/taskany-inc/issues/commit/d2ebf92f1edf93a99d9221f030400e33f3f5b301))
+* **INTERNAL-1289:** add assignee and creator to external task model ([bbd50ad](https://github.com/taskany-inc/issues/commit/bbd50ad84d34372e6cfe51ed6360fa7a2ca73fb1))
+
+
+### Bug Fixes
+
+* **INTERNAL-1191:** fix translations in filters panel ([07d482b](https://github.com/taskany-inc/issues/commit/07d482b3d124ca2098ab0e9115811680c8825518))
+* **INTERNAL-1233:** goals invalidation ([1fbef73](https://github.com/taskany-inc/issues/commit/1fbef73e80776f200d5646b70f92a7f86d1e5f4c))
+* **INTERNAL-1287:** fix participants duplicates ([08dd991](https://github.com/taskany-inc/issues/commit/08dd9910542e46e769426c8aab07f3029303c896))
+* **INTERNAL-1297:** drop beta flag for criteria with jira tasks ([9279108](https://github.com/taskany-inc/issues/commit/9279108699ce90f57ab8586d06229e6c001c9b1e))
+
 ## [2.60.1](https://github.com/taskany-inc/issues/compare/v2.60.0...v2.60.1) (2024-10-21)
 
 
