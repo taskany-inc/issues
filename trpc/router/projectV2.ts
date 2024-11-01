@@ -30,11 +30,12 @@ import {
     Priority,
     Team,
 } from '../../generated/kysely/types';
-import { ExtractTypeFromGenerated, pickUniqueValues, recalculateGoalRanksIfNeeded } from '../utils';
+import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
 import { projectAccessMiddleware } from '../access/accessMiddlewares';
 import { getAccessUsersByProjectId } from '../queries/activity';
+import { recalculateGoalRanksIfNeeded } from '../queries/ranking';
 
 type ProjectActivity = ExtractTypeFromGenerated<Activity> & {
     user: ExtractTypeFromGenerated<User> | null;
