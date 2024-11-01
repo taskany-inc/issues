@@ -6,6 +6,7 @@ import { getDeepParentGoalIds, getDeepChildrenGoalIds } from '../queries/goalV2'
 import { goalEditAccessMiddleware } from '../access/accessMiddlewares';
 import { db } from '../connection/kysely';
 import { getMiddleRank } from '../../src/utils/ranking';
+import { getGoalRank, updateGoalRank } from '../queries/ranking';
 
 import { tr } from './router.i18n';
 
@@ -30,29 +31,13 @@ export const goal = router({
             if (!projectId) {
                 throw new TRPCError({ code: 'PRECONDITION_FAILED', message: tr("Goal doesn't have a project") });
             }
-            const low = input.low
-                ? await db
-                      .selectFrom('GoalRank')
-                      .where('activityId', '=', ctx.session.user.activityId)
-                      .where('goalId', '=', input.low)
-                      .select(['value'])
-                      .executeTakeFirst()
-                : undefined;
-            const high = input.high
-                ? await db
-                      .selectFrom('GoalRank')
-                      .where('activityId', '=', ctx.session.user.activityId)
-                      .where('goalId', '=', input.high)
-                      .select(['value'])
-                      .executeTakeFirst()
-                : undefined;
+            const [low, high] = await Promise.all([
+                input.low ? getGoalRank(ctx.session.user.activityId, input.low).executeTakeFirst() : undefined,
+                input.high ? getGoalRank(ctx.session.user.activityId, input.high).executeTakeFirst() : undefined,
+            ]);
             const newRank = getMiddleRank({ low: low?.value, high: high?.value });
-            await db
-                .insertInto('GoalRank')
-                .values({ activityId: ctx.session.user.activityId, goalId: input.id, value: newRank })
-                .onConflict((oc) =>
-                    oc.columns(['activityId', 'goalId']).doUpdateSet({ value: (eb) => eb.ref('excluded.value') }),
-                )
-                .execute();
+            await updateGoalRank([
+                { activityId: ctx.session.user.activityId, goalId: input.id, value: newRank },
+            ]).execute();
         }),
 });

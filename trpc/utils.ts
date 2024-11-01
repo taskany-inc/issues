@@ -4,7 +4,6 @@ import prisma from '@prisma/client';
 import { Timestamp } from '../generated/kysely/types';
 import { ReactionsMap } from '../src/types/reactions';
 import { safeGetUserName } from '../src/utils/getUserName';
-import { getRankSeries } from '../src/utils/ranking';
 
 import { db } from './connection/kysely';
 
@@ -91,40 +90,4 @@ export const applyLastStateUpdateComment = (goal: any) => {
     }
 
     return null;
-};
-
-export const recalculateGoalRanksIfNeeded = async (projectId: string, activityId: string) => {
-    const { goalCount } = await db
-        .selectFrom('Goal')
-        .where('projectId', '=', projectId)
-        .select((eb) => eb.fn.count<number>('id').as('goalCount'))
-        .executeTakeFirstOrThrow();
-    const { rankCount } = await db
-        .selectFrom('GoalRank')
-        .leftJoin('Goal', 'GoalRank.goalId', 'Goal.id')
-        .where('Goal.projectId', '=', projectId)
-        .where('Goal.activityId', '=', activityId)
-        .select((eb) => eb.fn.count<number>('Goal.id').as('rankCount'))
-        .executeTakeFirstOrThrow();
-    if (goalCount === rankCount) return;
-    const ranks = getRankSeries(goalCount);
-    const goals = await db
-        .selectFrom('Goal')
-        .where('projectId', '=', projectId)
-        .leftJoin(
-            (eb) =>
-                eb.selectFrom('GoalRank').select(['goalId', 'value']).where('activityId', '=', activityId).as('ranks'),
-            (join) => join.onRef('ranks.goalId', '=', 'Goal.id'),
-        )
-        .orderBy('ranks.value asc')
-        .orderBy('updatedAt desc')
-        .select(['id'])
-        .execute();
-    await db
-        .insertInto('GoalRank')
-        .values(goals.map((g, i) => ({ activityId, goalId: g.id, value: ranks[i] })))
-        .onConflict((oc) =>
-            oc.columns(['activityId', 'goalId']).doUpdateSet({ value: (eb) => eb.ref('excluded.value') }),
-        )
-        .execute();
 };
