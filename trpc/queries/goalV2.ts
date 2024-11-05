@@ -69,6 +69,7 @@ interface GetGoalsQueryParams {
     role: Role;
     activityId: string;
     projectId: string;
+    isOnlySubsGoals?: boolean;
     limit?: number;
     offset?: number;
     goalsQuery?: QueryWithFilters;
@@ -178,14 +179,36 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                         .end()
                         .as('partnershipProjects'),
                 ])
-                .where(({ or, eb }) =>
-                    or([
+                .where(({ or, eb, and }) => {
+                    const baseOr = or([
                         eb('Goal.projectId', '=', params.projectId),
                         eb('Goal.id', 'in', ({ selectFrom }) =>
                             selectFrom('_partnershipProjects').where('B', '=', params.projectId).select('A'),
                         ),
-                    ]),
-                )
+                    ]);
+
+                    if (params.isOnlySubsGoals) {
+                        return and([
+                            baseOr,
+                            eb('Goal.id', 'in', ({ selectFrom }) =>
+                                selectFrom('_goalStargizers')
+                                    .select('B as id')
+                                    .where('A', '=', params.activityId)
+                                    .union(
+                                        selectFrom('_goalWatchers')
+                                            .select('B as id')
+                                            .where('A', '=', params.activityId),
+                                    )
+                                    .union(
+                                        selectFrom('_partnershipProjects')
+                                            .where('B', '=', params.projectId)
+                                            .select('A as id'),
+                                    ),
+                            ),
+                        ]);
+                    }
+                    return baseOr;
+                })
                 .where(({ or, and, eb, selectFrom, cast, val }) => {
                     const { goalsQuery } = params;
                     const estimate: Array<Date> = [];

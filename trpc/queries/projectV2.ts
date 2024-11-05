@@ -7,11 +7,26 @@ import { db } from '../connection/kysely';
 import { Activity, DB, Role } from '../../generated/kysely/types';
 import { QueryWithFilters, SortableProjectsPropertiesArray } from '../../src/schema/common';
 
-import { mapSortParamsToTableColumns } from './goalV2';
 import { getUserActivity } from './activity';
 
 export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId: string; role: Role }) => {
     return db
+        .with('project_goals', () =>
+            db
+                .selectFrom('Goal')
+                .select(['Goal.id', 'Goal.projectId'])
+                .$if(params.in.length > 0, (qb) =>
+                    qb.where((eb) =>
+                        eb.or([
+                            eb(
+                                'Goal.projectId',
+                                'in',
+                                params.in.map(({ id }) => id),
+                            ),
+                        ]),
+                    ),
+                ),
+        )
         .selectFrom('Project')
         .leftJoin('User as user', 'Project.activityId', 'user.activityId')
         .leftJoinLateral(
@@ -44,6 +59,22 @@ export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId
             sql<boolean>`((${val(params.role === Role.ADMIN)} or "Project"."activityId" = ${val(
                 params.activityId,
             )}) and not "Project"."personal")`.as('_isEditable'),
+            exists(
+                selectFrom('_goalWatchers')
+                    .select('B')
+                    .where('A', '=', params.activityId)
+                    .whereRef('B', 'in', ({ selectFrom }) =>
+                        selectFrom('project_goals').select('id').whereRef('projectId', '=', 'Project.id'),
+                    ),
+            ).as('_isGoalWatching'),
+            exists(
+                selectFrom('_goalStargizers')
+                    .select('B')
+                    .where('A', '=', params.activityId)
+                    .whereRef('B', 'in', ({ selectFrom }) =>
+                        selectFrom('project_goals').select('id').whereRef('projectId', '=', 'Project.id'),
+                    ),
+            ).as('_isGoalStarred'),
             jsonBuildObject({
                 activityId: ref('user.activityId'),
                 user: fn.toJson('user'),
@@ -438,23 +469,7 @@ export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams)
         .with('goals', (db) =>
             db
                 .selectFrom('Goal')
-                .selectAll('Goal')
-                .leftJoinLateral(
-                    () => getUserActivity().as('participant'),
-                    (join) =>
-                        join.onRef('participant.id', 'in', (qb) =>
-                            qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
-                        ),
-                )
-                .leftJoinLateral(
-                    ({ selectFrom }) =>
-                        selectFrom('_GoalToTag')
-                            .innerJoin('Tag', 'Tag.id', 'B')
-                            .selectAll('Tag')
-                            .whereRef('A', '=', 'Goal.id')
-                            .as('tag'),
-                    (join) => join.onTrue(),
-                )
+                .select(['Goal.id', 'Goal.projectId'])
                 .where(({ or, eb }) =>
                     or([
                         eb('Goal.id', 'in', ({ selectFrom }) => selectFrom('subs_goals').select('B')),
@@ -465,9 +480,7 @@ export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams)
                     ]),
                 )
                 .where(getGoalsFiltersWhereExpressionBuilder(params.goalsQuery))
-                .where('Goal.archived', 'is not', true)
-                .groupBy('Goal.id')
-                .orderBy(mapSortParamsToTableColumns(params.goalsQuery?.sort, 'Goal', params.activityId)),
+                .where('Goal.archived', 'is not', true),
         )
         .selectFrom('Project')
         .leftJoinLateral(
@@ -528,6 +541,72 @@ export const getUserDashboardProjects = (params: GetUserDashboardProjectsParams)
         .offset(params.offset || 0);
 };
 
+/**
+ * Если мы получаем пользовательские проекты по следующим условиям
+ * 1. Пользователь - владелец или участник проекта V
+ * 2. Пользователь - поставил звездочку или следит за проектом V
+ * 3. Проект является партенским по отношению к проектам пользователя владельцем которых он является
+ * 4. Пользователь является краним за цель в любом проекте
+ * 5. Пользователь поставил звездочку или подписался на цель внутри любого проекта
+ * 6. Пользователь является участником цели любого проекта
+ */
+
+export const getUserDashBoardProjectsAgain = (params: GetUserDashboardProjectsParams) => {
+    return db
+        .selectFrom('Project')
+        .selectAll('Project')
+        .where('Project.archived', 'is not', true)
+        .where(({ or, eb }) =>
+            or([
+                eb('Project.activityId', '=', params.activityId),
+                eb('Project.id', 'in', ({ selectFrom }) =>
+                    selectFrom('_projectParticipants')
+                        .select('B as id')
+                        .where('A', '=', params.activityId)
+                        .union(selectFrom('_projectStargizers').select('B as id').where('A', '=', params.activityId))
+                        .union(selectFrom('_projectWatchers').select('B as id').where('A', '=', params.activityId))
+                        .union(
+                            selectFrom('_partnershipProjects')
+                                .select('A as id')
+                                .where(
+                                    'A',
+                                    'in',
+                                    selectFrom('Project')
+                                        .select('Project.id')
+                                        .where('Project.activityId', '=', params.activityId),
+                                ),
+                        ),
+                ),
+                eb('Project.id', 'in', ({ selectFrom }) =>
+                    selectFrom('Goal')
+                        .select('Goal.projectId as id')
+                        .where('Goal.archived', 'is not', true)
+                        .where(({ or, eb }) =>
+                            or([
+                                eb('Goal.activityId', '=', params.activityId),
+                                eb('Goal.ownerId', '=', params.activityId),
+                                eb('Goal.id', 'in', ({ selectFrom }) =>
+                                    selectFrom('_goalParticipants')
+                                        .select('B as id')
+                                        .where('A', '=', params.activityId)
+                                        .union(
+                                            selectFrom('_goalStargizers')
+                                                .select('B as id')
+                                                .where('A', '=', params.activityId),
+                                        )
+                                        .union(
+                                            selectFrom('_goalWatchers')
+                                                .select('B as id')
+                                                .where('A', '=', params.activityId),
+                                        ),
+                                ),
+                            ]),
+                        ),
+                ),
+            ]),
+        );
+};
+
 interface GetWholeGoalCountByProjectIds {
     in: Array<{ id: string }>;
 }
@@ -538,7 +617,7 @@ export const getWholeGoalCountByProjectIds = (params: GetWholeGoalCountByProject
         .select((eb) => [
             eb
                 .selectFrom('Goal')
-                .select(({ fn }) => [fn.count('Goal.id').as('count')])
+                .select(({ fn, cast }) => [cast(fn.count('Goal.id'), 'integer').as('count')])
                 .whereRef('Goal.projectId', '=', 'Project.id')
                 .where('Goal.archived', 'is not', true)
                 .as('wholeGoalsCount'),
@@ -549,7 +628,8 @@ export const getWholeGoalCountByProjectIds = (params: GetWholeGoalCountByProject
                 'in',
                 params.in.map(({ id }) => id),
             ),
-        );
+        )
+        .$castTo<{ wholeGoalsCount: number }>();
 };
 
 interface GetProjectSuggestionsParams {
