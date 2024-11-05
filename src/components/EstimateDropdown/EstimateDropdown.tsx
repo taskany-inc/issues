@@ -101,7 +101,9 @@ export const EstimateDropdown = ({ value, onChange, onClose, placement, ...props
                 warning: tr('warning'),
             },
         }),
-        [],
+        // needs for run-time locale change
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [locale],
     );
 
     const dateFragments: Record<'en' | 'ru', ('month' | 'day' | 'year')[]> = useMemo(
