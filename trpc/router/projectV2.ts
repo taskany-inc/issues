@@ -46,6 +46,8 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
     _isStarred: boolean;
     _isOwner: boolean;
     _isEditable: boolean;
+    _isGoalWatching: boolean;
+    _isGoalStarred: boolean;
     activity: ProjectActivity;
     participants: ProjectActivity[] | null;
     goals?: any[]; // this prop is overrides below
@@ -220,7 +222,7 @@ export const project = router({
                 })
                     .$castTo<ProjectResponse>()
                     .execute(),
-                getWholeGoalCountByProjectIds({ in: projectIds }).executeTakeFirst(),
+                getWholeGoalCountByProjectIds({ in: projectIds }).execute(),
             ]);
 
             const projectsExtendedDataMap = new Map(extendedProjects.map((project) => [project.id, project]));
@@ -245,7 +247,10 @@ export const project = router({
                     limit,
                     offset: dashboardProjects.length < limit + 1 ? undefined : offset + (limit ?? 0),
                 },
-                totalGoalsCount: goalsCountsByProjects?.wholeGoalsCount ?? 0,
+                totalGoalsCount: (goalsCountsByProjects || []).reduce(
+                    (acc, count) => acc + (count?.wholeGoalsCount ?? 0),
+                    0,
+                ),
             };
         }),
 
@@ -398,18 +403,20 @@ export const project = router({
         .input(
             z.object({
                 id: z.string(),
+                isOnlySubsGoals: z.boolean().optional(),
                 limit: z.number().optional(),
                 cursor: z.number().optional(),
                 goalsQuery: queryWithFiltersSchema.optional(),
             }),
         )
         .query(async ({ input, ctx }) => {
-            const { limit = 10, cursor: offset = 0, goalsQuery, id } = input;
+            const { limit = 10, cursor: offset = 0, goalsQuery, id, isOnlySubsGoals } = input;
             if (input.goalsQuery?.sort?.some(({ key }) => key === 'rank')) {
                 await recalculateGoalRanksIfNeeded(id, ctx.session.user.activityId);
             }
             const goalsByProjectQuery = getGoalsQuery({
                 ...ctx.session.user,
+                isOnlySubsGoals,
                 projectId: id,
                 limit: limit + 1,
                 offset,
