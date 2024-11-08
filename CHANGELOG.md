@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.62.0](https://github.com/taskany-inc/issues/compare/v2.61.0...v2.62.0) (2024-11-08)
+
+
+### Features
+
+* **INTERNAL-1100:** move event processing out of middleware ([76607c4](https://github.com/taskany-inc/issues/commit/76607c4525be2ecb483c6c3b1687226a0771daba))
+
+
+### Bug Fixes
+
+* **INTERNAL-1174:** fix recalc translations for <EstimateDropdown /> ([c17836e](https://github.com/taskany-inc/issues/commit/c17836eae482c7b56ec58578a62e548e9724bc32))
+
 ## [2.61.0](https://github.com/taskany-inc/issues/compare/v2.60.1...v2.61.0) (2024-10-31)
 
 
