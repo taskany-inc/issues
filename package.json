@@ -96,7 +96,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.23.9",
-    "@commitlint/cli": "18.6.1",
+    "@commitlint/cli": "19.5.0",
     "@commitlint/config-conventional": "19.5.0",
     "@faker-js/faker": "8.4.1",
     "@next/bundle-analyzer": "15.0.1",
