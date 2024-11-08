@@ -38,7 +38,6 @@ import { GlobalSearch } from '../GlobalSearch/GlobalSearch';
 import { Separator } from '../Separator/Separator';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { useFilterResource } from '../../hooks/useFilterResource';
-import { usePageContext } from '../../hooks/usePageContext';
 import { AppliedFiltersBar } from '../AppliedFiltersBar/AppliedFiltersBar';
 import { AppliedEstimateFilter } from '../AppliedEstimateFilter/AppliedEstimateFilter';
 import { AppliedGoalParentFilter } from '../AppliedGoalParentFilter/AppliedGoalParentFilter';
@@ -75,7 +74,6 @@ export const FiltersPanel: FC<{
         filterPreset,
     }) => {
         const { toggleFilterStar } = useFilterResource();
-        const { user } = usePageContext();
         const locale = useLocale();
 
         const {
@@ -234,7 +232,7 @@ export const FiltersPanel: FC<{
                             <FiltersBarCounter total={total} counter={counter} />
                         </FiltersBarControlGroup>
                     </FiltersBarItem>
-                    {nullable(enableLayoutToggle && user?.settings?.beta, () => (
+                    {nullable(enableLayoutToggle, () => (
                         <>
                             <FiltersBarItem>
                                 <FiltersBarLayoutSwitch value={view} onChange={setView} />
