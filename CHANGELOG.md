@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.62.1](https://github.com/taskany-inc/issues/compare/v2.62.0...v2.62.1) (2024-11-11)
+
+
+### Bug Fixes
+
+* **INTERNAL-1196:** correct watchers / starred goals ([fff872b](https://github.com/taskany-inc/issues/commit/fff872b4051c03ef8bc6ef19f33a6fe8e4aa9d8c))
+
 ## [2.62.0](https://github.com/taskany-inc/issues/compare/v2.61.0...v2.62.0) (2024-11-08)
 
 
