@@ -49,6 +49,7 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
     _isEditable: boolean;
     _isGoalWatching: boolean;
     _isGoalStarred: boolean;
+    _onlySubsGoals: boolean;
     activity: ProjectActivity;
     participants: ProjectActivity[] | null;
     goals?: any[]; // this prop is overrides below
@@ -239,7 +240,21 @@ export const project = router({
                     throw new Error(`Missing project by id: ${id}`);
                 }
 
-                resultProjects.push({ ...currentProject, _count, partnerProjectIds });
+                const { _isEditable, _isGoalStarred, _isGoalWatching, _isOwner, _isStarred, _isWatching, ...project } =
+                    currentProject;
+
+                const flags = {
+                    _isEditable,
+                    _isOwner,
+                    _isStarred,
+                    _isWatching,
+                    _isGoalStarred,
+                    _isGoalWatching,
+                    _onlySubsGoals:
+                        !(_isEditable || _isOwner || _isStarred || _isWatching) && (_isGoalStarred || _isGoalWatching),
+                };
+
+                resultProjects.push({ ...project, ...flags, _count, partnerProjectIds });
             }
 
             return {
