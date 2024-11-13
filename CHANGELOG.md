@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.62.2](https://github.com/taskany-inc/issues/compare/v2.62.1...v2.62.2) (2024-11-13)
+
+
+### Bug Fixes
+
+* **INTERNAL-1354:** fix dashboard queries ([712a3e3](https://github.com/taskany-inc/issues/commit/712a3e3a84748a60ca9e0184d7e737d3b5a8feb7))
+
 ## [2.62.1](https://github.com/taskany-inc/issues/compare/v2.62.0...v2.62.1) (2024-11-11)
 
 
