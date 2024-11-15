@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import path from 'path';
+import fs from 'fs';
 
 import { prisma } from '../../src/utils/prisma';
 import { protectedProcedure, router } from '../trpcBackend';
@@ -17,12 +19,19 @@ export const whatsnew = router({
             let delayed = false;
             let read = false;
             let createdAt: Date | undefined;
+            let version: string | undefined;
 
-            const rawReleaseVersion = await fetch(`${process.env.PUBLIC_URL}/version.txt`).then((res) => res.text());
-            const version = rawReleaseVersion.replace(/\n/g, '');
+            const whatsnewDir = path.join(process.cwd(), 'src/pages/whatsnew');
+            try {
+                const versionsWithNotes = fs.readdirSync(whatsnewDir).filter((f) => /^\d+\.\d+\.\d+$/.test(f));
+                version = versionsWithNotes.at(-1);
+            } catch (e) {
+                console.log(e);
+            }
 
-            const releaseNotesExists =
-                (await fetch(`${process.env.PUBLIC_URL}${routes.whatsnew(version, locale)}`)).status === 200;
+            const releaseNotesExists = version
+                ? (await fetch(`${process.env.PUBLIC_URL}${routes.whatsnew(version, locale)}`)).status === 200
+                : undefined;
 
             if (version && releaseNotesExists) {
                 let release = await prisma.release.findFirst({
