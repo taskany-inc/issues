@@ -306,6 +306,7 @@ model State {
   type     StateType
   flows    Flow[]
   default  Boolean?
+  order    Int       @default(autoincrement())
   hue      Int       @default(1)
   goals    Goal[]    @relation("goalState")
   comments Comment[]
