@@ -316,6 +316,7 @@ export type State = {
     title: string;
     type: StateType;
     default: boolean | null;
+    order: Generated<number>;
     hue: Generated<number>;
     lightForeground: string | null;
     lightBackground: string | null;
