@@ -9,13 +9,15 @@ import {
     getStarredProjectsIds,
     getProjectSuggestions,
     getUserProjectsQuery,
-    getUserDashboardProjects,
     getWholeGoalCountByProjectIds,
     getDeepChildrenProjectsId,
     getAllProjectsQuery,
     getProjectChildrenTreeQuery,
     getProjectById,
     getChildrenProjectByParentProjectId,
+    getUserProjects,
+    getUserProjectsByGoals,
+    getRealDashboardQueryByProjectIds,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema, sortableProjectsPropertiesArraySchema } from '../../src/schema/common';
 import {
@@ -30,7 +32,7 @@ import {
     Priority,
     Team,
 } from '../../generated/kysely/types';
-import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
+import { calculateProjectRules, ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
 import { projectAccessMiddleware } from '../access/accessMiddlewares';
@@ -49,6 +51,7 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
     _isEditable: boolean;
     _isGoalWatching: boolean;
     _isGoalStarred: boolean;
+    _isGoalParticipant: boolean;
     _onlySubsGoals: boolean;
     activity: ProjectActivity;
     participants: ProjectActivity[] | null;
@@ -58,6 +61,7 @@ type ProjectResponse = ExtractTypeFromGenerated<Project> & {
 
 interface DashboardProject extends Pick<ProjectResponse, 'id'> {
     partnerProjectIds?: string[];
+    readRights: { fullProject: true; onlySubs: false } | { fullProject: false; onlySubs: true };
     _count: {
         children: number;
         stargizers: number;
@@ -200,15 +204,50 @@ export const project = router({
             }),
         )
         .query(async ({ ctx, input }) => {
-            const { limit = 5, cursor: offset = 0, goalsQuery, projectsSort } = input;
+            const { limit = 5, cursor: offset = 0, goalsQuery, projectsSort: _ } = input;
             const {
                 session: { user },
             } = ctx;
 
-            const dashboardProjects = await getUserDashboardProjects({
-                ...user,
+            const allDashboardProjectsRules = await Promise.all([
+                getUserProjects(user).execute(),
+                getUserProjectsByGoals(user).execute(),
+            ]).then(([p1, p2]) => {
+                const projectMap: { [key: string]: number[] } = {};
+
+                for (const record of p1.concat(p2)) {
+                    const { pid, role } = record;
+                    if (!(pid in projectMap)) {
+                        projectMap[pid] = [];
+                    }
+
+                    projectMap[pid].push(role);
+                }
+
+                const projectsRules: Map<string, ReturnType<typeof calculateProjectRules>> = new Map(
+                    Object.entries(projectMap).map(([pid, roles]) => {
+                        return [pid, calculateProjectRules(Array.from(new Set(roles)))];
+                    }),
+                );
+
+                return projectsRules;
+            });
+
+            if (allDashboardProjectsRules.size === 0) {
+                return {
+                    groups: [],
+                    pagination: {
+                        limit,
+                        offset: undefined,
+                    },
+                    totalGoalsCount: 0,
+                };
+            }
+
+            const dashboardProjects = await getRealDashboardQueryByProjectIds({
+                rules: allDashboardProjectsRules,
                 goalsQuery,
-                projectsSort,
+                ...user,
                 limit: limit + 1,
                 offset,
             })
@@ -231,7 +270,7 @@ export const project = router({
 
             const resultProjects: (ProjectResponse & Pick<DashboardProject, '_count' | 'partnerProjectIds'>)[] = [];
 
-            for (const { id, _count, partnerProjectIds } of dashboardProjects.slice(0, limit)) {
+            for (const { id, _count, partnerProjectIds, readRights } of dashboardProjects.slice(0, limit)) {
                 const currentProject = projectsExtendedDataMap.get(id) as
                     | (ProjectResponse & Pick<DashboardProject, '_count' | 'partnerProjectIds'>)
                     | undefined;
@@ -240,8 +279,16 @@ export const project = router({
                     throw new Error(`Missing project by id: ${id}`);
                 }
 
-                const { _isEditable, _isGoalStarred, _isGoalWatching, _isOwner, _isStarred, _isWatching, ...project } =
-                    currentProject;
+                const {
+                    _isEditable,
+                    _isGoalStarred,
+                    _isGoalWatching,
+                    _isGoalParticipant,
+                    _isOwner,
+                    _isStarred,
+                    _isWatching,
+                    ...project
+                } = currentProject;
 
                 const flags = {
                     _isEditable,
@@ -250,8 +297,8 @@ export const project = router({
                     _isWatching,
                     _isGoalStarred,
                     _isGoalWatching,
-                    _onlySubsGoals:
-                        !(_isEditable || _isOwner || _isStarred || _isWatching) && (_isGoalStarred || _isGoalWatching),
+                    _isGoalParticipant,
+                    _onlySubsGoals: readRights.onlySubs,
                 };
 
                 resultProjects.push({ ...project, ...flags, _count, partnerProjectIds });
