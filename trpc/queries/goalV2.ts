@@ -88,10 +88,15 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                             qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
                         ),
                 )
-                .leftJoin('Tag as tag', (join) =>
-                    join.onRef('tag.id', 'in', ({ selectFrom }) =>
-                        selectFrom('_GoalToTag').select('B').whereRef('A', '=', 'Goal.id'),
-                    ),
+                .leftJoinLateral(
+                    ({ selectFrom }) =>
+                        selectFrom('Tag')
+                            .selectAll('Tag')
+                            .whereRef('Tag.id', 'in', ({ selectFrom }) =>
+                                selectFrom('_GoalToTag').select('B').whereRef('A', '=', 'Goal.id'),
+                            )
+                            .as('tag'),
+                    (join) => join.onTrue(),
                 )
                 .leftJoinLateral(
                     ({ selectFrom }) =>
@@ -105,10 +110,15 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                             .as('criteria'),
                     (join) => join.onTrue(),
                 )
-                .leftJoin('Project as partnershipProject', (join) =>
-                    join.onRef('partnershipProject.id', 'in', ({ selectFrom }) =>
-                        selectFrom('_partnershipProjects').select('B').whereRef('A', '=', 'Goal.id'),
-                    ),
+                .leftJoinLateral(
+                    ({ selectFrom }) =>
+                        selectFrom('Project')
+                            .selectAll('Project')
+                            .whereRef('Project.id', 'in', ({ selectFrom }) =>
+                                selectFrom('_partnershipProjects').select('B').whereRef('A', '=', 'Goal.id'),
+                            )
+                            .as('partnershipProjects'),
+                    (join) => join.onTrue(),
                 )
                 .select(({ case: caseFn, exists, selectFrom, val, fn }) => [
                     sql<boolean>`("Goal"."ownerId" = ${val(params.activityId)})`.as('_isOwner'),
@@ -173,42 +183,57 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                         .end()
                         .as('participants'),
                     caseFn()
-                        .when(fn.count('partnershipProject.id'), '>', 0)
-                        .then(fn.agg('array_agg', [sql`"partnershipProject"`]).distinct())
+                        .when(fn.count('partnershipProjects.id'), '>', 0)
+                        .then(fn.agg('array_agg', [sql`"partnershipProjects"`]).distinct())
                         .else(null)
                         .end()
                         .as('partnershipProjects'),
                 ])
-                .where(({ or, eb, and }) => {
-                    const baseOr = or([
-                        eb('Goal.projectId', '=', params.projectId),
-                        eb('Goal.id', 'in', ({ selectFrom }) =>
-                            selectFrom('_partnershipProjects').where('B', '=', params.projectId).select('A'),
-                        ),
-                    ]);
-
-                    if (params.isOnlySubsGoals) {
-                        return and([
-                            baseOr,
-                            eb('Goal.id', 'in', ({ selectFrom }) =>
-                                selectFrom('_goalStargizers')
-                                    .select('B as id')
-                                    .where('A', '=', params.activityId)
-                                    .union(
-                                        selectFrom('_goalWatchers')
-                                            .select('B as id')
-                                            .where('A', '=', params.activityId),
-                                    )
-                                    .union(
-                                        selectFrom('_partnershipProjects')
-                                            .where('B', '=', params.projectId)
-                                            .select('A as id'),
-                                    ),
+                .where('Goal.archived', 'is not', true)
+                .where('Goal.projectId', '=', params.projectId)
+                .where(({ and, or, eb, val, cast, selectFrom }) =>
+                    or([
+                        and([
+                            eb(cast(val(!!params.isOnlySubsGoals), 'boolean'), 'is', false),
+                            eb(
+                                'Goal.id',
+                                'in',
+                                selectFrom('_partnershipProjects').select('A').where('B', '=', params.projectId),
                             ),
-                        ]);
-                    }
-                    return baseOr;
-                })
+                        ]),
+                        and([
+                            eb(cast(val(!!params.isOnlySubsGoals), 'boolean'), 'is', true),
+                            or([
+                                eb('Goal.ownerId', '=', params.activityId),
+                                eb('Goal.activityId', '=', params.activityId),
+                                eb('Goal.id', 'in', ({ selectFrom }) =>
+                                    selectFrom('_goalParticipants')
+                                        .select('B')
+                                        .where('A', '=', params.activityId)
+                                        .union(
+                                            selectFrom('_goalWatchers').select('B').where('A', '=', params.activityId),
+                                        )
+                                        .union(
+                                            selectFrom('_goalStargizers')
+                                                .select('B')
+                                                .where('A', '=', params.activityId),
+                                        )
+                                        .union(
+                                            selectFrom('_partnershipProjects')
+                                                .select('A as B')
+                                                .where(
+                                                    'B',
+                                                    'in',
+                                                    selectFrom('Project')
+                                                        .select('Project.id')
+                                                        .where('Project.activityId', '=', params.activityId),
+                                                ),
+                                        ),
+                                ),
+                            ]),
+                        ]),
+                    ]),
+                )
                 .where(({ or, and, eb, selectFrom, cast, val }) => {
                     const { goalsQuery } = params;
                     const estimate: Array<Date> = [];
@@ -232,13 +257,7 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
 
                     const filters: Record<keyof NonNullable<typeof goalsQuery>, null | ReturnType<typeof eb>> = {
                         project: null,
-                        partnershipProject: goalsQuery?.partnershipProject?.length
-                            ? eb('Goal.id', 'in', ({ selectFrom }) =>
-                                  selectFrom('_partnershipProjects')
-                                      .where('B', 'in', goalsQuery.partnershipProject || [])
-                                      .select('A'),
-                              )
-                            : null,
+                        partnershipProject: null,
                         owner: eb('Goal.ownerId', 'in', goalsQuery?.owner || []),
                         issuer: eb('Goal.activityId', 'in', goalsQuery?.issuer || []),
                         participant: eb('participant.id', 'in', goalsQuery?.participant || []),
@@ -301,7 +320,6 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
 
                     return and(filterToApply);
                 })
-                .where('Goal.archived', 'is not', true)
                 .groupBy(['Goal.id']),
         )
         .selectFrom('proj_goals')

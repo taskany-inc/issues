@@ -91,3 +91,36 @@ export const applyLastStateUpdateComment = (goal: any) => {
 
     return null;
 };
+
+export enum ProjectRoles {
+    'project_owner',
+    'project_participant',
+    'project_stargizer',
+    'project_watcher',
+    'goal_owner',
+    'goal_issuer',
+    'goal_participant',
+    'goal_stargizer',
+    'goal_watcher',
+    'goal_partner',
+}
+
+export interface ProjectRules {
+    projectFullAccess: boolean;
+    projectOnlySubsGoals: boolean;
+}
+
+export const calculateProjectRules = (roles: ProjectRoles[]): ProjectRules => {
+    const rules: ProjectRules = {
+        projectFullAccess: false,
+        projectOnlySubsGoals: false,
+    };
+
+    if (roles.some((role) => ProjectRoles[role].startsWith('project_'))) {
+        rules.projectFullAccess = true;
+    } else {
+        rules.projectOnlySubsGoals = true;
+    }
+
+    return rules;
+};
