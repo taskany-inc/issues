@@ -53,6 +53,8 @@ declare global {
         interface Chainable {
             logout(): Chainable<void>;
             signInViaEmail(fields?: SignInFields): Chainable<void>;
+            interceptWhatsNew(): Chainable<void>;
+            hideEmptyProjectOnGoalLists(): Chainable<void>;
             createProject(fields: ProjectCreate): Chainable<ProjectCreateReturnType>;
             createGoal(projectTitle: string, fields: GoalCommon): Chainable<GoalCreateReturnType>;
             updateGoal(shortId: string, filelds: GoalUpdate): Chainable<GoalUpdateReturnType>;
