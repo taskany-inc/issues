@@ -30,6 +30,9 @@ import {
     userSettingsLogoutButton,
     commentFormDescription,
     pageContent,
+    sortPanelDropdownTrigger,
+    sortPanel,
+    sortPanelEmptyProjectsCheckbox,
 } from '../../src/utils/domObjects';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { SignInFields } from '..';
@@ -52,6 +55,18 @@ Cypress.Commands.addAll({
 
         cy.clearCookies();
         cy.reload(true);
+    },
+
+    interceptWhatsNew: () => {
+        cy.intercept('api/trpc/whatsnew.check*', (req) =>
+            req.on('response', (res) => {
+                if (res.body.result?.data != null && 'version' in res.body.result.data) {
+                    res.body.result.data = null;
+                }
+
+                res.send();
+            }),
+        ).as('whatsnew.check');
     },
 
     signInViaEmail: (fields?: SignInFields) => {
@@ -267,6 +282,16 @@ Cypress.Commands.addAll({
         });
 
         return cy.wrap(values);
+    },
+    hideEmptyProjectOnGoalLists: () => {
+        cy.get(sortPanelDropdownTrigger.query).should('exist').click();
+        cy.get(sortPanel.query).should('exist').and('be.visible');
+
+        cy.get(sortPanel.query)
+            .get(sortPanelEmptyProjectsCheckbox.query)
+            .should('be.checked')
+            .click()
+            .should('not.be.checked');
     },
 });
 

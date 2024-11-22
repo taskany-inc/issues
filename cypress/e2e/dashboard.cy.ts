@@ -33,7 +33,9 @@ describe('Dashboard', () => {
     });
 
     beforeEach(() => {
+        cy.interceptWhatsNew();
         cy.signInViaEmail();
+        cy.wait('@whatsnew.check');
     });
 
     it('filters are active by default', () => {
@@ -72,7 +74,9 @@ describe('User dashboard', () => {
     });
 
     beforeEach(() => {
+        cy.interceptWhatsNew();
         cy.signInViaEmail(testUser);
+        cy.wait('@whatsnew.check');
     });
 
     describe('User have own project', () => {
@@ -142,6 +146,7 @@ describe('User dashboard', () => {
         });
 
         it('User cannot see self goal which assigned in not own project if filter contains next quarter', () => {
+            cy.hideEmptyProjectOnGoalLists();
             cy.get(appliedFiltersPanelEstimate.query).click();
             cy.get(estimateQuarterTrigger.query).children().find(':button:contains(@next)').click();
             cy.get(appliedFiltersPanelEstimate.query).focus().realPress('{esc}');
