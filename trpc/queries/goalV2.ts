@@ -407,3 +407,127 @@ export const getGoalActivityFilterIdsQuery = db
     .select(['GoalAchieveCriteria.criteriaGoalId'])
     .where('GoalAchieveCriteria.deleted', 'is not', true)
     .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null);
+
+export const getGoalsForCSVExport = ({
+    goalsQuery,
+    activityId,
+}: Pick<GetGoalsQueryParams, 'goalsQuery' | 'activityId' | 'role'>) => {
+    return db
+        .selectFrom('Goal')
+        .innerJoin('Project', 'Goal.projectId', 'Project.id')
+        .innerJoin('Priority', 'Goal.priorityId', 'Priority.id')
+        .innerJoin('State', 'Goal.stateId', 'State.id')
+        .leftJoinLateral(
+            () => getUserActivity().as('participant'),
+            (join) =>
+                join.onRef('participant.id', 'in', (qb) =>
+                    qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
+                ),
+        )
+        .leftJoin('Tag as tag', (join) =>
+            join.onRef('tag.id', 'in', ({ selectFrom }) =>
+                selectFrom('_GoalToTag').select('B').whereRef('A', '=', 'Goal.id'),
+            ),
+        )
+        .select([
+            'Goal.id',
+            'Goal.title',
+            'Goal.estimate',
+            'Goal.estimateType',
+            'Project.title as project',
+            'Priority.title as priority',
+            'State.title as state',
+        ])
+        .where(({ or, and, eb, selectFrom, cast, val }) => {
+            const estimate: Array<Date> = [];
+
+            if (goalsQuery?.estimate != null) {
+                const parsedEstimateFilter = decodeUrlDateRange(goalsQuery.estimate[0]);
+
+                if (parsedEstimateFilter) {
+                    const end = new Date(getDateString(parsedEstimateFilter.end));
+                    const start = parsedEstimateFilter.start
+                        ? new Date(getDateString(parsedEstimateFilter.start))
+                        : null;
+
+                    if (start != null) {
+                        estimate.push(start, end);
+                    } else {
+                        estimate.push(end);
+                    }
+                }
+            }
+
+            const filters: Record<keyof NonNullable<typeof goalsQuery>, null | ReturnType<typeof eb>> = {
+                project: eb('Goal.projectId', 'in', goalsQuery?.project || []),
+                partnershipProject: goalsQuery?.partnershipProject?.length
+                    ? eb('Goal.id', 'in', ({ selectFrom }) =>
+                          selectFrom('_partnershipProjects')
+                              .where('B', 'in', goalsQuery.partnershipProject || [])
+                              .select('A'),
+                      )
+                    : null,
+                owner: eb('Goal.ownerId', 'in', goalsQuery?.owner || []),
+                issuer: eb('Goal.activityId', 'in', goalsQuery?.issuer || []),
+                participant: eb('participant.id', 'in', goalsQuery?.participant || []),
+                priority: eb('Goal.priorityId', 'in', goalsQuery?.priority || []),
+                state: eb('Goal.stateId', 'in', goalsQuery?.state || []),
+                stateType: eb('Goal.stateId', 'in', ({ selectFrom }) =>
+                    selectFrom('State')
+                        .select('State.id')
+                        .where('State.type', 'in', goalsQuery?.stateType || []),
+                ),
+                tag: eb('tag.id', 'in', goalsQuery?.tag || []),
+                estimate:
+                    // eslint-disable-next-line no-nested-ternary
+                    estimate.length > 0
+                        ? estimate.length === 1
+                            ? eb('Goal.estimate', '=', cast<Date>(val<Date>(estimate[0]), 'date'))
+                            : and([
+                                  eb('Goal.estimate', '>=', cast<Date>(val<Date>(estimate[0]), 'date')),
+                                  eb('Goal.estimate', '<=', cast<Date>(val<Date>(estimate[1]), 'date')),
+                              ])
+                        : null,
+                query: or([
+                    eb('Goal.title', 'ilike', goalsQuery?.query || ''),
+                    eb('Goal.description', 'ilike', goalsQuery?.query || ''),
+                    eb('Goal.projectId', 'in', () =>
+                        selectFrom('Project')
+                            .select('Project.id')
+                            .where((eb) =>
+                                eb.or([
+                                    eb('Project.title', 'ilike', goalsQuery?.query || ''),
+                                    eb('Project.description', 'ilike', goalsQuery?.query || ''),
+                                ]),
+                            ),
+                    ),
+                ]),
+                hideCriteria: eb('Goal.id', 'not in', ({ selectFrom }) =>
+                    selectFrom('GoalAchieveCriteria')
+                        .select('GoalAchieveCriteria.criteriaGoalId')
+                        .where('GoalAchieveCriteria.criteriaGoalId', 'is not', null)
+                        .where('GoalAchieveCriteria.deleted', 'is not', true),
+                ),
+                hideEmptyProjects: null,
+                sort: null,
+                starred: null,
+                watching: null,
+                limit: null,
+                offset: null,
+            };
+
+            const filterToApply: Array<ReturnType<typeof eb>> = [];
+
+            if (goalsQuery != null) {
+                (Object.keys(goalsQuery) as Array<keyof typeof goalsQuery>).forEach((key) => {
+                    const expr = filters[key];
+                    if (goalsQuery[key] != null && expr != null) {
+                        filterToApply.push(expr);
+                    }
+                });
+            }
+
+            return and(filterToApply);
+        })
+        .orderBy(mapSortParamsToTableColumns(goalsQuery?.sort, 'Goal', activityId));
+};

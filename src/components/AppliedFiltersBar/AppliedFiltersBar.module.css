@@ -22,6 +22,25 @@
     padding: 0 var(--gap-xs);
 }
 
+.AppliedFiltersBarBadge {
+    position: relative;
+}
+
+.AppliedFiltersBarBadge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: visiblePainted;
+}
+
 .AppliedFiltersTrash {
+    color: var(--danger-500);
+}
+
+.AppliedFiltersTrash:hover.AppliedFiltersTrash {
     color: var(--danger-500);
 }

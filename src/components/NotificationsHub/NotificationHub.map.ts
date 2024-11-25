@@ -10,6 +10,7 @@ type Namespaces =
     | NamespacedAction<'filter', 'Star' | 'Unstar' | 'Delete' | 'Create'>
     | SubscribeNamespacesAction<'project'>
     | SubscribeNamespacesAction<'goals'>
+    | 'exportCsv'
     | 'userSettingsUpdate'
     | 'tagCreate'
     | 'userInvite'
@@ -157,6 +158,10 @@ export const getNotificicationKeyMap = (key: keyof NotificationMap) => {
         criteriaUpdate: {
             onSuccess: 'Voila! Successfully updated 🎉',
             onPending: 'We are updating criteria...',
+        },
+        exportCsv: {
+            onSuccess: 'Viola! You can save the exported data',
+            onPending: 'We are forming data for export...',
         },
     };
 
