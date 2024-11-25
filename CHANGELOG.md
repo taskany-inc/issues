@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.64.0](https://github.com/taskany-inc/issues/compare/v2.63.0...v2.64.0) (2024-11-25)
+
+
+### Features
+
+* **INTERNAL-1361:** whats new in separate trpc call ([df8f338](https://github.com/taskany-inc/issues/commit/df8f338648ac191363114c01a69fb8b5eb91e615))
+
+
+### Bug Fixes
+
+* more queries performance ([d0bc0ca](https://github.com/taskany-inc/issues/commit/d0bc0ca4aa3642f5cf2402fbda9765b17b1ffe3c))
+
 ## [2.63.0](https://github.com/taskany-inc/issues/compare/v2.62.2...v2.63.0) (2024-11-21)
 
 
