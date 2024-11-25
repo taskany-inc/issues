@@ -24,8 +24,8 @@
     "cy:open": "ELECTRON_EXTRA_LAUNCH_ARGS=--lang=en npx cypress open",
     "test:e2e": "./scripts/e2eRun.sh",
     "test:e2e:env": "./scripts/e2eEnv.sh",
-    "i18n": "generate-i18n --func=tr --langs=ru,en --path='./{src/{components,hooks,i18n,schema},trpc}/**/*' --getLang='./src/utils/getLang' && tsx ./scripts/generateLangsFixture",
-    "extract-i18n": "extract-i18n-meta --langs=ru,en --path='./src/{components,hooks,i18n,schema}/**/*' --func=tr",
+    "i18n": "generate-i18n --func=tr --langs=ru,en --path='./{src/{components,hooks,i18n,schema,modules},trpc}/**/*' --getLang='./src/utils/getLang' && tsx ./scripts/generateLangsFixture",
+    "extract-i18n": "extract-i18n-meta --langs=ru,en --path='./src/{components,hooks,i18n,schema,modules}/**/*' --func=tr",
     "build:css": "npx postcss src/styles/dark.css src/styles/light.css -d public/theme"
   },
   "prisma": {

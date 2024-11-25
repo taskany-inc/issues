@@ -1,7 +1,6 @@
-import { QueryState } from '../hooks/useUrlFilterParams';
-
 import { declareSsrProps } from './declareSsrProps';
 import { filtersPanelSsrInit } from './filters';
+import { QueryState } from './parseUrlParams';
 
 const pageSize = 20;
 

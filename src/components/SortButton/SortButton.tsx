@@ -3,7 +3,7 @@ import { Button } from '@taskany/bricks/harmony';
 import { nullable } from '@taskany/bricks';
 import { IconArrowDownOutline, IconArrowUpOutline } from '@taskany/icons';
 
-import { SortDirection } from '../../hooks/useUrlFilterParams';
+import { SortDirection } from '../../utils/parseUrlParams';
 
 const getNextDirection = (currentDirection?: SortDirection | null): SortDirection | null => {
     switch (currentDirection) {

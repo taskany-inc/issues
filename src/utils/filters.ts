@@ -1,5 +1,4 @@
-import { filtersNoSearchPresetCookie, buildURLSearchParams, parseQueryState } from '../hooks/useUrlFilterParams';
-
+import { filtersNoSearchPresetCookie, buildURLSearchParams, parseQueryState } from './parseUrlParams';
 import { SSRProps } from './declareSsrProps';
 
 export const filtersTakeCount = 5;

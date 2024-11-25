@@ -7,7 +7,7 @@ import type {
     SortableGoalsProps,
     SortableProjectsProps,
     SortDirection,
-} from '../../hooks/useUrlFilterParams';
+} from '../../utils/parseUrlParams';
 import { SortButton } from '../SortButton/SortButton';
 
 import { tr } from './SortList.i18n';

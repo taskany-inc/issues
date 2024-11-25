@@ -105,3 +105,35 @@ export const getEstimateLabel = (estimate: EstimateValue, locale: TLocale): stri
               locale,
               type: estimate.type,
           });
+
+const baseDatePartTypes = ['year', 'month', 'day'] as const;
+type keys = (typeof baseDatePartTypes)[number];
+
+export const localeDateFormat = (date: Date, locale: TLocale) => {
+    const formatParts = new Intl.DateTimeFormat().formatToParts(date);
+
+    const formattedPartsMap = new Map<keyof Intl.DateTimeFormatPartTypesRegistry, string>();
+
+    for (const part of formatParts) {
+        formattedPartsMap.set(part.type, part.value);
+    }
+
+    const neededParts = baseDatePartTypes.reduce<{ [K in keys]: string }>((acc, type) => {
+        const part = formattedPartsMap.get(type);
+
+        if (part != null) {
+            acc[type] = part;
+        }
+
+        return acc;
+    }, {} as { [K in keys]: string });
+
+    switch (locale) {
+        case 'en':
+            return [neededParts.month, neededParts.day, neededParts.year].join('/');
+        case 'ru':
+            return [neededParts.day, neededParts.month, neededParts.year].join('.');
+        default:
+            throw new ReferenceError('Invalid date or unsupported locale');
+    }
+};

@@ -1,5 +1,4 @@
-import { QueryState } from '../hooks/useUrlFilterParams';
-
+import { QueryState } from './parseUrlParams';
 import { SSRProps } from './declareSsrProps';
 import { getIsStateShown } from './getShownStates';
 

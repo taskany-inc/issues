@@ -3,13 +3,14 @@ import { Text, Switch, SwitchControl, Button } from '@taskany/bricks/harmony';
 import { IconAddOutline, IconAdjustHorizontalSolid, IconAlignTopSolid, IconListUnorderedOutline } from '@taskany/icons';
 import { nullable } from '@taskany/bricks';
 
-import { PageView } from '../../hooks/useUrlFilterParams';
 import { Dropdown, DropdownPanel, DropdownTrigger } from '../Dropdown/Dropdown';
 import { sortPanel, sortPanelDropdownTrigger } from '../../utils/domObjects';
+import { pageViewValue } from '../../utils/parseUrlParams';
 
 import s from './FiltersBar.module.css';
 import { tr } from './FiltersBar.i18n';
 
+type PageView = keyof typeof pageViewValue;
 interface FiltersBarLayoutSwitchProps {
     value?: PageView;
     onChange?: (value: PageView) => void;

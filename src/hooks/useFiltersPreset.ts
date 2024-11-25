@@ -4,8 +4,7 @@ import { deleteCookie } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
 import { refreshInterval } from '../utils/config';
-
-import { filtersNoSearchPresetCookie } from './useUrlFilterParams';
+import { filtersNoSearchPresetCookie } from '../utils/parseUrlParams';
 
 export const useFiltersPreset = ({ defaultPresetFallback = true }: { defaultPresetFallback?: boolean }) => {
     const router = useRouter();

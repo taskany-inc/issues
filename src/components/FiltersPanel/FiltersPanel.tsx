@@ -10,13 +10,7 @@ import {
 } from '@taskany/bricks/harmony';
 import { nullable, useLatest } from '@taskany/bricks';
 
-import {
-    FilterQueryState,
-    QueryState,
-    SortableGoalsProps,
-    SortableProjectsProps,
-    useUrlFilterParams,
-} from '../../hooks/useUrlFilterParams';
+import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { FilterById } from '../../../trpc/inferredTypes';
 import {
     filtersPanel,
@@ -27,6 +21,7 @@ import {
     appliedFiltersPanelState,
     sortPanelEmptyProjectsCheckbox,
 } from '../../utils/domObjects';
+import { FilterQueryState, QueryState, SortableGoalsProps, SortableProjectsProps } from '../../utils/parseUrlParams';
 import {
     FiltersBarViewDropdown,
     FiltersBarDropdownTitle,
@@ -73,7 +68,7 @@ export const FiltersPanel: FC<{
         enableHideProjectToggle,
         filterPreset,
     }) => {
-        const { toggleFilterStar } = useFilterResource();
+        const { toggleFilterStar, exportCsv } = useFilterResource();
         const locale = useLocale();
 
         const {
@@ -134,6 +129,12 @@ export const FiltersPanel: FC<{
                 direction: !currentPreset._isStarred,
             });
         }, [currentPreset, toggleFilterStar]);
+
+        const exportCsvHandler = useCallback(async () => {
+            if (currentPreset?._isOwner) {
+                await exportCsv(currentPreset.id);
+            }
+        }, [currentPreset, exportCsv]);
 
         const onApplyClick = useCallback(
             (key?: keyof Omit<FilterQueryState, 'query' | 'sort' | 'hideCriteria' | 'hideEmptyProjects'>) => {
@@ -356,6 +357,7 @@ export const FiltersPanel: FC<{
                         queryString={queryString}
                         onDeletePreset={filterStarHandler}
                         onSavePreset={filterStarHandler}
+                        onExport={exportCsvHandler}
                         {...appliedFiltersPanel.attr}
                     >
                         {nullable(Boolean(filterQuery?.state) || Boolean(filterQuery?.stateType), () => (

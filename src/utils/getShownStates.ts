@@ -1,5 +1,6 @@
 import { State } from '../../trpc/inferredTypes';
-import { QueryState } from '../hooks/useUrlFilterParams';
+
+import { QueryState } from './parseUrlParams';
 
 export const getIsStateShown = (state: State, queryState?: QueryState) => {
     const hasState = queryState?.state?.some((id) => id === state.id);
