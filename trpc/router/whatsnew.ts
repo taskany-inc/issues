@@ -23,7 +23,8 @@ export const whatsnew = router({
 
             const whatsnewDir = path.join(process.cwd(), 'src/pages/whatsnew');
             try {
-                const versionsWithNotes = fs.readdirSync(whatsnewDir).filter((f) => /^\d+\.\d+\.\d+$/.test(f));
+                const directories = await fs.promises.readdir(whatsnewDir);
+                const versionsWithNotes = directories.filter((f) => /^\d+\.\d+\.\d+$/.test(f));
                 version = versionsWithNotes.at(-1);
             } catch (e) {
                 console.log(e);

@@ -25,6 +25,11 @@ const WhatsNew = () => {
         },
         {
             staleTime: Infinity,
+            trpc: {
+                context: {
+                    skipBatch: true,
+                },
+            },
         },
     );
 
