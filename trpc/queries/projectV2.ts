@@ -802,13 +802,16 @@ export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; go
         .leftJoinLateral(
             ({ selectFrom }) =>
                 selectFrom('Goal')
-                    .selectAll('Goal')
+                    .select(({ fn }) => fn.count('Goal.id').as('goal_count'))
                     .leftJoinLateral(
-                        () => getUserActivity().as('participant'),
-                        (join) =>
-                            join.onRef('participant.id', 'in', (qb) =>
-                                qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
-                            ),
+                        () =>
+                            getUserActivity()
+                                .whereRef('Activity.id', 'in', (qb) =>
+                                    // @ts-ignore
+                                    qb.selectFrom('_goalParticipants').select('A').whereRef('B', '=', 'Goal.id'),
+                                )
+                                .as('participant'),
+                        (join) => join.onTrue(),
                     )
                     .leftJoinLateral(
                         ({ selectFrom }) =>
@@ -823,16 +826,16 @@ export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; go
                     .where('Goal.archived', 'is not', true)
                     .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery))
                     .as('goal'),
-            (join) => join.onRef('goal.projectId', '=', 'Project.id'),
+            (join) => join.onTrue(),
         )
-        .select(({ fn, cast }) => [
+        .select(({ cast, ref }) => [
             'Project.id',
             'Project.title',
-            cast(fn.count('goal.id'), 'integer').as('goal_count'),
-            sql`to_json(ch.parent_chain)`.as('chain'),
+            cast(ref('goal.goal_count'), 'integer').as('goal_count'),
+            'ch.parent_chain as chain',
             'ch.level as deep',
         ])
-        .groupBy(['Project.id', 'ch.level', 'ch.parent_chain'])
+        .groupBy(['Project.id', 'ch.level', 'ch.parent_chain', 'goal.goal_count'])
         .orderBy('ch.level asc');
 };
 

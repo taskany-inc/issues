@@ -6,7 +6,7 @@ import { OfflineBanner as OfflineBannerBricks } from '@taskany/bricks/harmony';
 import { tr } from './OfflineBanner.i18n';
 
 export const OfflineBanner = () => {
-    const isOnline = useRef<boolean | null>(null);
+    const isOnline = useRef<boolean | null>(true);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, remoteServerStatus] = useOfflineDetector({
