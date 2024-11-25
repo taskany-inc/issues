@@ -2,17 +2,16 @@ import { FC, ComponentProps, useMemo, useState, useEffect } from 'react';
 import { nullable } from '@taskany/bricks';
 import { TreeViewElement } from '@taskany/bricks/harmony';
 
-import { FilterById } from '../../../trpc/inferredTypes';
+import { FilterById, ProjectChildrenTree } from '../../../trpc/inferredTypes';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
 import { routes } from '../../hooks/router';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { ProjectGoalList } from '../ProjectGoalList/ProjectGoalList';
 import { Kanban } from '../Kanban/Kanban';
-import { ProjectTree } from '../../../trpc/router/projectV2';
 
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     parent?: ComponentProps<typeof ProjectListItemCollapsable>['project'];
-    subTree?: ProjectTree[string] | null;
+    subTree?: ProjectChildrenTree[string] | null;
     partnershipProject?: string[];
     filterPreset?: FilterById;
     mainProject?: boolean;
@@ -26,7 +25,7 @@ const onProjectClickHandler = (e: React.MouseEvent) => {
     }
 };
 
-const getIsProjectEmptySetter = (subTree?: ProjectTree[string] | null) => () => {
+const getIsProjectEmptySetter = (subTree?: ProjectChildrenTree[string] | null) => () => {
     if (subTree) {
         if (Number(subTree.count) > 0) return false;
 

@@ -28,6 +28,7 @@ export type StateType = State['type'];
 export type DashboardProjectV2 = RouterOutputs['v2']['project']['getUserDashboardProjects']['groups'][number];
 export type DashboardGoalV2 = NonNullable<DashboardProjectV2['goals']>[number];
 export type ProjectByIdReturnTypeV2 = RouterOutputs['v2']['project']['getById'];
+export type ProjectChildrenTree = RouterOutputs['v2']['project']['getProjectChildrenTree'];
 
 export type GoalActivityHistory = RouterOutputs['goal']['getGoalActivityFeed'];
 export type GoalComments = RouterOutputs['goal']['getGoalCommentsFeed'];

@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo } from 'react';
 import NextLink from 'next/link';
 import { nullable } from '@taskany/bricks';
 import { ListView, Breadcrumb, Breadcrumbs, Link, FiltersBarItem } from '@taskany/bricks/harmony';
 
 import { Page } from '../Page/Page';
-import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
-import { refreshInterval } from '../../utils/config';
+import { GoalByIdReturnType, ProjectChildrenTree } from '../../../trpc/inferredTypes';
 import { routes } from '../../hooks/router';
 import { ExternalPageProps } from '../../utils/declareSsrProps';
 import { useUrlFilterParams } from '../../hooks/useUrlFilterParams';
@@ -23,6 +22,29 @@ import s from './ProjectPage.module.css';
 
 export const projectsSize = 20;
 
+const countAvailableGoals = (subTree?: ProjectChildrenTree[string] | null) => {
+    let count = 0;
+    if (subTree) {
+        const nodes = [subTree.children];
+        let i = 0;
+        let current = nodes[0];
+        while (current) {
+            const keys = Object.keys(current);
+            for (const key of keys) {
+                count += current[key].count || 0;
+
+                if (current[key].children) {
+                    nodes.push(current[key].children);
+                }
+            }
+            i++;
+            current = nodes[i];
+        }
+    }
+
+    return count;
+};
+
 export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallback }: ExternalPageProps) => {
     const utils = trpc.useContext();
 
@@ -32,16 +54,8 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         preset,
     });
 
-    const [projectQuery, projectDeepInfoQuery, projectTreeQuery] = trpc.useQueries((ctx) => [
+    const [projectQuery, projectTreeQuery] = trpc.useQueries((ctx) => [
         ctx.v2.project.getById({ id }, { enabled: Boolean(id) }),
-        ctx.v2.project.getProjectGoalsById(
-            { id, goalsQuery: queryState },
-            {
-                keepPreviousData: true,
-                staleTime: refreshInterval,
-                enabled: Boolean(id),
-            },
-        ),
         ctx.v2.project.getProjectChildrenTree(
             {
                 id,
@@ -49,18 +63,20 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
             },
             {
                 keepPreviousData: true,
-                staleTime: refreshInterval,
+                staleTime: Infinity,
                 enabled: Boolean(id),
             },
         ),
     ]);
 
+    const wholeGoalCountValue = useDeferredValue(countAvailableGoals(projectTreeQuery.data?.[id]));
+
     const { setPreview, on } = useGoalPreview();
 
     const invalidateFnsCallback = useCallback(() => {
         utils.v2.project.getById.invalidate();
-        utils.v2.project.getProjectGoalsById.invalidate();
-    }, [utils.v2.project.getProjectGoalsById, utils.v2.project.getById]);
+        utils.v2.project.getProjectChildrenTree.invalidate();
+    }, [utils.v2.project.getProjectChildrenTree, utils.v2.project.getById]);
 
     useEffect(() => {
         const unsubUpdate = on('on:goal:update', invalidateFnsCallback);
@@ -95,8 +111,8 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
                 header={
                     <FiltersPanel
                         title={ctx.project?.title || tr('Projects')}
-                        total={ctx.project?._count?.goals ?? 0}
-                        counter={projectDeepInfoQuery.data?.goals?.length}
+                        counter={ctx.project?._count?.goals ?? 0}
+                        total={wholeGoalCountValue}
                         filterPreset={preset}
                         enableLayoutToggle
                         enableHideProjectToggle
