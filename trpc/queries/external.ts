@@ -1,4 +1,4 @@
-import { searchIssue } from '../../src/utils/integration/jira';
+import { JiraUser, searchIssue } from '../../src/utils/integration/jira';
 import { db } from '../connection/kysely';
 import { ExternalTask } from '../../generated/kysely/types';
 import { ExtractTypeFromGenerated } from '../utils';
@@ -43,6 +43,8 @@ export const getOrCreateExternalTask = async ({ id }: { id: string }) => {
         resolution,
     } = externalIssue;
 
+    const creatorOrReporter = [reporter, creator].find((val) => val != null) || ({} as JiraUser);
+
     return insertExternalTask({
         title,
         externalId,
@@ -58,12 +60,12 @@ export const getOrCreateExternalTask = async ({ id }: { id: string }) => {
         stateCategoryName: state.statusCategory.name,
         project: project.name,
         projectId: project.key,
-        ownerName: reporter.displayName,
-        ownerEmail: reporter.emailAddress,
-        ownerId: reporter.key,
-        creatorName: creator.displayName,
-        creatorEmail: creator.emailAddress,
-        creatorId: creator.key,
+        ownerName: creatorOrReporter.displayName ?? creatorOrReporter.name,
+        ownerEmail: creatorOrReporter.emailAddress,
+        ownerId: creatorOrReporter.key,
+        creatorName: creatorOrReporter.displayName ?? creatorOrReporter.name,
+        creatorEmail: creatorOrReporter.emailAddress,
+        creatorId: creatorOrReporter.key,
         assigneeName: assignee?.displayName ?? null,
         assigneeEmail: assignee?.emailAddress ?? null,
         assigneeId: assignee?.key ?? null,

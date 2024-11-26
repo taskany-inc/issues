@@ -92,9 +92,9 @@ export type ExternalTask = {
     stateColor: string | null;
     stateCategoryId: number;
     stateCategoryName: string;
-    ownerEmail: string;
-    ownerName: string;
-    ownerId: string;
+    ownerEmail: string | null;
+    ownerName: string | null;
+    ownerId: string | null;
     creatorEmail: string | null;
     creatorName: string | null;
     creatorId: string | null;

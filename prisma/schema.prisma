@@ -442,9 +442,9 @@ model ExternalTask {
   stateColor        String?
   stateCategoryId   Int
   stateCategoryName String
-  ownerEmail        String
-  ownerName         String
-  ownerId           String
+  ownerEmail        String?
+  ownerName         String?
+  ownerId           String?
   creatorEmail      String?
   creatorName       String?
   creatorId         String?

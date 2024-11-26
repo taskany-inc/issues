@@ -23,7 +23,7 @@ export const criteriaSchema = z.object({
         .optional(),
     externalTask: z
         .object({
-            externalKey: z.string(),
+            taskKey: z.string(),
         })
         .optional(),
 });

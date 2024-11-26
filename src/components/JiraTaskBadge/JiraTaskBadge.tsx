@@ -8,6 +8,7 @@ import { NextLink } from '../NextLink';
 import styles from './JiraTaskBadge.module.css';
 
 interface JiraTaskBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'color' | 'title'> {
+    taskKey: string;
     title: React.ReactNode;
     href?: string;
     type?: {
@@ -55,15 +56,14 @@ export const JiraTaskBadgeState: React.FC<{ state: string; color?: string | null
     );
 };
 
-const JiraTaskBadgeLabel: React.FC<Pick<JiraTaskBadgeProps, 'title' | 'project'>> = ({ title, project }) => {
+const JiraTaskBadgeLabel: React.FC<Pick<JiraTaskBadgeProps, 'title' | 'taskKey'>> = ({ title, taskKey }) => {
     return (
         <>
             {title}
-            {nullable(project, (p) => (
-                <Text className={styles.JiraTaskBadgeProjectName} as="span" color="var(--gray-500)">
-                    ({p})
-                </Text>
-            ))}
+            {String.fromCharCode(0x0d)}
+            <Text as="span" color="var(--gray-500)">
+                ({taskKey})
+            </Text>
         </>
     );
 };
@@ -76,7 +76,7 @@ export const JiraTaskBadge: React.FC<JiraTaskBadgeProps> = ({
     onClick,
     type,
     state,
-    project,
+    taskKey,
     ...attrs
 }) => {
     return (
@@ -94,10 +94,10 @@ export const JiraTaskBadge: React.FC<JiraTaskBadgeProps> = ({
                 href,
                 (h) => (
                     <NextLink href={h} target="_blank" view="secondary" onClick={onClick}>
-                        <JiraTaskBadgeLabel title={title} project={project} />
+                        <JiraTaskBadgeLabel title={title} taskKey={taskKey} />
                     </NextLink>
                 ),
-                <JiraTaskBadgeLabel title={title} project={project} />,
+                <JiraTaskBadgeLabel title={title} taskKey={taskKey} />,
             )}
             action="dynamic"
             {...attrs}

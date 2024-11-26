@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { protectedProcedure, router } from '../trpcBackend';
-import { JiraIssue, searchIssue, jiraService } from '../../src/utils/integration/jira';
+import { JiraIssue, searchIssue, jiraService, JiraUser } from '../../src/utils/integration/jira';
 import { ExternalTask } from '../../generated/kysely/types';
 import { ExtractTypeFromGenerated } from '../utils';
 
@@ -9,6 +9,9 @@ const jiraIssueToExternalTask = (
     issue: JiraIssue,
 ): Omit<ExtractTypeFromGenerated<ExternalTask>, 'createdAt' | 'id' | 'updatedAt'> => {
     const { key, id, summary, status, project, creator, reporter, assignee, resolution, issuetype } = issue;
+
+    const creatorOrReporter = [reporter, creator].find((val) => val != null) || ({} as JiraUser);
+
     return {
         externalKey: key,
         externalId: id,
@@ -24,12 +27,12 @@ const jiraIssueToExternalTask = (
         type: issuetype.name,
         typeIconUrl: issuetype.iconUrl,
         typeId: issuetype.id,
-        ownerEmail: reporter.emailAddress,
-        ownerId: reporter.key,
-        ownerName: reporter.displayName || reporter.name,
-        creatorEmail: creator.emailAddress,
-        creatorId: creator.key,
-        creatorName: creator.displayName || creator.name,
+        ownerEmail: creatorOrReporter?.emailAddress ?? null,
+        ownerId: creatorOrReporter?.key ?? null,
+        ownerName: creatorOrReporter?.displayName ?? creatorOrReporter?.name ?? null,
+        creatorEmail: creatorOrReporter?.emailAddress ?? null,
+        creatorId: creatorOrReporter?.key ?? null,
+        creatorName: creatorOrReporter?.displayName ?? creatorOrReporter?.name ?? null,
         assigneeEmail: assignee?.emailAddress ?? null,
         assigneeId: assignee?.key ?? null,
         assigneeName: assignee?.displayName ?? assignee?.name ?? null,

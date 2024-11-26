@@ -40,7 +40,7 @@ type SuggestItem =
           id: string;
           title: string;
           type: TaskTypeProps;
-          key: string;
+          taskKey: string;
       };
 
 interface ValidityData {
@@ -102,7 +102,7 @@ function patchZodSchema<T extends FormValues>(
                 mode: z.literal('task'),
                 id: z.string(),
                 selected: z.object({
-                    key: z.string(),
+                    taskKey: z.string(),
                 }),
             }),
         ])
@@ -414,6 +414,14 @@ export const CriteriaForm = ({
         return !!(title && selected?.id);
     }, [mode, title, selected?.id]);
 
+    const disbaleSubmitBtn = useMemo(() => {
+        if (mode === 'simple') {
+            return !title.length;
+        }
+
+        return selected == null || selected.title?.length === 0;
+    }, [mode, title, selected]);
+
     const resetHandler = useCallback(() => {
         if (!isEditMode) {
             setShowWeightInput(false);
@@ -513,7 +521,12 @@ export const CriteriaForm = ({
 
                         <div className={s.FormControlButtons}>
                             <Button type="reset" text={tr('Reset')} view="default" />
-                            <Button type="submit" text={isEditMode ? tr('Save') : tr('Add')} view="primary" />
+                            <Button
+                                type="submit"
+                                disabled={disbaleSubmitBtn}
+                                text={isEditMode ? tr('Save') : tr('Add')}
+                                view="primary"
+                            />
                         </div>
                     </div>
                 </>

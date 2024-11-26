@@ -19,6 +19,7 @@ interface Goal {
 interface Task {
     id: string;
     title: string;
+    taskKey: string;
     type?: Record<string, unknown> | null;
     state?: Record<string, unknown> | null;
     project: string;
@@ -115,7 +116,7 @@ export const GoalCriteriaSuggest: React.FC<GoalCriteriaSuggestProps> = ({
 
         return issues.map((issue) => ({
             ...issue,
-            key: issue.externalKey,
+            taskKey: issue.externalKey,
             state: null,
             id: issue.externalId,
             title: issue.title,

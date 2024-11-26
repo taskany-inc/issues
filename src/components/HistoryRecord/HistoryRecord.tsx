@@ -435,6 +435,7 @@ const HistoryRecordCriteriaItem: React.FC<CriteriaItem> = ({ criteriaGoal, exter
                     title: externalTask.state,
                     color: externalTask.stateColor,
                 }}
+                taskKey={externalTask.externalKey}
                 title={externalTask.title}
                 href={routes.jiraTask(externalTask.externalKey)}
                 strike={strike}
