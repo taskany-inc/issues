@@ -90,7 +90,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
             async (data: {
                 title: string;
                 weight: string;
-                selected?: { id?: string; key?: string };
+                selected?: { id?: string; taskKey?: string };
                 mode: AddCriteriaMode;
             }) => {
                 await onGoalCriteriaAdd({
@@ -104,9 +104,9 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                               }
                             : undefined,
                     externalTask:
-                        data.mode === 'task' && data.selected?.key
+                        data.mode === 'task' && data.selected?.taskKey
                             ? {
-                                  externalKey: data.selected.key,
+                                  taskKey: data.selected.taskKey,
                               }
                             : undefined,
                 });
@@ -119,7 +119,7 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                 id?: string;
                 title: string;
                 weight?: number;
-                selected?: { id?: string; externalKey?: string };
+                selected?: { id?: string; taskKey?: string };
                 mode: AddCriteriaMode;
             }) => {
                 if (!data.id) return;
@@ -136,9 +136,9 @@ export const GoalActivityFeed = forwardRef<HTMLDivElement, GoalActivityFeedProps
                               }
                             : undefined,
                     externalTask:
-                        data.mode === 'task' && data.selected?.externalKey
+                        data.mode === 'task' && data.selected?.taskKey
                             ? {
-                                  externalKey: data.selected.externalKey,
+                                  taskKey: data.selected.taskKey,
                               }
                             : undefined,
                 });

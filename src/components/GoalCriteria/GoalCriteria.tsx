@@ -74,6 +74,7 @@ interface ExternalTaskCriteriaProps extends CriteriaProps {
         id: string;
         title: string;
         externalKey: string;
+        taskKey: string;
         project: string;
         type: ExternalTaskTypeProps;
         state?: {
@@ -155,6 +156,7 @@ export function mapCriteria<
             id: criteria.id,
             externalTask: {
                 ...task,
+                taskKey: task.externalKey,
                 project: task.projectId,
                 type: {
                     src: task.typeIconUrl,
@@ -190,7 +192,7 @@ const SimpleCriteria: React.FC<Omit<CriteriaProps, 'id'> & OnCheckCriteriaCallba
     onCheck,
 }) => (
     <TableRow className={classes.GoalCriteriaTableRow}>
-        <TableCell width={350}>
+        <TableCell width={450}>
             <Checkbox
                 className={classNames(classes.GoalCriteriaItemCheckbox, {
                     [classes.CriteriaIsDone]: isDone,
@@ -231,9 +233,10 @@ const ExternalTaskCriteria = ({ title, externalTask, weight, isDone }: Omit<Exte
 
     return (
         <>
-            <TableCell className={classes.GoalCriteriaTitleCell} width={200}>
+            <TableCell className={classes.GoalCriteriaTitleCell} width={300}>
                 <JiraTaskBadge
                     title={title}
+                    taskKey={externalTask.externalKey}
                     state={
                         externalTask.state
                             ? {
@@ -282,7 +285,7 @@ const GoalCriteria = ({ title, goal, weight, isDone }: Omit<GoalCriteriaProps, '
 
     return (
         <>
-            <TableCell className={classes.GoalCriteriaTitleCell} width={200}>
+            <TableCell className={classes.GoalCriteriaTitleCell} width={300}>
                 <GoalBadge
                     title={title}
                     state={getStateProps(goal.state)}
@@ -461,7 +464,7 @@ export const Criteria: React.FC<
                         id: props.externalTask.id,
                         title: props.externalTask.title,
                         type: props.externalTask.type,
-                        key: props.externalTask.externalKey,
+                        taskKey: props.externalTask.externalKey,
                         itemType: 'task',
                     },
                 },
@@ -501,7 +504,7 @@ export const Criteria: React.FC<
                     valuesToUpdate.selected.id = values.selected.id;
                     break;
                 case 'task':
-                    valuesToUpdate.selected.externalKey = values.selected.key;
+                    valuesToUpdate.selected.externalKey = values.selected.taskKey;
                     break;
                 default:
             }

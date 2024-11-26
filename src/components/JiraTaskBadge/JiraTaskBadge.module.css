@@ -3,11 +3,6 @@
     font-size: 16px;
 }
 
-.JiraTaskBadgeProjectName {
-    /* must be used of current font-size, but not root font-size */
-    margin-left: 0.25em;
-}
-
 .JiraTaskBadgeState {
     color: white;
     background-color: var(--task-badge-color, var(--gray-500));

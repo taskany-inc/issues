@@ -65,7 +65,7 @@ import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
 import { getOrCreateExternalTask, updateExternalTask } from '../queries/external';
-import { jiraService, searchIssue } from '../../src/utils/integration/jira';
+import { jiraService, JiraUser, searchIssue } from '../../src/utils/integration/jira';
 
 import { tr } from './router.i18n';
 
@@ -1112,9 +1112,9 @@ export const goal = router({
                     // replace by default if have connected goal
                     criteriaTitle = connectedGoal.title;
                 }
-            } else if (input.externalTask?.externalKey) {
+            } else if (input.externalTask?.taskKey) {
                 externalTask = await getOrCreateExternalTask({
-                    id: input.externalTask.externalKey,
+                    id: input.externalTask.taskKey,
                 });
 
                 if (externalTask) {
@@ -1159,7 +1159,7 @@ export const goal = router({
                               }
                             : undefined,
                         externalTask:
-                            input.externalTask?.externalKey && externalTask != null
+                            input.externalTask?.taskKey && externalTask != null
                                 ? {
                                       connect: {
                                           id: externalTask.id,
@@ -1248,15 +1248,15 @@ export const goal = router({
                     }
                 }
 
-                if (input.externalTask?.externalKey) {
-                    const existTask = await getOrCreateExternalTask({ id: input.externalTask?.externalKey });
+                if (input.externalTask?.taskKey) {
+                    const existTask = await getOrCreateExternalTask({ id: input.externalTask?.taskKey });
 
                     if (existTask) {
                         // replace by default if have connected goal
                         criteriaTitle = existTask.title;
 
                         // override from db data for next connect between criteria and task
-                        input.externalTask.externalKey = existTask.id;
+                        input.externalTask.taskKey = existTask.id;
 
                         isDoneByConnect = jiraService.checkStatusIsFinished(
                             (await searchIssue({ value: existTask.externalKey, limit: 1 }))[0].status,
@@ -1283,9 +1283,9 @@ export const goal = router({
                                       connect: { id: input.criteriaGoal.id },
                                   }
                                 : undefined,
-                            externalTask: input.externalTask?.externalKey
+                            externalTask: input.externalTask?.taskKey
                                 ? {
-                                      connect: { id: input.externalTask.externalKey },
+                                      connect: { id: input.externalTask.taskKey },
                                   }
                                 : undefined,
                             createdAt: currentCriteria.createdAt,
@@ -1493,6 +1493,8 @@ export const goal = router({
                     resolution,
                 } = updatedTask;
 
+                const creatorOrReporter = [reporter, creator].find((val) => val != null) || ({} as JiraUser);
+
                 await updateExternalTask({
                     id: currentCriteria.externalTask.id,
                     title,
@@ -1509,12 +1511,12 @@ export const goal = router({
                     stateCategoryName: state.statusCategory.name,
                     project: project.name,
                     projectId: project.key,
-                    ownerName: reporter.displayName,
-                    ownerEmail: reporter.emailAddress,
-                    ownerId: reporter.key,
-                    creatorName: creator.displayName,
-                    creatorEmail: creator.emailAddress,
-                    creatorId: creator.key,
+                    ownerName: creatorOrReporter.displayName ?? creatorOrReporter.name,
+                    ownerEmail: creatorOrReporter.emailAddress,
+                    ownerId: creatorOrReporter.key,
+                    creatorName: creatorOrReporter.displayName ?? creatorOrReporter.name,
+                    creatorEmail: creatorOrReporter.emailAddress,
+                    creatorId: creatorOrReporter.key,
                     assigneeName: assignee?.displayName ?? null,
                     assigneeEmail: assignee?.emailAddress ?? null,
                     assigneeId: assignee?.key ?? null,
