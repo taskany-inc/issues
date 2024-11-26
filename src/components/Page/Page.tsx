@@ -65,8 +65,12 @@ export const Page: React.FC<PageProps> = ({
     ...attrs
 }) => {
     const { setPreview } = useGoalPreview();
-    const { data: userSettings = user?.settings } = trpc.user.settings.useQuery();
-    const { data: config } = trpc.appConfig.get.useQuery();
+    const { data: userSettings = user?.settings } = trpc.user.settings.useQuery(undefined, {
+        staleTime: Infinity,
+    });
+    const { data: config } = trpc.appConfig.get.useQuery(undefined, {
+        staleTime: Infinity,
+    });
     const { data: jiraIsEnable = false } = trpc.jira.isEnable.useQuery(undefined, {
         staleTime: Infinity,
     });
