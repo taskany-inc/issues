@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.65.0](https://github.com/taskany-inc/issues/compare/v2.64.0...v2.65.0) (2024-11-28)
+
+
+### Features
+
+* **INTERNAL-1357:** export goals by filter preset ([647cbf3](https://github.com/taskany-inc/issues/commit/647cbf33bcee975a7f45fa73c55e164afd53afb2))
+
+
+### Bug Fixes
+
+* **INTERNAL-1358:** read rules for each personalized dashboard project ([01c8f25](https://github.com/taskany-inc/issues/commit/01c8f2562b0fdfc7d3a1bc6ff0407ebc4547a47b))
+* remove unnecessary trpc calls ([f6a5037](https://github.com/taskany-inc/issues/commit/f6a5037be44b83df9d515d9e3900712c90d0b60d))
+
 ## [2.64.0](https://github.com/taskany-inc/issues/compare/v2.63.0...v2.64.0) (2024-11-25)
 
 
