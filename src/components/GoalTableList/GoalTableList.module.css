@@ -1,3 +1,11 @@
+.SortableContainer {
+    display: contents;
+}
+
+.SortableListItem_enable {
+    cursor: grab;
+}
+
 .TableListItemTitle {
     display: flex;
     flex-direction: column;

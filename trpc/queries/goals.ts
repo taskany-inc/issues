@@ -226,6 +226,7 @@ export const goalsFilter = (
                 desc: { user: { name: 'desc' } },
             },
             rank: undefined,
+            rankGlobal: undefined,
         };
         data.sort.forEach(({ key, dir }) => {
             if (key === 'rank') return;

@@ -19,6 +19,7 @@ const sortGoalsPropEnum = z.enum([
     'activity',
     'owner',
     'rank',
+    'rankGlobal',
     'updatedAt',
     'createdAt',
 ]);
