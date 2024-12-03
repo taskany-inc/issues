@@ -61,6 +61,10 @@ export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R =
             asc: sql`(select value from "GoalRank" where "activityId" = ${activityId} and "goalId" = ${dbKey}.id) asc`,
             desc: sql`(select value from "GoalRank" where "activityId" = ${activityId} and "goalId" = ${dbKey}.id) desc`,
         },
+        rankGlobal: {
+            asc: sql`(select value from "GoalRank" where "activityId" is NULL and "goalId" = ${dbKey}.id) asc`,
+            desc: sql`(select value from "GoalRank" where "activityId" is NULL and "goalId" = ${dbKey}.id) desc`,
+        },
     };
 
     return sort.map<OrderByExpression<T, K, R>>(({ key, dir }) => mapToTableColumn[key][dir]);

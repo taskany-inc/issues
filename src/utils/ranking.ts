@@ -3,7 +3,9 @@ export const getMiddleRank = (values: { low?: number | null; high?: number | nul
     const high = values.high ?? Number.MAX_VALUE;
     if (low === high) throw new Error('Exhausted precision');
     if (low > high) throw new Error('Low cannot be greater than high');
-    const middle = low + (high - low) / 2;
+    const difference = high - low;
+    const deviation = (Math.random() - 0.5) * difference * 0.1;
+    const middle = low + deviation + difference / 2;
     if (middle === low || middle === high) throw new Error('Exhausted precision');
     return middle;
 };

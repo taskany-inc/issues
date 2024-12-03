@@ -463,14 +463,13 @@ model ExternalTask {
 }
 
 model GoalRank {
-  id         String   @id @default(dbgenerated("gen_random_uuid()"))
-  activity   Activity @relation(fields: [activityId], references: [id])
-  activityId String
-  goal       Goal     @relation(fields: [goalId], references: [id])
+  id         String    @id @default(dbgenerated("gen_random_uuid()"))
+  activity   Activity? @relation(fields: [activityId], references: [id])
+  activityId String?
+  goal       Goal      @relation(fields: [goalId], references: [id])
   goalId     String
 
   value Float
 
-  @@unique([activityId, goalId])
   @@index([activityId])
 }

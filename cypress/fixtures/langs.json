@@ -1354,6 +1354,10 @@
             "ru": "Проект",
             "en": "Project"
         },
+        "Manual": {
+            "ru": "",
+            "en": ""
+        },
         "Stargizers": {
             "ru": "В избранном",
             "en": "Stargizers"

@@ -191,7 +191,7 @@ export type goalParticipants = {
 };
 export type GoalRank = {
     id: Generated<string>;
-    activityId: string;
+    activityId: string | null;
     goalId: string;
     value: number;
 };
