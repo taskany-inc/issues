@@ -14,6 +14,7 @@ export type SortableGoalsProps =
     | 'project'
     | 'activity'
     | 'owner'
+    | 'rankGlobal'
     | 'updatedAt'
     | 'createdAt';
 

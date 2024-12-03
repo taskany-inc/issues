@@ -430,6 +430,9 @@ export const project = router({
             if (input.goalsQuery?.sort?.some(({ key }) => key === 'rank')) {
                 await recalculateGoalRanksIfNeeded(id, ctx.session.user.activityId);
             }
+            if (input.goalsQuery?.sort?.some(({ key }) => key === 'rankGlobal')) {
+                await recalculateGoalRanksIfNeeded(id);
+            }
             const goalsByProjectQuery = getGoalsQuery({
                 ...ctx.session.user,
                 isOnlySubsGoals,

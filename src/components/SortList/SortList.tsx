@@ -42,6 +42,7 @@ export const SortList = <T extends FilterQueryState['sort'] | FilterQueryState['
             activity: tr('Activity'),
             priority: tr('Priority'),
             project: tr('Project'),
+            rankGlobal: tr('Manual'),
         };
 
         const sortProjectItems: Record<Exclude<SortableProjectsProps, SortableGoalsProps>, string> = {
