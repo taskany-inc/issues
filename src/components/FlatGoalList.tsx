@@ -70,6 +70,8 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
         [setPreview],
     );
 
+    const enableManualSorting = Boolean(queryState?.sort.some(({ key }) => key === 'rankGlobal'));
+
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {nullable(goalsOnScreen, (goals) => (
@@ -83,6 +85,7 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
                         achievedCriteriaWeight: goal._achivedCriteriaWeight,
                     }))}
                     onTagClick={setTagsFilterOutside}
+                    enableManualSorting={enableManualSorting}
                 />
             ))}
 

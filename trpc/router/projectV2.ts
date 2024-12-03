@@ -503,6 +503,10 @@ export const project = router({
                 });
             }
 
+            if (input.goalsQuery?.sort?.some(({ key }) => key === 'rankGlobal')) {
+                await recalculateGoalRanksIfNeeded(id);
+            }
+
             const goalsByProjectQuery = getGoalsQuery({
                 ...ctx.session.user,
                 projectId: id,

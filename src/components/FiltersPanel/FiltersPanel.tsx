@@ -278,7 +278,12 @@ export const FiltersPanel: FC<{
                                                             key: key as SortableGoalsProps,
                                                             dir,
                                                         };
+                                                    } else if (key === 'rankGlobal') {
+                                                        sortParams = [{ key, dir }];
                                                     } else {
+                                                        sortParams = sortParams.filter(
+                                                            ({ key }) => key !== 'rankGlobal',
+                                                        );
                                                         sortParams.push({ key: key as SortableGoalsProps, dir });
                                                     }
                                                 }

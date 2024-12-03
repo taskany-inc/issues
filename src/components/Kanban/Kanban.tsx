@@ -196,6 +196,7 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
                     id: goal.id,
                     low: lowGoal?.id,
                     high: highGoal?.id,
+                    global: false,
                 });
 
                 utils.v2.project.getProjectGoalsById.invalidate({
@@ -224,6 +225,7 @@ const KanbanStateColumn: FC<KanbanStateColumnProps> = ({
                 id: goal.id,
                 low: lowGoal?.id,
                 high: highGoal?.id,
+                global: false,
             });
 
             utils.v2.project.getProjectGoalsById.setInfiniteData(getColumnQuery(oldStateId), (data) => {
