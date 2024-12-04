@@ -32,7 +32,7 @@ import {
     Priority,
     Team,
 } from '../../generated/kysely/types';
-import { calculateProjectRules, ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
+import { calculateProjectRules, ExtractTypeFromGenerated, pickUniqueValues, ProjectRoles } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';
 import { projectAccessMiddleware } from '../access/accessMiddlewares';
@@ -224,13 +224,11 @@ export const project = router({
                     projectMap[pid].push(role);
                 }
 
-                const projectsRules: Map<string, ReturnType<typeof calculateProjectRules>> = new Map(
+                return new Map<string, ReturnType<typeof calculateProjectRules>>(
                     Object.entries(projectMap).map(([pid, roles]) => {
                         return [pid, calculateProjectRules(Array.from(new Set(roles)))];
                     }),
                 );
-
-                return projectsRules;
             });
 
             if (allDashboardProjectsRules.size === 0) {
@@ -299,6 +297,7 @@ export const project = router({
                     _isGoalWatching,
                     _isGoalParticipant,
                     _onlySubsGoals: readRights.onlySubs,
+                    ...readRights,
                 };
 
                 resultProjects.push({ ...project, ...flags, _count, partnerProjectIds });
@@ -466,24 +465,51 @@ export const project = router({
         .input(
             z.object({
                 id: z.string(),
-                isOnlySubsGoals: z.boolean().optional(),
+                askRights: z.boolean().optional(),
                 limit: z.number().optional(),
                 cursor: z.number().optional(),
                 goalsQuery: queryWithFiltersSchema.optional(),
             }),
         )
         .query(async ({ input, ctx }) => {
-            const { limit = 10, cursor: offset = 0, goalsQuery, id, isOnlySubsGoals } = input;
+            const { limit = 10, cursor: offset = 0, goalsQuery, id, askRights } = input;
             if (input.goalsQuery?.sort?.some(({ key }) => key === 'rank')) {
                 await recalculateGoalRanksIfNeeded(id, ctx.session.user.activityId);
             }
+
+            let currentProjectRights: Map<string, Array<ProjectRoles>> | null = null;
+
+            if (askRights) {
+                currentProjectRights = await Promise.all([
+                    getUserProjects({ ...ctx.session.user, projectId: id }).execute(),
+                    getUserProjectsByGoals({ ...ctx.session.user, projectId: id }).execute(),
+                ]).then(([p1, p2]) => {
+                    const projectMap: { [key: string]: number[] } = {};
+
+                    for (const record of p1.concat(p2)) {
+                        const { pid, role } = record;
+                        if (!(pid in projectMap)) {
+                            projectMap[pid] = [];
+                        }
+
+                        projectMap[pid].push(role);
+                    }
+
+                    return new Map<string, Array<ProjectRoles>>(
+                        Object.entries(projectMap).map(([pid, roles]) => {
+                            return [pid, Array.from(new Set(roles))];
+                        }),
+                    );
+                });
+            }
+
             const goalsByProjectQuery = getGoalsQuery({
                 ...ctx.session.user,
-                isOnlySubsGoals,
                 projectId: id,
                 limit: limit + 1,
                 offset,
                 goalsQuery,
+                readRights: currentProjectRights?.get(id),
             });
 
             const goals = await goalsByProjectQuery.$castTo<ProjectGoal>().execute();
