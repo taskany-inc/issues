@@ -17,7 +17,7 @@ interface ProjectGoalListProps {
     filterPreset?: FilterById;
     partnershipProject?: string[];
     showNoGoals?: boolean;
-    isOnlySubsGoals?: boolean;
+    askRights?: boolean;
 }
 
 const onGoalClickHandler = (e: React.MouseEvent) => {
@@ -33,7 +33,7 @@ export const ProjectGoalList: FC<ProjectGoalListProps> = ({
     filterPreset,
     partnershipProject,
     showNoGoals,
-    isOnlySubsGoals,
+    askRights,
 }) => {
     const { queryState, setTagsFilterOutside } = useUrlFilterParams({
         preset: filterPreset,
@@ -48,7 +48,7 @@ export const ProjectGoalList: FC<ProjectGoalListProps> = ({
     } = trpc.v2.project.getProjectGoalsById.useInfiniteQuery(
         {
             id,
-            isOnlySubsGoals,
+            askRights,
             goalsQuery: {
                 ...queryState,
                 partnershipProject: partnershipProject ?? undefined,

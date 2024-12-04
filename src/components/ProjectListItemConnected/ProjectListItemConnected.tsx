@@ -116,7 +116,7 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
                                 filterPreset={filterPreset}
                                 partnershipProject={partnershipProject}
                                 showNoGoals={showNoGoals}
-                                isOnlySubsGoals={project._onlySubsGoals}
+                                askRights={project._onlySubsGoals}
                             />,
                         )}
                     </TreeViewElement>

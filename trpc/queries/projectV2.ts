@@ -769,7 +769,10 @@ export const getChildrenProjectByParentProjectId = ({ id }: { id: string }) => {
         );
 };
 
-export const getUserProjects = ({ activityId }: Pick<GetAllProjectsQueryParams, 'activityId'>) => {
+export const getUserProjects = ({
+    activityId,
+    projectId = '',
+}: Pick<GetAllProjectsQueryParams, 'activityId'> & { projectId?: string }) => {
     return db
         .with('subs_projects', (db) =>
             db
@@ -810,24 +813,20 @@ export const getUserProjects = ({ activityId }: Pick<GetAllProjectsQueryParams, 
         .selectFrom('Project')
         .innerJoin('subs_projects', 'subs_projects.pid', 'Project.id')
         .select(['Project.id as pid', 'subs_projects.role'])
-        .where(({ or, eb }) =>
-            or([
-                eb('Project.id', 'in', ({ selectFrom }) => selectFrom('subs_projects').select('pid')),
-                eb('Project.activityId', '=', activityId),
-            ]),
-        )
         .union((eb) =>
-            eb.parens(
-                eb
-                    .selectFrom('_parentChildren')
-                    .innerJoin('subs_projects', 'subs_projects.pid', 'A')
-                    .select(['B as pid', 'subs_projects.role']),
-            ),
+            eb
+                .selectFrom('_parentChildren')
+                .innerJoin('subs_projects', 'subs_projects.pid', 'A')
+                .select(['B as pid', 'subs_projects.role']),
         )
+        .$if(projectId.length > 0, (qb) => qb.where('Project.id', '=', projectId))
         .$castTo<{ pid: string; role: number }>();
 };
 
-export const getUserProjectsByGoals = ({ activityId }: Pick<GetAllProjectsQueryParams, 'activityId'>) => {
+export const getUserProjectsByGoals = ({
+    activityId,
+    projectId = '',
+}: Pick<GetAllProjectsQueryParams, 'activityId'> & { projectId?: string }) => {
     return db
         .with('cte_user_goals', () =>
             db
@@ -876,22 +875,22 @@ export const getUserProjectsByGoals = ({ activityId }: Pick<GetAllProjectsQueryP
                 .union(
                     db
                         .selectFrom('_partnershipProjects')
-                        .innerJoinLateral(
-                            () => getUserProjects({ activityId }).as('cte_user_projects'),
-                            (join) =>
-                                join
-                                    .on('role', 'in', [ProjectRoles.project_owner, ProjectRoles.project_participant])
-                                    .onRef('_partnershipProjects.B', '=', 'cte_user_projects.pid'),
-                        )
                         .select(({ cast, val }) => [
                             'A as gid',
                             cast<number>(val(ProjectRoles.goal_partner), 'integer').as('role'),
-                        ]),
+                        ])
+                        .where('_partnershipProjects.B', 'in', () =>
+                            db
+                                .selectFrom(() => getUserProjects({ activityId }).as('user_projects'))
+                                .select('user_projects.pid'),
+                        ),
                 ),
         )
         .selectFrom('Goal')
         .innerJoin('cte_user_goals', 'Goal.id', 'cte_user_goals.gid')
         .select(['Goal.projectId as pid', 'cte_user_goals.role as role'])
+        .where('Goal.archived', 'is not', true)
+        .$if(projectId.length > 0, (qb) => qb.where('Goal.projectId', '=', projectId))
         .$castTo<{ pid: string; role: number }>();
 };
 
@@ -915,16 +914,24 @@ export const getRealDashboardQueryByProjectIds = ({
     const values = sql<{ pid: string; full_access: boolean; only_subs: boolean }>`(values ${sql.join(toJoinValues)})`;
     const aliasedValues = values.as<'proj_rules'>(sql`proj_rules(pid, full_access, only_subs)`);
 
-    const query = db
+    return db
         .with('cte_projects', () => db.selectFrom(aliasedValues).selectAll('proj_rules'))
         .selectFrom('Project')
         .innerJoin('cte_projects as projectRights', 'projectRights.pid', 'Project.id')
         .leftJoinLateral(
             ({ selectFrom }) =>
                 selectFrom('_partnershipProjects')
-                    .innerJoin('Goal', 'Goal.id', '_partnershipProjects.A')
-                    .distinctOn('Goal.projectId')
-                    .select('Goal.projectId as pid')
+                    .innerJoinLateral(
+                        ({ selectFrom }) =>
+                            selectFrom('Goal')
+                                .select('Goal.projectId')
+                                .where('Goal.archived', 'is not', true)
+                                .whereRef('Goal.id', '=', '_partnershipProjects.A')
+                                .as('goal'),
+                        (join) => join.onTrue(),
+                    )
+                    .distinctOn('goal.projectId')
+                    .select('goal.projectId as pid')
                     .whereRef('_partnershipProjects.B', '=', 'Project.id')
                     .as('partnershipProjectIds'),
             (join) => join.onTrue(),
@@ -934,16 +941,18 @@ export const getRealDashboardQueryByProjectIds = ({
                 selectFrom('Goal')
                     .select('Goal.id')
                     .where('Goal.archived', 'is not', true)
-                    .whereRef('Goal.projectId', '=', 'Project.id')
                     .where(({ and, or, eb, ref, cast }) =>
                         or([
                             and([
                                 eb(cast(ref('projectRights.full_access'), 'boolean'), 'is', true),
-                                eb(
-                                    'Goal.id',
-                                    'in',
-                                    selectFrom('_partnershipProjects').select('A').whereRef('B', '=', 'Project.id'),
-                                ),
+                                or([
+                                    eb('Goal.projectId', '=', ref('Project.id')),
+                                    eb(
+                                        'Goal.id',
+                                        'in',
+                                        selectFrom('_partnershipProjects').select('A').whereRef('B', '=', 'Project.id'),
+                                    ),
+                                ]),
                             ]),
                             and([
                                 eb(cast(ref('projectRights.only_subs'), 'boolean'), 'is', true),
@@ -1005,6 +1014,4 @@ export const getRealDashboardQueryByProjectIds = ({
         .orderBy('Project.updatedAt desc')
         .limit(limit)
         .offset(offset);
-
-    return query;
 };

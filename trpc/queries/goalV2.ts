@@ -6,6 +6,7 @@ import { decodeUrlDateRange, getDateString } from '@taskany/bricks';
 import { db } from '../connection/kysely';
 import { QueryWithFilters } from '../../src/schema/common';
 import { DB, Role } from '../../generated/kysely/types';
+import { calculateProjectRules, ProjectRoles } from '../utils';
 
 import { getUserActivity } from './activity';
 
@@ -65,6 +66,34 @@ export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R =
     return sort.map<OrderByExpression<T, K, R>>(({ key, dir }) => mapToTableColumn[key][dir]);
 };
 
+const subSelectUserProejcts = (activityId: string) =>
+    db
+        .selectFrom('_projectParticipants')
+        .select('B')
+        .where('A', '=', activityId)
+        .union(db.selectFrom('_projectStargizers').select('B').where('A', '=', activityId))
+        .union(db.selectFrom('_projectWatchers').select('B').where('A', '=', activityId))
+        .union(db.selectFrom('Project').select('Project.id as B').where('Project.activityId', '=', activityId));
+
+const subSelectUserGoals = (activityId: string) =>
+    db
+        .selectFrom('_goalParticipants')
+        .select('B')
+        .where('A', '=', activityId)
+        .union(db.selectFrom('_goalStargizers').select('B').where('A', '=', activityId))
+        .union(db.selectFrom('_goalWatchers').select('B').where('A', '=', activityId))
+        .union(
+            db
+                .selectFrom('Goal')
+                .select('Goal.id as B')
+                .where(({ or, eb }) =>
+                    or([eb('Goal.activityId', '=', activityId), eb('Goal.ownerId', '=', activityId)]),
+                ),
+        );
+
+const subSelectPartnershipGoals = (projectId: string) =>
+    db.selectFrom('_partnershipProjects').select('A').where('B', '=', projectId);
+
 interface GetGoalsQueryParams {
     role: Role;
     activityId: string;
@@ -73,6 +102,7 @@ interface GetGoalsQueryParams {
     limit?: number;
     offset?: number;
     goalsQuery?: QueryWithFilters;
+    readRights?: Array<ProjectRoles>;
 }
 
 export const getGoalsQuery = (params: GetGoalsQueryParams) =>
@@ -190,49 +220,67 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                         .as('partnershipProjects'),
                 ])
                 .where('Goal.archived', 'is not', true)
-                .where('Goal.projectId', '=', params.projectId)
-                .where(({ and, or, eb, val, cast, selectFrom }) =>
-                    or([
-                        and([
-                            eb(cast(val(!!params.isOnlySubsGoals), 'boolean'), 'is', false),
-                            eb(
-                                'Goal.id',
-                                'in',
-                                selectFrom('_partnershipProjects').select('A').where('B', '=', params.projectId),
-                            ),
+                .$if(params.readRights == null, (qb) =>
+                    qb.where(({ or, eb }) =>
+                        or([
+                            eb('Goal.projectId', '=', params.projectId),
+                            eb('Goal.id', 'in', subSelectPartnershipGoals(params.projectId)),
                         ]),
-                        and([
-                            eb(cast(val(!!params.isOnlySubsGoals), 'boolean'), 'is', true),
-                            or([
-                                eb('Goal.ownerId', '=', params.activityId),
-                                eb('Goal.activityId', '=', params.activityId),
-                                eb('Goal.id', 'in', ({ selectFrom }) =>
-                                    selectFrom('_goalParticipants')
-                                        .select('B')
-                                        .where('A', '=', params.activityId)
-                                        .union(
-                                            selectFrom('_goalWatchers').select('B').where('A', '=', params.activityId),
-                                        )
-                                        .union(
-                                            selectFrom('_goalStargizers')
-                                                .select('B')
-                                                .where('A', '=', params.activityId),
-                                        )
-                                        .union(
-                                            selectFrom('_partnershipProjects')
-                                                .select('A as B')
-                                                .where(
-                                                    'B',
-                                                    'in',
-                                                    selectFrom('Project')
-                                                        .select('Project.id')
-                                                        .where('Project.activityId', '=', params.activityId),
-                                                ),
+                    ),
+                )
+                .$if((params.readRights?.length ?? 0) > 0, (qb) =>
+                    qb.where(({ or, selectFrom, eb, and }) => {
+                        if (params.readRights) {
+                            const parsedRights = calculateProjectRules(params.readRights);
+
+                            if (parsedRights.projectFullAccess) {
+                                return or([
+                                    eb('Goal.projectId', '=', params.projectId),
+                                    eb('Goal.id', 'in', subSelectPartnershipGoals(params.projectId)),
+                                ]);
+                            }
+
+                            const filteredPartnershipBySubGoalsAndProjects = and([
+                                eb('Goal.projectId', '=', params.projectId),
+                                eb(
+                                    'Goal.id',
+                                    'in',
+                                    selectFrom('_partnershipProjects')
+                                        .select('A')
+                                        .where(({ ref }) =>
+                                            or([
+                                                eb(ref('B'), 'in', subSelectUserProejcts(params.activityId)),
+                                                eb(ref('A'), 'in', subSelectUserGoals(params.activityId)),
+                                            ]),
                                         ),
                                 ),
-                            ]),
-                        ]),
-                    ]),
+                            ]);
+
+                            const filteredPartnershipGoalsToCurrentProject = and([
+                                eb(
+                                    'Goal.id',
+                                    'in',
+                                    selectFrom('_partnershipProjects')
+                                        .select('A')
+                                        .where('B', '=', params.projectId)
+                                        .where('A', 'in', subSelectUserGoals(params.activityId)),
+                                ),
+                            ]);
+
+                            const filterPRojectGoalsBySubscribe = and([
+                                eb('Goal.projectId', '=', params.projectId),
+                                eb('Goal.id', 'in', subSelectUserGoals(params.activityId)),
+                            ]);
+
+                            return or([
+                                filteredPartnershipBySubGoalsAndProjects,
+                                filteredPartnershipGoalsToCurrentProject,
+                                filterPRojectGoalsBySubscribe,
+                            ]);
+                        }
+
+                        return and([]);
+                    }),
                 )
                 .where(({ or, and, eb, selectFrom, cast, val }) => {
                     const { goalsQuery } = params;
