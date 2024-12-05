@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.65.1](https://github.com/taskany-inc/issues/compare/v2.65.0...v2.65.1) (2024-12-05)
+
+
+### Bug Fixes
+
+* **INTERNAL-1384:** linking jira tasks ([5b2252e](https://github.com/taskany-inc/issues/commit/5b2252eb709f20f7edc6655101e94392f6ffc19b))
+* **INTERNAL-1408:** fix query for parntership projects ([fbf14ae](https://github.com/taskany-inc/issues/commit/fbf14ae543b94dd183288baa2557060fb666fb08))
+
 ## [2.65.0](https://github.com/taskany-inc/issues/compare/v2.64.0...v2.65.0) (2024-11-28)
 
 
