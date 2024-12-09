@@ -14,14 +14,15 @@ export async function middleware(request: NextRequest) {
 
     const {
         url,
-        nextUrl: { searchParams, pathname },
+        nextUrl: { searchParams: rawParams, pathname },
     } = request;
+    const searchParams = Object.fromEntries(rawParams);
 
     processEvent({
-        eventType: searchParams.size === 0 ? 'pageview' : 'query',
+        eventType: Object.keys(searchParams).length === 0 ? 'pageview' : 'query',
         url,
         pathname,
-        searchParams: Object.fromEntries(searchParams),
+        searchParams,
         session,
         uaHeader: request.headers.get('user-agent') || undefined,
     });
@@ -41,7 +42,7 @@ export const config = {
          * - favicon.ico (favicon file)
          */
         {
-            source: '/((?!api|_next/static|_next/image|_next/data|favicon|theme).*)',
+            source: '/((?!api|_next/static|_next/image|_next/data|favicon|theme|whatsnew).*)',
             missing: [
                 { type: 'header', key: 'next-router-prefetch' },
                 { type: 'header', key: 'purpose', value: 'prefetch' },
