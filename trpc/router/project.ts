@@ -41,7 +41,10 @@ export const project = router({
                 .optional(),
         )
         .query(
-            async ({ ctx, input: { cursor, skip, limit, firstLevel, goalsQuery, includePersonal = false } = {} }) => {
+            async ({
+                ctx,
+                input: { cursor, skip = 0, limit = 20, firstLevel, goalsQuery, includePersonal = false } = {},
+            }) => {
                 const { activityId, role } = ctx.session.user;
                 const projectIds = goalsQuery?.project ?? [];
 

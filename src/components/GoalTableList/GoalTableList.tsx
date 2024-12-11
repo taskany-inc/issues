@@ -1,5 +1,5 @@
 import { Badge, Table, Tag, Text, UserGroup, ListViewItem, Tooltip } from '@taskany/bricks/harmony';
-import { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
 import { nullable, formateEstimate } from '@taskany/bricks';
 import { IconGitBranchOutline, IconMessageTextOutline } from '@taskany/icons';
 
@@ -18,11 +18,11 @@ import { InlineUserBadge } from '../InlineUserBadge/InlineUserBadge';
 import { State } from '../State';
 import { GoalCriteriaPreview } from '../GoalCriteria/GoalCriteria';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
-import { participants } from '../../utils/domObjects';
+import { participants, goalTableListItem } from '../../utils/domObjects';
 
 import s from './GoalTableList.module.css';
 
-interface GoalTableListProps<T> {
+interface GoalTableListProps<T> extends React.ComponentProps<typeof Table> {
     goals: T[];
     onGoalPreviewShow?: (goal: T) => MouseEventHandler<HTMLAnchorElement>;
     onGoalClick?: MouseEventHandler<HTMLAnchorElement>;
@@ -220,6 +220,7 @@ export const GoalTableList = <T extends GoalTableListItem>({
                                 <TableListItem
                                     selected={goal.shortId === shortId || goal.id === preview?.id}
                                     hovered={active}
+                                    {...goalTableListItem.attr}
                                     {...props}
                                 >
                                     {row.list.map(({ content, width, className }, index) => (

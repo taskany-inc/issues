@@ -57,6 +57,7 @@ declare global {
             hideEmptyProjectOnGoalLists(): Chainable<void>;
             createProject(fields: ProjectCreate): Chainable<ProjectCreateReturnType>;
             createGoal(projectTitle: string, fields: GoalCommon): Chainable<GoalCreateReturnType>;
+            createPersonalGoal(fields: GoalCommon): Chainable<GoalCreateReturnType>;
             updateGoal(shortId: string, filelds: GoalUpdate): Chainable<GoalUpdateReturnType>;
             deleteGoal(shortId: string): Chainable<void>;
             createComment(fields: GoalCommentCreateSchema): Chainable<CommentCreateReturnType>;
@@ -64,7 +65,7 @@ declare global {
             deleteComment(id: string): Chainable<void>;
             task(
                 event: 'db:create:project',
-                data: { title: string; key: string; description?: string; ownerEmail: string },
+                data: { title: string; key: string; description?: string; ownerEmail: string; personal?: boolean },
             ): Chainable<string>;
             task(event: 'db:remove:project', data: { id: string }): Chainable<null>;
             task(
@@ -75,7 +76,7 @@ declare global {
             task(event: 'db:remove:user', data?: { ids: string[] }): Chainable<null>;
             task(
                 event: 'db:create:goal',
-                data: { title: string; projectId: string; ownerEmail: string },
+                data: { title: string; projectId: string; ownerEmail: string; private?: boolean },
             ): Chainable<Goal>;
             task(event: 'db:create:tag', data: { title: string; userEmail: string }): Chainable<TagData>;
             task(event: 'db:remove:tag', data: { id: string }): Chainable<null>;

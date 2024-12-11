@@ -11,6 +11,7 @@ import { GoalTableList, mapToRenderProps } from '../GoalTableList/GoalTableList'
 import { LoadMoreButton } from '../LoadMoreButton/LoadMoreButton';
 import { NoGoalsText } from '../NoGoalsText/NoGoalsText';
 import { Loader } from '../Loader/Loader';
+import { goalTableList } from '../../utils/domObjects';
 
 interface ProjectGoalListProps {
     id: string;
@@ -94,6 +95,7 @@ export const ProjectGoalList: FC<ProjectGoalListProps> = ({
                             }))}
                             onTagClick={setTagsFilterOutside}
                             onGoalClick={onGoalClickHandler}
+                            {...goalTableList.attr}
                         />
                         {nullable(hasNextPage, () => (
                             <LoadMoreButton disabled={isGoalsFetch} onClick={fetchNextGoals as () => void} />

@@ -1,4 +1,5 @@
-import { useRouter as NextRouter } from 'next/router';
+import { useRouter as useNextRouter } from 'next/router';
+import { useMemo } from 'react';
 
 import { AvailableHelpPages } from '../types/help';
 import { TLocale } from '../utils/getLang';
@@ -33,26 +34,29 @@ export const routes = {
     jiraTask: (id: string) => `${process.env.NEXT_PUBLIC_JIRA_URL}browse/${id}`,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useRouter = () => {
-    const router = NextRouter();
+    const router = useNextRouter();
 
-    return {
-        index: () => router.push(routes.index()),
+    return useMemo(
+        () => ({
+            index: () => router.push(routes.index()),
 
-        project: (id: string) => router.push(routes.project(id)),
-        projectSettings: (id: string) => router.push(routes.projectSettings(id)),
+            project: (id: string) => router.push(routes.project(id)),
+            projectSettings: (id: string) => router.push(routes.projectSettings(id)),
 
-        goals: () => router.push(routes.goals()),
-        goal: (shortId: string) => router.push(routes.goal(shortId)),
+            goals: () => router.push(routes.goals()),
+            goal: (shortId: string) => router.push(routes.goal(shortId)),
 
-        signIn: () => router.push(routes.signIn()),
-        userSettings: () => router.push(routes.userSettings()),
+            signIn: () => router.push(routes.signIn()),
+            userSettings: () => router.push(routes.userSettings()),
 
-        exploreProjects: () => router.push(routes.exploreProjects()),
-        exploreTopProjects: () => router.push(routes.exploreTopProjects()),
-        exploreGoals: () => router.push(routes.exploreGoals()),
+            exploreProjects: () => router.push(routes.exploreProjects()),
+            exploreTopProjects: () => router.push(routes.exploreTopProjects()),
+            exploreGoals: () => router.push(routes.exploreGoals()),
 
-        help: (slug: AvailableHelpPages) => router.push(slug),
-    };
+            help: (slug: AvailableHelpPages) => router.push(slug),
+            appRouter: router,
+        }),
+        [router],
+    );
 };

@@ -41,7 +41,15 @@ export const addCalculatedProjectFields = <
     };
 };
 
-export const checkProjectAccess = <T extends { accessUsers: WithId[]; activityId: string; archived?: boolean | null }>(
+export const checkProjectAccess = <
+    T extends {
+        accessUsers: WithId[];
+        activityId: string;
+        archived?: boolean | null;
+        personal: boolean | null;
+        goalAccessIds?: string[];
+    },
+>(
     project: T,
     activityId: string,
     role: Role,
@@ -50,12 +58,27 @@ export const checkProjectAccess = <T extends { accessUsers: WithId[]; activityId
         return !project.archived;
     }
 
-    return (
-        !project.archived ||
-        project.activityId === activityId ||
-        !project.accessUsers.length ||
-        project.accessUsers.some((p) => p.id === activityId)
-    );
+    if (project.archived) {
+        return false;
+    }
+
+    if (project.personal) {
+        if (project.goalAccessIds?.length) {
+            return project.goalAccessIds.includes(activityId);
+        }
+
+        if (project.accessUsers.length) {
+            return project.accessUsers.some(({ id }) => id === activityId);
+        }
+
+        return project.activityId === activityId;
+    }
+
+    if (project.accessUsers.length) {
+        return project.accessUsers.some(({ id }) => id === activityId);
+    }
+
+    return true;
 };
 
 export const getProjectSchema = ({

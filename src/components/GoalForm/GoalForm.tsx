@@ -26,6 +26,9 @@ import {
     combobox,
     estimateCombobox,
     goalDescriptionInput,
+    goalPersonalityToggle,
+    goalPersonalityToggleProjectValue,
+    goalPersonalityTogglePersonalValue,
     goalTagList,
     goalTagListItem,
     goalTagListItemClean,
@@ -224,9 +227,21 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <div className={s.SwitchGoalType}>
-                                        <Switch {...field} onChange={(_, value) => setValue('mode', value)}>
-                                            <SwitchControl text={tr('Project goal')} value={goalTypeMap.default} />
-                                            <SwitchControl text={tr('Personal goal')} value={goalTypeMap.personal} />
+                                        <Switch
+                                            {...field}
+                                            onChange={(_, value) => setValue('mode', value)}
+                                            {...goalPersonalityToggle.attr}
+                                        >
+                                            <SwitchControl
+                                                text={tr('Project goal')}
+                                                value={goalTypeMap.default}
+                                                {...goalPersonalityToggleProjectValue.attr}
+                                            />
+                                            <SwitchControl
+                                                text={tr('Personal goal')}
+                                                value={goalTypeMap.personal}
+                                                {...goalPersonalityTogglePersonalValue.attr}
+                                            />
                                         </Switch>
                                         <HelpButton slug="goals" />
                                     </div>
