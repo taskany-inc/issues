@@ -18,10 +18,16 @@ const notAllowed = (errorMessage: string): AccessCheckerResult => ({ allowed: fa
 
 export const goalAccessChecker = (session: Session, goal: GoalEntity) => {
     const { activityId, role } = session.user;
+    const { _isEditable, _isIssuer, _isOwner, _isParticipant, _isStarred, _isWatching } = addCalculatedGoalsFields(
+        goal,
+        activityId,
+        role,
+    );
 
-    return goal.project && checkProjectAccess(goal.project, activityId, role)
-        ? allowed()
-        : notAllowed(tr('No access to update Goal'));
+    const accessFromProjectLevel = goal.project && checkProjectAccess(goal.project, activityId, role);
+    const accessByGoalLevel = _isParticipant || _isStarred || _isWatching || ((_isOwner || _isIssuer) && _isEditable);
+
+    return accessFromProjectLevel || accessByGoalLevel ? allowed() : notAllowed(tr('No access to update Goal'));
 };
 
 export const goalEditAccessChecker = (session: Session, goal: GoalEntity) => {

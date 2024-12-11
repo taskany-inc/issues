@@ -19,6 +19,7 @@ import {
     projectsCombobox,
     filtersPanelTitle,
     dashboardLoadMore,
+    goalTableList,
 } from '../../src/utils/domObjects';
 import { exactUrl } from '../helpers';
 import { routes } from '../../src/hooks/router';
@@ -37,6 +38,10 @@ const testProjectTitleRu = 'Тестовый проект';
 const testProjectKeyRu = keyPredictor(testProjectTitleRu);
 const customKeyRu = 'КАСТОМНЫЙ КЛЮЧ РУ';
 const customKeyRuPredict = keyPredictor(customKeyRu, { allowVowels: true });
+
+before(() => {
+    cy.loadLangFile();
+});
 
 describe('Projects', () => {
     beforeEach(() => {
@@ -253,5 +258,77 @@ describe('Projects', () => {
             cy.get(goalForm.query).should('exist').and('be.visible');
             cy.get(projectsCombobox.query).contains(testProjectTitle);
         });
+    });
+});
+
+describe('Personal project', () => {
+    const testUser = {
+        name: 'Test user 1',
+        email: 'user1@taskany.org',
+        password: 'password',
+        provider: 'provider1',
+    };
+
+    const testUser2 = {
+        name: 'Test user 2',
+        email: 'user2@taskany.org',
+        password: 'password',
+        provider: 'provider2',
+    };
+
+    before(() => {
+        cy.task('db:create:user', testUser).then((u) => {
+            Cypress.env('testUser', u);
+        });
+        cy.task('db:create:user', testUser2).then((u) => {
+            Cypress.env('testUser2', u);
+        });
+    });
+
+    after(() => {
+        cy.task('db:remove:user', Cypress.env('testUser'));
+        cy.task('db:remove:user', Cypress.env('testUser2'));
+    });
+
+    beforeEach(() => {
+        cy.interceptWhatsNew();
+        cy.intercept('/api/trpc/*v2.project.getUserDashboardProjects*?*').as('userDashboard');
+        cy.intercept('/api/trpc/*v2.project.getProjectGoalsById*?*').as('goalsByProject');
+        cy.signInViaEmail(testUser);
+        cy.wait('@whatsnew.check');
+        // @ts-ignore
+        cy.createPersonalGoal({
+            title: 'Personal test goal',
+            description: 'Personal test goal description',
+            mode: 'personal',
+        });
+    });
+
+    it('should be able on personal dashboard', () => {
+        cy.wait(['@userDashboard', '@goalsByProject']);
+
+        cy.get(projectListItem.query)
+            .should('exist')
+            .get(projectListItemTitle.query)
+            .should('include.text', testUser.name);
+
+        cy.get(projectListItem.query)
+            .get(goalTableList.query)
+            .should('have.length.gt', 0)
+            .and('contain.text', 'Personal test goal');
+        cy.logout();
+
+        cy.signInViaEmail(testUser2);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        cy.visit(routes.project(Cypress.env('createdGoal')!.projectId as string), {
+            failOnStatusCode: false,
+        });
+        cy.get('body').should('contain.text', '404');
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        cy.visit(routes.goal(Cypress.env('createdGoal')!._shortId as string), {
+            failOnStatusCode: false,
+        });
+        cy.get('body').should('contain.text', '404');
     });
 });

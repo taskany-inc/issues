@@ -65,6 +65,9 @@ export const goalUpdateButton = goalForm.add('updateButton');
 export const goalTagList = goalForm.add('tagList');
 export const goalTagListItem = goalTagList.add('item');
 export const goalTagListItemClean = goalTagListItem.add('clean');
+export const goalPersonalityToggle = goalForm.add('goalPersonalityToggle');
+export const goalPersonalityToggleProjectValue = goalPersonalityToggle.add('project');
+export const goalPersonalityTogglePersonalValue = goalPersonalityToggle.add('personal');
 
 export const goalDeleteForm = DO('goalDeleteForm');
 export const goalDeleteShortIdInput = goalDeleteForm.add('shortIdInput');
@@ -153,3 +156,6 @@ export const dashboardLoadMore = DO('dashboardLoadMore');
 
 export const watch = DO('watch');
 export const participants = DO('participants');
+
+export const goalTableList = DO('goalTableList');
+export const goalTableListItem = goalTableList.add('item');

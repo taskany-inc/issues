@@ -48,22 +48,54 @@ export const getComment = (id: string) =>
 export type CommentEntity = NonNullable<Awaited<ReturnType<typeof getComment>>>;
 
 export const getProject = (id: string) =>
-    prisma.project.findUnique({
-        where: { id },
-        include: {
-            accessUsers: {
-                include: {
-                    user: true,
-                    ghost: true,
+    prisma.project
+        .findUnique({
+            where: { id },
+            include: {
+                accessUsers: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                participants: {
+                    include: {
+                        user: true,
+                        ghost: true,
+                    },
+                },
+                goals: {
+                    include: {
+                        stargizers: true,
+                        watchers: true,
+                        participants: true,
+                    },
                 },
             },
-            participants: {
-                include: {
-                    user: true,
-                    ghost: true,
-                },
-            },
-        },
-    });
+        })
+        .then((project) => {
+            if (project?.goals == null || project.goals.length === 0) {
+                return project;
+            }
+
+            const { goals, ...restProject } = project;
+
+            const goalAccessActivityIds = new Set<string>();
+
+            for (const goal of goals) {
+                const { ownerId, activityId, watchers, stargizers, participants } = goal;
+
+                const unionSubArray = [...watchers, ...stargizers, ...participants];
+
+                [ownerId, activityId, ...unionSubArray.map(({ id }) => id)].filter(Boolean).forEach((id) => {
+                    goalAccessActivityIds.add(id);
+                });
+            }
+
+            return {
+                ...restProject,
+                goalAccessIds: Array.from(goalAccessActivityIds),
+            };
+        });
 
 export type ProjectEntity = NonNullable<Awaited<ReturnType<typeof getProject>>>;

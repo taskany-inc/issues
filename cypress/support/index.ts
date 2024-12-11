@@ -33,12 +33,18 @@ import {
     sortPanelDropdownTrigger,
     sortPanel,
     sortPanelEmptyProjectsCheckbox,
+    goalPersonalityToggle,
+    createPersonalGoalItem,
+    estimateCombobox,
+    estimateQuarterTrigger,
 } from '../../src/utils/domObjects';
 import { keyPredictor } from '../../src/utils/keyPredictor';
 import { SignInFields } from '..';
 import { GoalCommentCreateSchema, GoalCommon, GoalUpdate } from '../../src/schema/goal';
 import { CommentEditSchema } from '../../src/schema/comment';
 import { ProjectCreate } from '../../src/schema/project';
+
+import { getTranslation } from './lang';
 
 Cypress.Commands.addAll({
     logout: () => {
@@ -133,6 +139,41 @@ Cypress.Commands.addAll({
             });
     },
 
+    createPersonalGoal: (fields: GoalCommon) => {
+        const translations = getTranslation({
+            Dropdown: ['Not chosen'],
+            EstimateDropdown: ['Choose quarter'],
+        });
+        cy.intercept('/api/trpc/*goal.create?*').as('createGoalRequest');
+        cy.get(createSelectButton.query).click();
+        cy.get(createPersonalGoalItem.query).click();
+        cy.get(goalForm.query).should('exist').and('be.visible');
+        cy.get(goalTitleInput.query).type(fields.title);
+        cy.get(goalDescriptionInput.query).type(fields.description);
+        cy.get(goalPersonalityToggle.query).should('exist');
+        cy.get(projectsCombobox.query).should('not.exist');
+
+        cy.get(estimateCombobox.query).should('contain.text', translations.Dropdown['Not chosen']()).click();
+        cy.get(estimateQuarterTrigger.query)
+            .find(`:button:contains(${translations.EstimateDropdown['Choose quarter']()})`)
+            .click();
+
+        cy.get(estimateQuarterTrigger.query).children().find(':button:contains(@current)').click();
+        cy.get(estimateCombobox.query).should('not.contain.text', translations.Dropdown['Not chosen']()).click();
+
+        cy.get(goalActionCreateOnly.query).should('exist').and('be.visible').and('be.enabled');
+        cy.get(goalActionCreateOnly.query).click();
+
+        cy.wait('@createGoalRequest')
+            .its('response')
+            .then((res) => {
+                const createdGoal = res.body[0].result.data;
+
+                Cypress.env('createdGoal', createdGoal);
+                cy.wrap(createdGoal).as('createdGoal');
+            });
+    },
+
     updateGoal: (shortId: string, fields: GoalUpdate) => {
         cy.visit(routes.goal(shortId));
         cy.intercept('/api/trpc/goal.update?*').as('updateGoal');
@@ -168,7 +209,7 @@ Cypress.Commands.addAll({
 
                 const createdGoal = Cypress.env('createdGoal');
 
-                if (createdGoal._shortId === shortId) {
+                if (createdGoal?._shortId === shortId) {
                     Cypress.env('createdGoal', null);
                 }
             });
@@ -237,7 +278,7 @@ Cypress.Commands.addAll({
 
                 const createdComment = Cypress.env('createdComment');
 
-                if (createdComment.id === id) {
+                if (createdComment?.id === id) {
                     Cypress.env('createdComment', null);
                 }
             });
