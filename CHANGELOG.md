@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.65.2](https://github.com/taskany-inc/issues/compare/v2.65.1...v2.65.2) (2024-12-12)
+
+
+### Bug Fixes
+
+* **INTERNAL-1432:** restrict access to personal goals ([6125123](https://github.com/taskany-inc/issues/commit/6125123e2d9c7e27526987e4149c6d496397ef50))
+
 ## [2.65.1](https://github.com/taskany-inc/issues/compare/v2.65.0...v2.65.1) (2024-12-05)
 
 
