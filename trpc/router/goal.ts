@@ -1530,7 +1530,10 @@ export const goal = router({
                     if (isPositiveStatus) {
                         // needs update all associated criteria
                         await prisma.goalAchieveCriteria.updateMany({
-                            where: { externalTaskId: currentCriteria.externalTask.id, deleted: { not: true } },
+                            where: {
+                                externalTaskId: currentCriteria.externalTask.id,
+                                OR: [{ deleted: false }, { deleted: null }],
+                            },
                             data: {
                                 isDone: true,
                             },
@@ -1539,7 +1542,7 @@ export const goal = router({
                         const goalIdsToUpdate = await prisma.goalAchieveCriteria.findMany({
                             where: {
                                 externalTaskId: currentCriteria.externalTask.id,
-                                deleted: { not: true },
+                                OR: [{ deleted: false }, { deleted: null }],
                             },
                             select: {
                                 goalId: true,
