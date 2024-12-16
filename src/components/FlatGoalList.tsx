@@ -27,13 +27,13 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
     });
 
     const [, setPage] = useState(0);
-    const { data, fetchNextPage, hasNextPage } = trpc.goal.getBatch.useInfiniteQuery(
+    const { data, fetchNextPage, hasNextPage } = trpc.v2.goal.getAllGoals.useInfiniteQuery(
         {
             limit: pageSize,
-            query: queryState,
+            goalsQuery: queryState,
         },
         {
-            getNextPageParam: (p) => p.nextCursor,
+            getNextPageParam: ({ pagination }) => pagination.offset,
             keepPreviousData: true,
             staleTime: refreshInterval,
         },
@@ -56,7 +56,7 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
     useFMPMetric(!!data);
 
     const pages = data?.pages;
-    const goalsOnScreen = useMemo(() => pages?.flatMap((p) => p.items), [pages]);
+    const goalsOnScreen = useMemo(() => pages?.flatMap((p) => p.goals), [pages]);
 
     const onFetchNextPage = useCallback(() => {
         fetchNextPage();
@@ -70,7 +70,7 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
         [setPreview],
     );
 
-    const enableManualSorting = Boolean(queryState?.sort.some(({ key }) => key === 'rankGlobal'));
+    const enableManualSorting = Boolean(queryState?.sort?.some(({ key }) => key === 'rankGlobal'));
 
     return (
         <ListView onKeyboardClick={handleItemEnter}>
