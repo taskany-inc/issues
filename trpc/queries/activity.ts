@@ -15,7 +15,7 @@ export const getUserActivity = () => {
         .innerJoin('User', 'User.activityId', 'Activity.id')
         .leftJoin('Ghost', 'Ghost.id', 'Activity.ghostId')
         .selectAll('Activity')
-        .select([sql`"User"`.as('user'), sql`"Ghost"`.as('ghost')])
+        .select([sql`to_jsonb("User")`.as('user'), sql`to_jsonb("Ghost")`.as('ghost')])
         .$castTo<Activity>();
 };
 
