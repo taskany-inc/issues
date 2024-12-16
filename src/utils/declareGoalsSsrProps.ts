@@ -22,9 +22,9 @@ export const declareGoalsSsrProps = (baseQueryState: Partial<QueryState> = {}) =
                     firstLevel: !queryState.project?.length,
                 });
             } else {
-                await ssrHelpers.goal.getBatch.fetchInfinite({
+                await ssrHelpers.v2.goal.getAllGoals.fetchInfinite({
                     limit: pageSize,
-                    query: queryState,
+                    goalsQuery: queryState,
                 });
             }
 

@@ -75,6 +75,8 @@ export const ProjectGoalList: FC<ProjectGoalListProps> = ({
 
     useGoalPreviewInvalidate(goals);
 
+    const enableManualSorting = Boolean(queryState?.sort?.some(({ key }) => key === 'rankGlobal'));
+
     return nullable(
         !isLoading,
         () =>
@@ -95,6 +97,7 @@ export const ProjectGoalList: FC<ProjectGoalListProps> = ({
                             }))}
                             onTagClick={setTagsFilterOutside}
                             onGoalClick={onGoalClickHandler}
+                            enableManualSorting={enableManualSorting}
                             {...goalTableList.attr}
                         />
                         {nullable(hasNextPage, () => (

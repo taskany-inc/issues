@@ -1,7 +1,9 @@
 import { Badge, Table, Tag, Text, UserGroup, ListViewItem, Tooltip } from '@taskany/bricks/harmony';
-import React, { MouseEventHandler, useCallback, useEffect, useMemo } from 'react';
+import { ComponentProps, MouseEventHandler, useCallback, useEffect, useMemo, useState } from 'react';
 import { nullable, formateEstimate } from '@taskany/bricks';
 import { IconGitBranchOutline, IconMessageTextOutline } from '@taskany/icons';
+import { ReactSortable } from 'react-sortablejs';
+import cn from 'classnames';
 
 import { DateType } from '../../../generated/kysely/types';
 import { State as StateType } from '../../../trpc/inferredTypes';
@@ -19,6 +21,7 @@ import { State } from '../State';
 import { GoalCriteriaPreview } from '../GoalCriteria/GoalCriteria';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { participants, goalTableListItem } from '../../utils/domObjects';
+import { trpc } from '../../utils/trpcClient';
 
 import s from './GoalTableList.module.css';
 
@@ -27,6 +30,8 @@ interface GoalTableListProps<T> extends React.ComponentProps<typeof Table> {
     onGoalPreviewShow?: (goal: T) => MouseEventHandler<HTMLAnchorElement>;
     onGoalClick?: MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
+    enableManualSorting: boolean;
+    invalidateGoals?: VoidFunction;
 }
 
 interface IdentifierRecord {
@@ -47,12 +52,15 @@ interface GoalTableListItem extends IdentifierRecord {
     achievedCriteriaWeight?: number | null;
     project?: IdentifierRecord | null;
     isInPartnerProject?: boolean;
+    _isEditable: boolean;
 }
 
 export const GoalTableList = <T extends GoalTableListItem>({
     goals,
     onGoalClick,
     onTagClick,
+    enableManualSorting,
+    invalidateGoals,
     ...attrs
 }: GoalTableListProps<T>) => {
     const locale = useLocale();
@@ -83,10 +91,48 @@ export const GoalTableList = <T extends GoalTableListItem>({
         [setPreview, onGoalClick],
     );
 
+    const updateGoalRankMutation = trpc.v2.goal.updateRank.useMutation();
+
+    const onSortableMove = useCallback<NonNullable<ComponentProps<typeof ReactSortable>['onMove']>>(
+        (event) => {
+            if (enableManualSorting && event.dragged.classList.contains(s.SortableListItem_enable)) {
+                return -1;
+            }
+            return false;
+        },
+        [enableManualSorting],
+    );
+
+    const onDragEnd = useCallback<NonNullable<ComponentProps<typeof ReactSortable>['onEnd']>>(
+        async (result) => {
+            const {
+                item: { id: goalId },
+                oldIndex,
+                newIndex,
+            } = result;
+
+            if (oldIndex === undefined || newIndex === undefined) return;
+
+            const lowGoal = newIndex < oldIndex ? goals[newIndex - 1] : goals[newIndex];
+            const highGoal = newIndex < oldIndex ? goals[newIndex] : goals[newIndex + 1];
+
+            await updateGoalRankMutation.mutateAsync({
+                id: goalId,
+                low: lowGoal?.id,
+                high: highGoal?.id,
+                global: true,
+            });
+
+            invalidateGoals?.();
+        },
+        [goals, updateGoalRankMutation, invalidateGoals],
+    );
+
     const data = useMemo(
         () =>
             goals.map((goal) => {
                 return {
+                    id: goal.id,
                     goal,
                     list: [
                         {
@@ -199,41 +245,59 @@ export const GoalTableList = <T extends GoalTableListItem>({
         [goals, locale, onTagClick],
     );
 
+    const [list, setList] = useState(data);
+
+    useEffect(() => {
+        setList(data);
+    }, [data]);
+
     return (
         <Table {...attrs}>
-            {data.map((row) => {
-                const { project: _, ...goal } = row.goal;
+            <ReactSortable
+                list={list}
+                setList={setList}
+                className={s.SortableContainer}
+                onMove={onSortableMove}
+                onEnd={onDragEnd}
+            >
+                {list.map((row) => {
+                    const { project: _, ...goal } = row.goal;
 
-                return (
-                    <NextLink
-                        key={goal.id}
-                        href={routes.goal(goal.shortId as string)}
-                        onClick={onGoalPreviewShow({
-                            _shortId: goal.shortId,
-                            title: goal.title,
-                            state: goal.state,
-                        })}
-                    >
-                        <ListViewItem
-                            value={row.goal}
-                            renderItem={({ active, hovered: _, ...props }) => (
-                                <TableListItem
-                                    selected={goal.shortId === shortId || goal.id === preview?.id}
-                                    hovered={active}
-                                    {...goalTableListItem.attr}
-                                    {...props}
-                                >
-                                    {row.list.map(({ content, width, className }, index) => (
-                                        <TableListItemElement key={index} width={width} className={className}>
-                                            {content}
-                                        </TableListItemElement>
-                                    ))}
-                                </TableListItem>
-                            )}
-                        />
-                    </NextLink>
-                );
-            })}
+                    return (
+                        <NextLink
+                            id={goal.id}
+                            key={goal.id}
+                            href={routes.goal(goal.shortId as string)}
+                            onClick={onGoalPreviewShow({
+                                _shortId: goal.shortId,
+                                title: goal.title,
+                                state: goal.state,
+                            })}
+                            className={cn({
+                                [s.SortableListItem_enable]: enableManualSorting && goal._isEditable,
+                            })}
+                        >
+                            <ListViewItem
+                                value={row.goal}
+                                renderItem={({ active, hovered: _, ...props }) => (
+                                    <TableListItem
+                                        selected={goal.shortId === shortId || goal.id === preview?.id}
+                                        hovered={active}
+                                        {...goalTableListItem.attr}
+                                        {...props}
+                                    >
+                                        {row.list.map(({ content, width, className }, index) => (
+                                            <TableListItemElement key={index} width={width} className={className}>
+                                                {content}
+                                            </TableListItemElement>
+                                        ))}
+                                    </TableListItem>
+                                )}
+                            />
+                        </NextLink>
+                    );
+                })}
+            </ReactSortable>
         </Table>
     );
 };
