@@ -99,7 +99,7 @@
     "@commitlint/cli": "19.5.0",
     "@commitlint/config-conventional": "19.5.0",
     "@faker-js/faker": "8.4.1",
-    "@next/bundle-analyzer": "15.0.1",
+    "@next/bundle-analyzer": "15.1.0",
     "@prisma/client": "4.16.2",
     "@statoscope/webpack-plugin": "5.28.0",
     "@svgr/webpack": "8.1.0",
