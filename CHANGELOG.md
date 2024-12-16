@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.65.3](https://github.com/taskany-inc/issues/compare/v2.65.2...v2.65.3) (2024-12-16)
+
+
+### Bug Fixes
+
+* **ExternalTasks:** correct querying criteria and goals for update ([6268689](https://github.com/taskany-inc/issues/commit/626868929c15b85e622e6294b07197830ed1092b))
+* **telemetry:** older next support ([0e84ca5](https://github.com/taskany-inc/issues/commit/0e84ca571acfb3f3e70d44a8ef849ff41308132e))
+
 ## [2.65.2](https://github.com/taskany-inc/issues/compare/v2.65.1...v2.65.2) (2024-12-12)
 
 
