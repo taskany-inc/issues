@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { nullable } from '@taskany/bricks';
 
 import { FilterById } from '../../../trpc/inferredTypes';
@@ -40,6 +40,8 @@ export const ProjectGoalList: FC<ProjectGoalListProps> = ({
         preset: filterPreset,
     });
 
+    const utils = trpc.useContext();
+
     const {
         data,
         isLoading,
@@ -64,40 +66,49 @@ export const ProjectGoalList: FC<ProjectGoalListProps> = ({
 
     const goals = useMemo(() => {
         if (data == null) {
-            return [];
+            return { list: [], renderList: [] };
         }
 
-        return data.pages.reduce<(typeof data)['pages'][number]['goals']>((acc, cur) => {
+        const list = data.pages.reduce<(typeof data)['pages'][number]['goals']>((acc, cur) => {
             acc.push(...cur.goals);
             return acc;
         }, []);
-    }, [data]);
 
-    useGoalPreviewInvalidate(goals);
+        const renderList = mapToRenderProps(list, (goal) => ({
+            ...goal,
+            shortId: goal._shortId,
+            commentsCount: goal._count.comments,
+            owner: safeUserData(goal.owner),
+            participants: goal.participants?.map(safeUserData),
+            achievedCriteriaWeight: goal._achivedCriteriaWeight,
+            partnershipProjects: goal.partnershipProjects,
+            isInPartnerProject: id !== goal.projectId,
+        }));
 
-    const enableManualSorting = Boolean(queryState?.sort?.some(({ key }) => key === 'rankGlobal'));
+        return { list, renderList };
+    }, [data, id]);
+
+    useGoalPreviewInvalidate(goals.list);
+
+    const enableManualSorting = Boolean(queryState?.sort?.some(({ key }) => key === 'rankGlobal')) && !isLoading;
+
+    const invalidate = useCallback(() => {
+        utils.v2.project.getProjectGoalsById.invalidate({ id });
+    }, [id, utils]);
 
     return nullable(
         !isLoading,
         () =>
             nullable(
-                goals,
+                goals.renderList,
                 (g) => (
                     <>
                         <GoalTableList
-                            goals={mapToRenderProps(g, (goal) => ({
-                                ...goal,
-                                shortId: goal._shortId,
-                                commentsCount: goal._count.comments,
-                                owner: safeUserData(goal.owner),
-                                participants: goal.participants?.map(safeUserData),
-                                achievedCriteriaWeight: goal._achivedCriteriaWeight,
-                                partnershipProjects: goal.partnershipProjects,
-                                isInPartnerProject: id !== goal.projectId,
-                            }))}
+                            goals={g}
                             onTagClick={setTagsFilterOutside}
                             onGoalClick={onGoalClickHandler}
                             enableManualSorting={enableManualSorting}
+                            invalidateGoals={invalidate}
                             {...goalTableList.attr}
                         />
                         {nullable(hasNextPage, () => (
