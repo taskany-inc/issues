@@ -111,6 +111,7 @@ const KeyInput: React.FC<KeyInputProps> = ({
                         size={size}
                         text={value}
                         tabIndex={tabIndex}
+                        brick="left"
                         view={available === true && !error ? 'primary' : 'danger'}
                         ref={buttonRef}
                         onClick={onButtonClick}
