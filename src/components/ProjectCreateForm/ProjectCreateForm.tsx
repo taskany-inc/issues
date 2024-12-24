@@ -1,4 +1,4 @@
-import React, { FormEvent, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { FormEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
@@ -14,6 +14,7 @@ import {
     ModalContent,
 } from '@taskany/bricks/harmony';
 import { IconGitPullOutline } from '@taskany/icons';
+import { z } from 'zod';
 
 import { keyPredictor } from '../../utils/keyPredictor';
 import { errorsProvider } from '../../utils/forms';
@@ -41,11 +42,30 @@ import s from './ProjectCreateForm.module.css';
 
 const KeyInput = dynamic(() => import('../KeyInput/KeyInput'));
 
+const getPatchedProjectCreateSchema = (checkKeyHandler: ({ id }: { id: string }) => Promise<null>) => {
+    return projectCreateSchema.extend({
+        id: z
+            .string()
+            .min(3, tr('Key must be 3 or longer characters'))
+            .superRefine(async (val, ctx) => {
+                try {
+                    await checkKeyHandler({ id: val });
+                    return z.NEVER;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } catch (error: any) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: error.message,
+                    });
+                }
+            }),
+    });
+};
+
 const ProjectCreateForm: React.FC = () => {
     const router = useRouter();
-    const { createProject } = useProjectResource('');
+    const { createProject, checkUniqueProjectKey } = useProjectResource('');
     const [busy, setBusy] = useState(false);
-    const [dirtyKey, setDirtyKey] = useState(false);
 
     const { project: parent } = useContext(ProjectContext);
     const { data: flowRecomendations = [] } = trpc.flow.recommedations.useQuery();
@@ -56,9 +76,10 @@ const ProjectCreateForm: React.FC = () => {
         watch,
         setValue,
         control,
-        formState: { errors, isSubmitted },
+        trigger,
+        formState: { errors, isSubmitted, isValid },
     } = useForm<ProjectCreate>({
-        resolver: zodResolver(projectCreateSchema),
+        resolver: zodResolver(getPatchedProjectCreateSchema(checkUniqueProjectKey)),
         mode: 'onChange',
         reValidateMode: 'onChange',
         shouldFocusError: false,
@@ -68,7 +89,10 @@ const ProjectCreateForm: React.FC = () => {
         },
     });
 
-    const errorsResolver = errorsProvider(errors, isSubmitted);
+    const errorsResolver = useCallback(
+        (key: keyof typeof errors) => errorsProvider(errors, isSubmitted)(key),
+        [errors, isSubmitted],
+    );
     const titleWatcher = watch('title');
     const keyWatcher = watch('id');
     const flowWatch = watch('flow');
@@ -78,18 +102,6 @@ const ProjectCreateForm: React.FC = () => {
             setValue('flow', flowRecomendations[0]);
         }
     }, [setValue, flowRecomendations, flowWatch]);
-
-    const isKeyEnoughLength = Boolean(keyWatcher?.length >= 3);
-    const existingProject = trpc.project.getById.useQuery(
-        {
-            id: keyWatcher,
-        },
-        {
-            enabled: isKeyEnoughLength,
-        },
-    );
-
-    const isKeyUnique = Boolean(!existingProject?.data);
 
     const onCreateProject = useCallback(
         (form: ProjectCreate) => {
@@ -107,57 +119,65 @@ const ProjectCreateForm: React.FC = () => {
     const onSubmit = useCallback(
         (e: FormEvent<HTMLFormElement>) => {
             e?.preventDefault();
-
-            if (isKeyUnique) {
-                handleSubmit(onCreateProject)(e);
-            }
+            handleSubmit(onCreateProject)(e);
         },
-        [isKeyUnique, handleSubmit, onCreateProject],
+        [handleSubmit, onCreateProject],
     );
 
-    const onKeyDirty = useCallback(() => {
-        setDirtyKey(true);
-    }, []);
+    useEffect(() => {
+        const titleWatch = watch(({ title }, { name, type }) => {
+            if (type === 'change') {
+                if (name === 'title') {
+                    if (title != null && title.length > 0) {
+                        setValue('id', keyPredictor(title));
+                    } else {
+                        setValue('id', '');
+                    }
 
-    const titleChangeHandler = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-        (event) => {
-            setValue('title', event.target.value);
-            if (!dirtyKey && !!event.target.value) {
-                setValue('id', keyPredictor(event.target.value));
+                    trigger('id');
+                }
             }
-        },
-        [setValue, dirtyKey],
-    );
+        });
 
-    // eslint-disable-next-line no-nested-ternary
-    const tooltip = isKeyEnoughLength
-        ? isKeyUnique
-            ? tr.raw('Perfect! Issues and goals will look like', {
-                  perfect: (
-                      <Text key="perfect" as="span" size="s" weight="bolder">
-                          {tr('Perfect')}
-                      </Text>
-                  ),
-                  issueKeyOne: (
-                      <Text key="issue key one" as="span" size="s" weight="bolder">
-                          {tr.raw('issue key one', {
-                              key: keyWatcher,
-                          })}
-                      </Text>
-                  ),
-                  issueKeyTwo: (
-                      <Text key="issue key two" as="span" size="s" weight="bolder">
-                          {tr.raw('issue key two', {
-                              key: keyWatcher,
-                          })}
-                      </Text>
-                  ),
-              })
-            : tr.raw('Key already exists', { key: keyWatcher })
-        : tr('Key must be 3 or longer characters');
+        return () => {
+            titleWatch.unsubscribe();
+        };
+    }, [watch, setValue, trigger]);
+
+    const tooltip =
+        // eslint-disable-next-line no-nested-ternary
+        keyWatcher?.length >= 3
+            ? errors.id?.message == null
+                ? tr.raw('Perfect! Issues and goals will look like', {
+                      perfect: (
+                          <Text key="perfect" as="span" size="s" weight="bolder">
+                              {tr('Perfect')}
+                          </Text>
+                      ),
+                      issueKeyOne: (
+                          <Text key="issue key one" as="span" size="s" weight="bolder">
+                              {tr.raw('issue key one', {
+                                  key: keyWatcher,
+                              })}
+                          </Text>
+                      ),
+                      issueKeyTwo: (
+                          <Text key="issue key two" as="span" size="s" weight="bolder">
+                              {tr.raw('issue key two', {
+                                  key: keyWatcher,
+                              })}
+                          </Text>
+                      ),
+                  })
+                : null
+            : null;
 
     const errorRef = useRef<HTMLTextAreaElement>(null);
     const error = errorsResolver('description');
+
+    const disableSubmitBtn = useMemo(() => {
+        return !isValid || busy;
+    }, [busy, isValid]);
 
     return (
         <>
@@ -168,7 +188,6 @@ const ProjectCreateForm: React.FC = () => {
                             <FormControl className={s.FormControl}>
                                 <FormControlInput
                                     {...register('title')}
-                                    onChange={titleChangeHandler}
                                     disabled={busy}
                                     placeholder={tr('Project title')}
                                     brick="bottom"
@@ -185,13 +204,13 @@ const ProjectCreateForm: React.FC = () => {
                                 <Controller
                                     name="id"
                                     control={control}
-                                    render={({ field }) => (
+                                    render={({ field, fieldState }) => (
                                         <KeyInput
+                                            size="m"
                                             disabled={busy}
-                                            available={isKeyUnique && isKeyEnoughLength}
+                                            available={keyWatcher?.length >= 3}
                                             tooltip={tooltip}
-                                            onDirty={onKeyDirty}
-                                            error={errorsResolver('id')}
+                                            error={fieldState.error}
                                             {...field}
                                         />
                                     )}
@@ -271,7 +290,7 @@ const ProjectCreateForm: React.FC = () => {
                             />
                             <Button
                                 view="primary"
-                                disabled={busy}
+                                disabled={disableSubmitBtn}
                                 type="submit"
                                 text={tr('Create')}
                                 {...projectSubmitButton.attr}

@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { TRPCClientError } from '@trpc/client';
 
 import { ProjectCreate, ProjectUpdate, TeamsUpdate } from '../schema/project';
 import { trpc } from '../utils/trpcClient';
@@ -19,6 +20,7 @@ export const useProjectResource = (id: string) => {
     const getActivityGoals = trpc.project.getActivityGoals.useMutation();
     const addParticipants = trpc.project.addParticipants.useMutation();
     const removeParticipants = trpc.project.removeParticipants.useMutation();
+    const checkUniqueProjectKey = utils.project.checkExistingProject.fetch;
 
     const invalidate = useCallback(() => {
         utils.v2.project.getById.invalidate({ id });
@@ -28,11 +30,25 @@ export const useProjectResource = (id: string) => {
         (cb: Callback<string>) => async (form: ProjectCreate) => {
             const promise = createMutation.mutateAsync(form);
 
-            notifyPromise(promise, 'projectCreate');
+            notifyPromise(promise, 'projectCreate', (error) => {
+                if (error instanceof TRPCClientError) {
+                    const { data, message } = error;
 
-            const res = await promise;
+                    if ('httpStatus' in data && data.httpStatus === 412) {
+                        if (message) {
+                            return message;
+                        }
+                    }
+                }
+            });
 
-            res && cb(res.id);
+            try {
+                const res = await promise;
+
+                res && cb(res.id);
+            } catch (_err: any) {
+                /* */
+            }
         },
         [createMutation],
     );
@@ -164,5 +180,6 @@ export const useProjectResource = (id: string) => {
         onProjectParticipantAdd,
         onProjectParticipantRemove,
         invalidate,
+        checkUniqueProjectKey,
     };
 };
