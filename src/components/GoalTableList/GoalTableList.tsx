@@ -31,7 +31,7 @@ interface GoalTableListProps<T> extends React.ComponentProps<typeof Table> {
     onGoalClick?: MouseEventHandler<HTMLAnchorElement>;
     onTagClick?: (tag: { id: string }) => MouseEventHandler<HTMLDivElement>;
     enableManualSorting: boolean;
-    invalidateGoals?: VoidFunction;
+    invalidateGoals: VoidFunction;
 }
 
 interface IdentifierRecord {
