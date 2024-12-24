@@ -9,5 +9,6 @@
     "Jira task isn't completed yet": "Jira задача еще не выполнена",
     "Jira task is closed, criteria isn't completed": "Jira задача закрыта, критерий не выполнен",
     "Jira task is completed": "Jira задача выполнена, критерий выполнен",
-    "Goal doesn't have a project": "Задача не привязана к проекту"
+    "Goal doesn't have a project": "Задача не привязана к проекту",
+    "Project with {key} key already exists": "Проект с ключом `{key}` уже существует"
 }

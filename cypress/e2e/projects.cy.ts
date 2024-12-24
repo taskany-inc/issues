@@ -132,8 +132,7 @@ describe('Projects', () => {
 
                 cy.get(projectKeyPredictorError.query).should('exist');
                 // screenshot
-
-                cy.get(projectSubmitButton.query).click();
+                cy.get(projectSubmitButton.query).should('be.disabled');
 
                 cy.get(projectCreateForm.query).should('exist');
                 cy.url().should('equal', exactUrl(routes.index()));
@@ -147,8 +146,7 @@ describe('Projects', () => {
 
                 cy.get(projectKeyPredictorError.query).should('exist');
                 // screenshot
-
-                cy.get(projectSubmitButton.query).click();
+                cy.get(projectSubmitButton.query).should('be.disabled');
 
                 cy.get(projectCreateForm.query).should('exist');
                 cy.url().should('equal', exactUrl(routes.index()));
@@ -192,8 +190,7 @@ describe('Projects', () => {
                     cy.get(projectKeyPredictor.query).trigger('mouseover');
 
                     cy.get(projectKeyPredictorError.query).should('exist');
-
-                    cy.get(projectSubmitButton.query).click();
+                    cy.get(projectSubmitButton.query).should('be.disabled');
 
                     cy.get(projectCreateForm.query).should('exist');
                     cy.url().should('equal', exactUrl(routes.index()));
@@ -204,8 +201,7 @@ describe('Projects', () => {
                     cy.get(projectKeyPredictor.query).contains(testProjectKeyRu).trigger('mouseover');
 
                     cy.get(projectKeyPredictorError.query).should('exist');
-
-                    cy.get(projectSubmitButton.query).click();
+                    cy.get(projectSubmitButton.query).should('be.disabled');
 
                     cy.get(projectCreateForm.query).should('exist');
                     cy.url().should('equal', exactUrl(routes.index()));

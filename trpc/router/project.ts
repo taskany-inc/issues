@@ -26,6 +26,8 @@ import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFiel
 import { getDeepChildrenProjectsId } from '../queries/projectV2';
 import { getGoalActivityFilterIdsQuery } from '../queries/goalV2';
 
+import { tr } from './router.i18n';
+
 export const project = router({
     getAll: protectedProcedure
         .input(
@@ -293,6 +295,17 @@ export const project = router({
         .input(projectCreateSchema)
         .mutation(async ({ ctx, input: { id, title, description, flow, parent } }) => {
             const { activityId } = ctx.session.user;
+
+            const existProject = await prisma.project.findFirst({ where: { id } });
+
+            if (existProject != null) {
+                throw new TRPCError({
+                    code: 'PRECONDITION_FAILED',
+                    message: tr('Project with {key} key already exists', {
+                        key: id,
+                    }),
+                });
+            }
 
             try {
                 return prisma.project.create({
@@ -746,4 +759,17 @@ export const project = router({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
         }),
+
+    checkExistingProject: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
+        const existProject = await prisma.project.findUnique({ where: { id: input.id } });
+
+        if (existProject) {
+            throw new TRPCError({
+                code: 'PRECONDITION_FAILED',
+                message: tr('Project with {key} key already exists', { key: input.id }),
+            });
+        }
+
+        return null;
+    }),
 });
