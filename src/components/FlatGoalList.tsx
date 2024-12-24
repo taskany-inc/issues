@@ -27,13 +27,13 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
     });
 
     const [, setPage] = useState(0);
-    const { data, fetchNextPage, hasNextPage } = trpc.goal.getBatch.useInfiniteQuery(
+    const { data, fetchNextPage, hasNextPage, isLoading } = trpc.v2.goal.getAllGoals.useInfiniteQuery(
         {
             limit: pageSize,
-            query: queryState,
+            goalsQuery: queryState,
         },
         {
-            getNextPageParam: (p) => p.nextCursor,
+            getNextPageParam: ({ pagination }) => pagination.offset,
             keepPreviousData: true,
             staleTime: refreshInterval,
         },
@@ -56,7 +56,20 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
     useFMPMetric(!!data);
 
     const pages = data?.pages;
-    const goalsOnScreen = useMemo(() => pages?.flatMap((p) => p.items), [pages]);
+    const goalsOnScreen = useMemo(() => {
+        const list = pages?.flatMap((p) => p.goals);
+
+        const renderList = mapToRenderProps(list ?? [], (goal) => ({
+            ...goal,
+            owner: safeUserData(goal.owner),
+            participants: goal.participants?.map(safeUserData),
+            shortId: goal._shortId,
+            commentsCount: goal._count.comments,
+            achievedCriteriaWeight: goal._achivedCriteriaWeight,
+        }));
+
+        return { list, renderList };
+    }, [pages]);
 
     const onFetchNextPage = useCallback(() => {
         fetchNextPage();
@@ -70,19 +83,20 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
         [setPreview],
     );
 
+    const enableManualSorting = Boolean(queryState?.sort?.some(({ key }) => key === 'rankGlobal')) && !isLoading;
+
+    const invalidate = useCallback(() => {
+        utils.v2.goal.getAllGoals.invalidate();
+    }, [utils]);
+
     return (
         <ListView onKeyboardClick={handleItemEnter}>
-            {nullable(goalsOnScreen, (goals) => (
+            {nullable(goalsOnScreen.renderList, (goals) => (
                 <GoalTableList
-                    goals={mapToRenderProps(goals, (goal) => ({
-                        ...goal,
-                        owner: safeUserData(goal.owner),
-                        participants: goal.participants?.map(safeUserData),
-                        shortId: goal._shortId,
-                        commentsCount: goal._count.comments,
-                        achievedCriteriaWeight: goal._achivedCriteriaWeight,
-                    }))}
+                    goals={goals}
                     onTagClick={setTagsFilterOutside}
+                    enableManualSorting={enableManualSorting}
+                    invalidateGoals={invalidate}
                 />
             ))}
 
