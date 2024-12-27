@@ -5,7 +5,7 @@ import { ListView } from '@taskany/bricks/harmony';
 import { refreshInterval } from '../utils/config';
 import { trpc } from '../utils/trpcClient';
 import { useFMPMetric } from '../utils/telemetry';
-import { FilterById, GoalByIdReturnType } from '../../trpc/inferredTypes';
+import { FilterById, GoalByIdReturnType, GroupedProjectById } from '../../trpc/inferredTypes';
 import { useUrlFilterParams } from '../hooks/useUrlFilterParams';
 
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
@@ -17,6 +17,25 @@ interface GroupedGoalListProps {
 }
 
 export const projectsSize = 20;
+
+const ProjectItem: React.FC<{ project: GroupedProjectById; preset?: FilterById }> = ({ project, preset }) => {
+    const { queryState } = useUrlFilterParams({ preset });
+
+    const { data } = trpc.v2.project.getProjectChildrenTree.useQuery({
+        id: project.id,
+        goalsQuery: queryState,
+    });
+
+    return (
+        <ProjectListItemConnected
+            key={project.id}
+            project={project}
+            filterPreset={preset}
+            actionButtonView="icons"
+            subTree={data?.[project.id]}
+        />
+    );
+};
 
 export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }) => {
     const { setPreview, on } = useGoalPreview();
@@ -67,12 +86,7 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }
     return (
         <ListView onKeyboardClick={handleItemEnter}>
             {projectsOnScreen.map((project) => (
-                <ProjectListItemConnected
-                    key={project.id}
-                    project={project}
-                    filterPreset={filterPreset}
-                    actionButtonView="icons"
-                />
+                <ProjectItem key={project.id} project={project} preset={filterPreset} />
             ))}
 
             {nullable(hasNextPage, () => (
