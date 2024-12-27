@@ -29,6 +29,7 @@ export type DashboardProjectV2 = RouterOutputs['v2']['project']['getUserDashboar
 export type DashboardGoalV2 = NonNullable<DashboardProjectV2['goals']>[number];
 export type ProjectByIdReturnTypeV2 = RouterOutputs['v2']['project']['getById'];
 export type ProjectChildrenTree = RouterOutputs['v2']['project']['getProjectChildrenTree'];
+export type GroupedProjectById = RouterOutputs['v2']['project']['getAll']['projects'][number];
 
 export type GoalActivityHistory = RouterOutputs['goal']['getGoalActivityFeed'];
 export type GoalComments = RouterOutputs['goal']['getGoalCommentsFeed'];
