@@ -1,6 +1,7 @@
 import { Role } from '@prisma/client';
 
 import { QueryWithFilters } from '../../src/schema/common';
+import { oneOf, and, inverse } from '../../src/utils/anyEntityCheck';
 
 import { goalsFilter } from './goals';
 import { getProjectAccessFilter } from './access';
@@ -41,45 +42,57 @@ export const addCalculatedProjectFields = <
     };
 };
 
-export const checkProjectAccess = <
-    T extends {
-        accessUsers: WithId[];
-        activityId: string;
-        archived?: boolean | null;
-        personal: boolean | null;
-        goalAccessIds?: string[];
-    },
->(
-    project: T,
-    activityId: string,
-    role: Role,
-) => {
-    if (role === 'ADMIN') {
-        return !project.archived;
-    }
+interface ProjectAccessEntity {
+    accessUsers: WithId[];
+    activityId: string;
+    archived?: boolean | null;
+    personal: boolean | null;
+    goalAccessIds?: string[];
+}
 
-    if (project.archived) {
-        return false;
-    }
+interface ProjectEntity {
+    project: ProjectAccessEntity;
+}
 
-    if (project.personal) {
-        if (project.goalAccessIds?.length) {
-            return project.goalAccessIds.includes(activityId);
-        }
+interface UserEntity {
+    activityId: string;
+    role: Role;
+}
 
-        if (project.accessUsers.length) {
-            return project.accessUsers.some(({ id }) => id === activityId);
-        }
+const notArchivedProject = ({ project }: ProjectEntity & UserEntity) => project.archived !== true;
+const projectIsPersonal = ({ project }: ProjectEntity & UserEntity) => project.personal === true;
+const userIsProjectOwner = ({ project, activityId }: ProjectEntity & UserEntity) => project.activityId === activityId;
 
-        return project.activityId === activityId;
-    }
-
+const publicProject = and<ProjectEntity & UserEntity>(
+    inverse(projectIsPersonal),
+    ({ project }) => project.accessUsers.length === 0 || project.accessUsers == null,
+);
+const userHadAccess = ({ project, activityId }: ProjectEntity & UserEntity) => {
     if (project.accessUsers.length) {
         return project.accessUsers.some(({ id }) => id === activityId);
     }
 
-    return true;
+    return false;
 };
+const userHadGoalsInProject = ({ project, activityId }: ProjectEntity & UserEntity) => {
+    if (project.goalAccessIds?.length) {
+        return project.goalAccessIds.some((id) => id === activityId);
+    }
+
+    return false;
+};
+
+const checkProjectEntity = and<ProjectEntity & UserEntity>(
+    notArchivedProject,
+    oneOf(
+        and(projectIsPersonal, oneOf(userIsProjectOwner, userHadGoalsInProject)),
+        and(inverse(projectIsPersonal), oneOf(userIsProjectOwner, userHadAccess, userHadGoalsInProject)),
+        and(inverse(projectIsPersonal), publicProject),
+    ),
+);
+
+export const checkProjectAccess = <T extends ProjectAccessEntity>(project: T, activityId: string, role: Role) =>
+    checkProjectEntity({ project, activityId, role });
 
 export const getProjectSchema = ({
     role,
