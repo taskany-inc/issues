@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.66.1](https://github.com/taskany-inc/issues/compare/v2.66.0...v2.66.1) (2025-01-17)
+
+
+### Bug Fixes
+
+* **INTERNAL-1057:** fix on conflict clause in goal rank update ([2d21a0b](https://github.com/taskany-inc/issues/commit/2d21a0b07280a23c2f5ec971d75fb33e26d1c56d))
+
 ## [2.66.0](https://github.com/taskany-inc/issues/compare/v2.65.3...v2.66.0) (2025-01-16)
 
 
