@@ -28,12 +28,12 @@ export const updateGoalRanks = (data: { goalId: string; value: number }[], activ
             if (activityId) {
                 return oc
                     .columns(['goalId', 'activityId'])
-                    .where('GoalRank.activityId', 'is not', null)
+                    .where('activityId', 'is not', null)
                     .doUpdateSet({ value: (eb) => eb.ref('excluded.value') });
             }
             return oc
                 .columns(['goalId'])
-                .where('GoalRank.activityId', 'is', null)
+                .where('activityId', 'is', null)
                 .doUpdateSet({ value: (eb) => eb.ref('excluded.value') });
         });
 };
