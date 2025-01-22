@@ -4,5 +4,5 @@ on: workflow_dispatch
 
 jobs:
   manual_release:
-    uses: taskany-inc/release/.github/workflows/release_pr.yml@main
+    uses: taskany-inc/release/.github/workflows/release_pr.yml@jira-tasks-changelog
     secrets: inherit
