@@ -25,6 +25,7 @@ import { prepareRecipients } from '../../src/utils/prepareRecipients';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 import { getDeepChildrenProjectsId } from '../queries/projectV2';
 import { getGoalActivityFilterIdsQuery } from '../queries/goalV2';
+import { processEvent } from '../../src/utils/analyticsEvent';
 
 import { tr } from './router.i18n';
 
@@ -308,7 +309,7 @@ export const project = router({
             }
 
             try {
-                return prisma.project.create({
+                const project = await prisma.project.create({
                     data: {
                         id,
                         title,
@@ -323,6 +324,18 @@ export const project = router({
                         },
                     },
                 });
+
+                processEvent({
+                    eventType: 'projectCreate',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        projectId: project.id,
+                    },
+                });
+
+                return project;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
@@ -508,6 +521,16 @@ export const project = router({
                     authorEmail: ctx.session.user.email,
                 });
 
+                processEvent({
+                    eventType: 'projectUpdate',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        projectId: project.id,
+                    },
+                });
+
                 return updatedProject;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -533,6 +556,16 @@ export const project = router({
 
                 // before update project need to update project goals
                 await updateLinkedGoalsByProject(input.id, ctx.session.user.activityId);
+
+                processEvent({
+                    eventType: 'projectRemove',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        projectId: input.id,
+                    },
+                });
 
                 return prisma.project.update({
                     where: {
@@ -624,6 +657,18 @@ export const project = router({
                     authorEmail: ctx.session.user.email,
                 });
 
+                processEvent({
+                    eventType: 'projectTransferOwnership',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        projectId: id,
+                        prevOwnerId: project.activityId,
+                        nextOwnerId: transferedProject.activityId,
+                    },
+                });
+
                 return transferedProject;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -663,7 +708,7 @@ export const project = router({
     updateTeams: protectedProcedure
         .input(teamsToProjectSchema)
         .use(projectEditAccessMiddleware)
-        .mutation(async ({ input: { id, teams } }) => {
+        .mutation(async ({ ctx, input: { id, teams } }) => {
             const project = await prisma.project.findUnique({
                 where: { id },
                 include: {
@@ -679,6 +724,18 @@ export const project = router({
             const teamsToDisconnect = project.teams.filter(
                 (t) => !teams?.some((externalTeamId) => externalTeamId === t.externalTeamId),
             );
+
+            processEvent({
+                eventType: 'projectUpdateTeams',
+                url: ctx.headers.referer || '',
+                session: ctx.session,
+                uaHeader: ctx.headers['user-agent'],
+                additionalData: {
+                    projectId: id,
+                    connectedTeams: teamsToConnect.join(','),
+                    disconnectedTeams: teamsToDisconnect.join(','),
+                },
+            });
 
             return prisma.project.update({
                 where: {
@@ -724,6 +781,17 @@ export const project = router({
                     authorEmail: ctx.session.user.email,
                 });
 
+                processEvent({
+                    eventType: 'projectAddParticipant',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        projectId: id,
+                        participants: participants.join(','),
+                    },
+                });
+
                 return updatedProject;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -752,6 +820,17 @@ export const project = router({
                     title: updatedProject.title,
                     author: ctx.session.user.name || ctx.session.user.email,
                     authorEmail: ctx.session.user.email,
+                });
+
+                processEvent({
+                    eventType: 'projectRemoveParticipant',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        projectId: id,
+                        participants: participants.join(','),
+                    },
                 });
 
                 return updatedProject;

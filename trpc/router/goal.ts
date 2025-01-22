@@ -66,6 +66,7 @@ import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
 import { getOrCreateExternalTask, updateExternalTask } from '../queries/external';
 import { jiraService, JiraUser, searchIssue } from '../../src/utils/integration/jira';
+import { processEvent } from '../../src/utils/analyticsEvent';
 
 import { tr } from './router.i18n';
 
@@ -476,6 +477,18 @@ export const goal = router({
                 }),
             ]);
 
+            processEvent({
+                eventType: 'goalCreate',
+                url: ctx.headers.referer || '',
+                session: ctx.session,
+                uaHeader: ctx.headers['user-agent'],
+                additionalData: {
+                    goalId: newGoal.id,
+                    scopedId: newGoal._shortId,
+                    projectId: newGoal.projectId || '',
+                },
+            });
+
             return newGoal;
         } catch (error: any) {
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -543,12 +556,27 @@ export const goal = router({
 
                 await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
 
-                // TODO: goal was moved
-
-                return {
+                const newGoal = {
                     ...goal,
                     ...addCalculatedGoalsFields(goal, activityId, role),
                 };
+
+                processEvent({
+                    eventType: 'goalTransfer',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: newGoal.id,
+                        scopedId: newGoal._shortId,
+                        newProjectId: newGoal.projectId || '',
+                        oldProjectId: goal.projectId || '',
+                    },
+                });
+
+                // TODO: goal was moved
+
+                return newGoal;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
@@ -785,9 +813,26 @@ export const goal = router({
                     ]);
                 }
 
-                return {
+                const updatedGoal = {
                     ...goal,
                     ...addCalculatedGoalsFields(goal, activityId, role),
+                };
+
+                processEvent({
+                    eventType: 'goalUpdate',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        scopedId: updatedGoal._shortId,
+                        projectId: updatedGoal.projectId || '',
+                        changes: history.map(({ subject }) => subject).join(','),
+                    },
+                });
+
+                return {
+                    ...updatedGoal,
                     _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                     _activityFeed: [],
                 };
@@ -902,6 +947,17 @@ export const goal = router({
                     authorEmail: ctx.session.user.email,
                 });
 
+                processEvent({
+                    eventType: 'goalArchived',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        projectId: updatedGoal.projectId || '',
+                    },
+                });
+
                 return updatedGoal;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1013,6 +1069,19 @@ export const goal = router({
                     title: actualGoal.title,
                     author: ctx.session.user.name || ctx.session.user.email,
                     authorEmail: ctx.session.user.email,
+                });
+
+                processEvent({
+                    eventType: 'goalChangeState',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        projectId: updatedGoal.projectId || '',
+                        prevState: actualGoal.state?.type ?? '',
+                        nextState: input.state.type,
+                    },
                 });
 
                 return updatedGoal;
@@ -1188,7 +1257,7 @@ export const goal = router({
                     },
                 });
 
-                const actualGoal = await prisma.goal.findUnique({
+                const actualGoal = await prisma.goal.findUniqueOrThrow({
                     where: { id: input.goalId },
                     include: {
                         state: true,
@@ -1204,12 +1273,27 @@ export const goal = router({
                     },
                 });
 
-                if (actualGoal) {
-                    await recalculateCriteriaScore(actualGoal.id)
-                        .recalcCurrentGoalScore()
-                        .recalcAverageProjectScore()
-                        .run();
-                }
+                await recalculateCriteriaScore(actualGoal.id)
+                    .recalcCurrentGoalScore()
+                    .recalcAverageProjectScore()
+                    .run();
+
+                processEvent({
+                    eventType: 'goalCriteriaCreate',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: actualGoal.id,
+                        criteriaId: newCriteria.id,
+                        meta: [
+                            newCriteria.criteriaGoalId && 'withGoal',
+                            newCriteria.externalTaskId && 'withJiraTask',
+                            String(newCriteria.weight),
+                            isDoneByConnect ? 'complete' : 'uncomplete',
+                        ].join(','),
+                    },
+                });
 
                 return newCriteria;
             } catch (error: any) {
@@ -1318,7 +1402,7 @@ export const goal = router({
                             },
                         },
                     }),
-                    prisma.goal.findUnique({
+                    prisma.goal.findUniqueOrThrow({
                         where: { id: input.goalId },
                         include: {
                             state: true,
@@ -1335,12 +1419,27 @@ export const goal = router({
                     }),
                 ]);
 
-                if (actualGoal) {
-                    await recalculateCriteriaScore(actualGoal.id)
-                        .recalcCurrentGoalScore()
-                        .recalcAverageProjectScore()
-                        .run();
-                }
+                await recalculateCriteriaScore(actualGoal.id)
+                    .recalcCurrentGoalScore()
+                    .recalcAverageProjectScore()
+                    .run();
+
+                processEvent({
+                    eventType: 'goalCriteriaCreate',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: actualGoal.id,
+                        criteriaId: updatedCriteria.id,
+                        meta: [
+                            updatedCriteria.criteriaGoalId && 'withGoal',
+                            updatedCriteria.externalTaskId && 'withJiraTask',
+                            String(updatedCriteria.weight),
+                            isDoneByConnect ? 'complete' : 'uncomplete',
+                        ].join(','),
+                    },
+                });
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
@@ -1383,6 +1482,18 @@ export const goal = router({
                     .recalcLinkedGoalsScores()
                     .recalcAverageProjectScore()
                     .run();
+
+                processEvent({
+                    eventType: 'goalCriteriaToggle',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: currentCriteria.goalId,
+                        criteriaId: currentCriteria.id,
+                        done: input.isDone ? 'complete' : 'uncomplete',
+                    },
+                });
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
@@ -1423,6 +1534,17 @@ export const goal = router({
                         .recalcCurrentGoalScore()
                         .recalcAverageProjectScore()
                         .run();
+
+                    processEvent({
+                        eventType: 'goalCriteriaRemove',
+                        url: ctx.headers.referer || '',
+                        session: ctx.session,
+                        uaHeader: ctx.headers['user-agent'],
+                        additionalData: {
+                            goalId: current.goalId,
+                            criteriaId: current.id,
+                        },
+                    });
                 }
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1431,7 +1553,7 @@ export const goal = router({
     convertCriteriaToGoal: protectedProcedure
         .input(convertCriteriaToGoalSchema)
         .use(criteriaAccessMiddleware)
-        .mutation(async ({ input }) => {
+        .mutation(async ({ ctx, input }) => {
             try {
                 const actualCriteria = await prisma.goalAchieveCriteria.findUnique({
                     where: { id: input.id },
@@ -1455,6 +1577,19 @@ export const goal = router({
                     .recalcCurrentGoalScore()
                     .recalcAverageProjectScore()
                     .run();
+
+                processEvent({
+                    eventType: 'goalCriteriaConvert',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: actualCriteria.goalId,
+                        criteriaId: actualCriteria.id,
+                        connectedGoal: input.criteriaGoal.id,
+                        convertMode: 'goal',
+                    },
+                });
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
@@ -1595,6 +1730,17 @@ export const goal = router({
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
 
+                processEvent({
+                    eventType: 'goalAddParticipant',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        userId: input.activityId,
+                    },
+                });
+
                 return updatedGoal;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1623,6 +1769,17 @@ export const goal = router({
                 });
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                processEvent({
+                    eventType: 'goalRemoveParticipant',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        userId: input.activityId,
+                    },
+                });
 
                 return updatedGoal;
             } catch (error: any) {
@@ -1672,6 +1829,18 @@ export const goal = router({
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
 
+                processEvent({
+                    eventType: 'goalAddDependency',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        depId: input.relation.id,
+                        kind: input.kind,
+                    },
+                });
+
                 return updatedGoal;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1715,6 +1884,18 @@ export const goal = router({
                 ]);
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                processEvent({
+                    eventType: 'goalRemoveDependency',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        depId: input.relation.id,
+                        kind: input.kind,
+                    },
+                });
 
                 return updatedGoal;
             } catch (error: any) {
@@ -1800,6 +1981,18 @@ export const goal = router({
                     authorEmail: ctx.session.user.email,
                 });
 
+                processEvent({
+                    eventType: 'addPartnerProject',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        projectId: updatedGoal.projectId || '',
+                        connectedProjectId: input.projectId,
+                    },
+                });
+
                 return updatedGoal;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
@@ -1876,6 +2069,18 @@ export const goal = router({
                 });
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                processEvent({
+                    eventType: 'removePartnerProject',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        projectId: updatedGoal.projectId || '',
+                        connectedProjectId: input.projectId,
+                    },
+                });
 
                 return updatedGoal;
             } catch (error: any) {
@@ -2011,6 +2216,19 @@ export const goal = router({
                 });
 
                 await updateProjectUpdatedAt(updatedGoal.projectId);
+
+                processEvent({
+                    eventType: 'removePartnerProject',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        goalId: updatedGoal.id,
+                        projectId: updatedGoal.projectId || '',
+                        prevOwnerId: actualGoal.ownerId || '',
+                        nextOwnerId: input.ownerId,
+                    },
+                });
 
                 return { ...updatedGoal, ...addCalculatedGoalsFields(updatedGoal, activityId, role) };
             } catch (error: any) {
