@@ -7,9 +7,30 @@ type EventType =
     | 'query'
     | 'click'
     | 'searchQuery'
-    | 'userRequestCreate'
-    | 'userActiveUpdate'
-    | 'groupCreate';
+    | 'projectCreate'
+    | 'projectUpdate'
+    | 'projectRemove'
+    | 'projectTransferOwnership'
+    | 'projectAddParticipant'
+    | 'projectRemoveParticipant'
+    | 'projectUpdateTeams'
+    | 'goalCreate'
+    | 'goalTransfer'
+    | 'goalUpdate'
+    | 'goalArchived'
+    | 'goalCriteriaCreate'
+    | 'goalCriteriaEdit'
+    | 'goalCriteriaRemove'
+    | 'goalCriteriaToggle'
+    | 'goalCriteriaConvert'
+    | 'goalCriteriaOwnerChange'
+    | 'goalAddDependency'
+    | 'goalRemoveDependency'
+    | 'goalAddParticipant'
+    | 'goalRemoveParticipant'
+    | 'goalChangeState'
+    | 'addPartnerProject'
+    | 'removePartnerProject';
 
 export interface AnalyticsEvent {
     event_type: EventType;
