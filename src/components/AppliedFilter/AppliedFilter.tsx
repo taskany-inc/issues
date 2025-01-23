@@ -9,6 +9,7 @@ interface AppliedFilterProps extends React.HTMLAttributes<HTMLDivElement> {
     label?: string;
     readOnly?: boolean;
     action?: ComponentProps<typeof Tag>['action'];
+    color?: ComponentProps<typeof Tag>['color'];
     children?: ReactNode;
 }
 
