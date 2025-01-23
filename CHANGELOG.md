@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.67.0](https://github.com/taskany-inc/issues/compare/v2.66.1...v2.67.0) (2025-01-23)
+
+
+### Features
+
+* **INTERNAL-1522:** handle api events ([53e3aa8](https://github.com/taskany-inc/issues/commit/53e3aa8d77d3600bd1af72e313616347f0e6c9f0))
+
+
+### Bug Fixes
+
+* **INTERNAL-1532:** replace `Taskany` on `SD Goals` ([9807055](https://github.com/taskany-inc/issues/commit/98070551fccf85eabf01c0763a8f170498fac889))
+
 ## [2.66.1](https://github.com/taskany-inc/issues/compare/v2.66.0...v2.66.1) (2025-01-17)
 
 
