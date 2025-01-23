@@ -14,7 +14,7 @@ export const PageFooter: FC = () => {
     const menuItems = [
         { title: tr('Terms'), url: '/terms' },
         { title: tr('Docs'), url: '/docs' },
-        { title: tr('Contact Taskany'), url: '/contactTaskany' },
+        { title: tr('Contact us'), url: '/contactTaskany' },
         { title: tr('API'), url: '/api' },
         { title: tr('About'), url: '/about' },
     ];
@@ -43,7 +43,7 @@ export const PageFooter: FC = () => {
 
     return (
         <Footer>
-            <FooterCopyright />
+            <FooterCopyright orgName={tr('Organization')} />
             <FooterMenu>
                 <FooterItem onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)} className={s.FooterItem}>
                     {tr('Feedback')}

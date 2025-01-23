@@ -155,8 +155,8 @@
     },
     "DashboardPage": {
         "title": {
-            "ru": "Taskany — Рабочий стол",
-            "en": "Taskany — Dashboard"
+            "ru": "SD Goals — Рабочий стол",
+            "en": "SD Goals — Dashboard"
         },
         "Dashboard": {
             "ru": "Рабочий стол",
@@ -223,14 +223,14 @@
     },
     "ExploreProjectsPage": {
         "title": {
-            "ru": "Taskany — Обзор — Проекты",
-            "en": "Taskany — Explore — Projects"
+            "ru": "SD Goals — Обзор — Проекты",
+            "en": "SD Goals — Explore — Projects"
         }
     },
     "ExploreProjectsStarredPage": {
         "title": {
-            "ru": "Taskany — Обзор — Проекты — Избранное",
-            "en": "Taskany — Explore — Projects - Starred"
+            "ru": "SD Goals — Обзор — Проекты — Избранное",
+            "en": "SD Goals — Explore — Projects - Starred"
         },
         "Starred": {
             "ru": "Избранные проекты",
@@ -251,8 +251,8 @@
     },
     "ExploreTopProjectsPage": {
         "title": {
-            "ru": "Taskany — Обзор — Проекты",
-            "en": "Taskany — Explore — Projects"
+            "ru": "SD Goals — Обзор — Проекты",
+            "en": "SD Goals — Explore — Projects"
         }
     },
     "FeedbackCreateForm": {
@@ -589,8 +589,8 @@
     },
     "GoalPage": {
         "title": {
-            "ru": "Taskany — Цели — {goal}",
-            "en": "Taskany — Goals — {goal}"
+            "ru": "SD Goals — Цели — {goal}",
+            "en": "SD Goals — Goals — {goal}"
         },
         "Edit": {
             "ru": "Редактировать",
@@ -711,8 +711,8 @@
     },
     "GoalsPage": {
         "title": {
-            "ru": "Taskany — Goals",
-            "en": "Taskany — Goals"
+            "ru": "SD Goals — Goals",
+            "en": "SD Goals — Goals"
         },
         "Goals": {
             "ru": "Цели",
@@ -946,9 +946,9 @@
             "ru": "Документация",
             "en": "Docs"
         },
-        "Contact Taskany": {
-            "ru": "Контакты",
-            "en": "Contact Taskany"
+        "Contact us": {
+            "ru": "Связаться с нами",
+            "en": ""
         },
         "API": {
             "ru": "API",
@@ -957,6 +957,10 @@
         "About": {
             "ru": "О нас",
             "en": "About"
+        },
+        "Organization": {
+            "ru": "SD Goals",
+            "en": "SD Goals"
         },
         "Feedback": {
             "ru": "Обратная связь",
@@ -1044,6 +1048,10 @@
         }
     },
     "ProjectCreateForm": {
+        "Key must be 3 or longer characters": {
+            "ru": "Ключ не может быть короче 3 символов",
+            "en": "Key must be 3 or longer characters"
+        },
         "Perfect! Issues and goals will look like": {
             "ru": "{perfect} Задачи и цели будут выглядеть примерно так: {issueKeyOne}, {issueKeyTwo}.",
             "en": "{perfect} Issues and goals will look like: {issueKeyOne}, {issueKeyTwo}"
@@ -1059,14 +1067,6 @@
         "issue key two": {
             "ru": "#{key}-911",
             "en": "#{key}-911"
-        },
-        "Key already exists": {
-            "ru": "Ключ {key} уже существует. Попробуй другой.",
-            "en": "Key {key} already exists. Please, try to use another key."
-        },
-        "Key must be 3 or longer characters": {
-            "ru": "Ключ не может быть короче 3 символов",
-            "en": "Key must be 3 or longer characters"
         },
         "Project title": {
             "ru": "Название проекта",
@@ -1099,8 +1099,8 @@
     },
     "ProjectPage": {
         "title": {
-            "ru": "Taskany — {project}",
-            "en": "Taskany — {project}"
+            "ru": "SD Goals — {project}",
+            "en": "SD Goals — {project}"
         },
         "Projects": {
             "ru": "Проекты",
@@ -1133,8 +1133,8 @@
     },
     "ProjectSettingsPage": {
         "title": {
-            "ru": "Taskany — {project} — Настройки",
-            "en": "Taskany — {project} — Settings"
+            "ru": "SD Goals — {project} — Настройки",
+            "en": "SD Goals — {project} — Settings"
         },
         "General": {
             "ru": "Основные",
@@ -1279,8 +1279,8 @@
     },
     "ProjectTeamPage": {
         "title": {
-            "ru": "Taskany — {project} — Настройки",
-            "en": "Taskany — {project} — Settings"
+            "ru": "SD Goals — {project} — Настройки",
+            "en": "SD Goals — {project} — Settings"
         },
         "Add team": {
             "ru": "Добавить команду",
@@ -1355,8 +1355,8 @@
             "en": "Project"
         },
         "Manual": {
-            "ru": "",
-            "en": ""
+            "ru": "Вручную",
+            "en": "Manual"
         },
         "Stargizers": {
             "ru": "В избранном",
@@ -1437,8 +1437,8 @@
             "en": "Nickname already exists"
         },
         "title": {
-            "ru": "Taskany — {user} — Настройки",
-            "en": "Taskany — {user} — Settings"
+            "ru": "SD Goals — {user} — Настройки",
+            "en": "SD Goals — {user} — Settings"
         },
         "Settings": {
             "ru": "Настройки",
