@@ -813,6 +813,7 @@ export const getUserProjects = ({
         .selectFrom('Project')
         .innerJoin('subs_projects', 'subs_projects.pid', 'Project.id')
         .select(['Project.id as pid', 'subs_projects.role'])
+        .where('Project.archived', 'is not', true)
         .union((eb) =>
             eb
                 .selectFrom('_parentChildren')
