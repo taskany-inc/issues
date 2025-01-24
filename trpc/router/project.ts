@@ -126,7 +126,7 @@ export const project = router({
                 })
                 .optional(),
         )
-        .query(async ({ ctx, input: { firstLevel, goalsQuery } = {} }) => {
+        .query(async ({ ctx, input: { firstLevel = true, goalsQuery } = {} }) => {
             const { activityId, role } = ctx.session.user;
             let hideCriteriaFilterIds: string[] = [];
             if (goalsQuery?.hideCriteria) {
