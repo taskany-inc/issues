@@ -77,7 +77,7 @@ const ProjectCreateForm: React.FC = () => {
         setValue,
         control,
         trigger,
-        formState: { errors, isSubmitted, isValid },
+        formState: { errors, isValid },
     } = useForm<ProjectCreate>({
         resolver: zodResolver(getPatchedProjectCreateSchema(checkUniqueProjectKey)),
         mode: 'onChange',
@@ -89,10 +89,7 @@ const ProjectCreateForm: React.FC = () => {
         },
     });
 
-    const errorsResolver = useCallback(
-        (key: keyof typeof errors) => errorsProvider(errors, isSubmitted)(key),
-        [errors, isSubmitted],
-    );
+    const errorsResolver = useCallback((key: keyof typeof errors) => errorsProvider(errors, true)(key), [errors]);
     const titleWatcher = watch('title');
     const keyWatcher = watch('id');
     const flowWatch = watch('flow');
