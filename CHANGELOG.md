@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.67.1](https://github.com/taskany-inc/issues/compare/v2.67.0...v2.67.1) (2025-01-30)
+
+
+### Bug Fixes
+
+* **INTERNAL-1503:** fixed archived dashboard project ([f9b49ed](https://github.com/taskany-inc/issues/commit/f9b49edbcfa6b6853db1ed4e31b13009ed827f18))
+* **INTERNAL-1530:** `/explore/projects` pagination ([5dff778](https://github.com/taskany-inc/issues/commit/5dff7785a413b37adafb46d3c215498c003a1a2a))
+
 ## [2.67.0](https://github.com/taskany-inc/issues/compare/v2.66.1...v2.67.0) (2025-01-23)
 
 
