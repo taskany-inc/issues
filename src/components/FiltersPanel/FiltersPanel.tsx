@@ -1,4 +1,4 @@
-import { FC, useCallback, memo, useState, useEffect, ReactNode, useMemo } from 'react';
+import { FC, useCallback, memo, useState, useEffect, ReactNode, useMemo, useRef } from 'react';
 import {
     Button,
     FiltersBar,
@@ -7,6 +7,8 @@ import {
     FiltersBarItem,
     FiltersBarTitle,
     Checkbox,
+    Text,
+    Tooltip,
 } from '@taskany/bricks/harmony';
 import { nullable, useLatest } from '@taskany/bricks';
 
@@ -45,6 +47,46 @@ import { SortList } from '../SortList/SortList';
 import { useLocale } from '../../hooks/useLocale';
 
 import { tr } from './FiltersPanel.i18n';
+
+const OverflowFilterTitle: React.FC<{ title: string }> = ({ title }) => {
+    const ref = useRef<HTMLSpanElement>(null);
+    const [shouldAppendTooltip, setShouldAppendTooltip] = useState(false);
+    const [visibleTooltip, setVisibleTooltip] = useState(false);
+
+    useEffect(() => {
+        if (ref.current != null) {
+            const node = ref.current;
+            setShouldAppendTooltip(() => node.clientHeight !== node.scrollHeight);
+        }
+    }, []);
+
+    const handleOver = useCallback(() => {
+        if (!shouldAppendTooltip) {
+            return;
+        }
+
+        setVisibleTooltip(true);
+    }, [shouldAppendTooltip]);
+
+    const handleLeave = useCallback(() => {
+        setVisibleTooltip(false);
+    }, []);
+
+    return (
+        <>
+            <FiltersBarTitle {...filtersPanelTitle.attr} onMouseOver={handleOver} onMouseLeave={handleLeave}>
+                <Text as="span" lines={2} ellipsis wordBreak="break-word" ref={ref}>
+                    {title}
+                </Text>
+            </FiltersBarTitle>
+            {nullable(shouldAppendTooltip, () => (
+                <Tooltip visible={visibleTooltip} reference={ref} placement="bottom" offset={[0, 10]} maxWidth={330}>
+                    {title}
+                </Tooltip>
+            ))}
+        </>
+    );
+};
 
 export const FiltersPanel: FC<{
     title: string;
@@ -209,7 +251,7 @@ export const FiltersPanel: FC<{
             <>
                 <FiltersBar {...filtersPanel.attr}>
                     <FiltersBarItem>
-                        <FiltersBarTitle {...filtersPanelTitle.attr}>{title}</FiltersBarTitle>
+                        <OverflowFilterTitle key={title} title={title} />
                     </FiltersBarItem>
                     <Separator />
                     {children}

@@ -4,7 +4,11 @@
 }
 
 .FormActions {
-    justify-content: space-between;
+    justify-content: flex-start;
+}
+
+.FormActionsShiftRight {
+    margin-left: auto;
 }
 
 .SwitchGoalType {
@@ -22,19 +26,24 @@
 
 .GoalFormPriorityDropdown {
     min-width: 120px;
+    width: 100%;
     max-width: 170px;
 }
 
 .GoalFormStateDropdown {
     max-width: 170px;
+    width: 100%;
 }
 
 .GoalFormEstimateDropdown {
     max-width: 170px;
+    width: 100%;
 }
 
 .GoalFormParentDropdown {
     min-width: 190px;
+    width: 100%;
+    max-width: 190px;
 }
 
 .GoalFormUserDropdown {

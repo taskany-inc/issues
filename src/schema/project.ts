@@ -34,8 +34,8 @@ export const projectCreateSchema = z.object({
         .min(2, {
             message: tr('Title must be longer than 2 symbols'),
         })
-        .max(50, {
-            message: tr('Title can be 50 symbols maximum'),
+        .max(120, {
+            message: tr('Title can be 120 symbols maximum'),
         }),
     description: z.string().optional(),
     flow: z.object({
@@ -63,6 +63,9 @@ export const projectUpdateSchema = z.object({
         })
         .min(2, {
             message: tr('Title must be longer than 2 symbols'),
+        })
+        .max(120, {
+            message: tr('Title can be 120 symbols maximum'),
         }),
     description: z.string().nullable().optional(),
     parent: z

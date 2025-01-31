@@ -1,0 +1,7 @@
+.DropdownTrigger {
+    min-height: 32px;
+    max-height: 50px;
+    height: 100%;
+    max-width: 100%;
+    width: auto;
+}

@@ -6,7 +6,7 @@
     "Comments's description must be a string": "Текст комментария может быть только строкой",
     "Comments's description must be longer than 1 symbol": "Текст комментария должен быть длиннее 1 символа",
     "Title must be longer than 2 symbols": "Заголовок должен быть длиннее 2 символов",
-    "Title can be 50 symbols maximum": "Заголовок может содержать не более 50 символов",
+    "Title can be 120 symbols maximum": "Заголовок может содержать не более 120 символов",
     "Goal's title must be a string": "Заголовок может быть только строкой",
     "Goal's title must be longer than 6 symbols": "Заголовок цели должен быть длиннее 6 символов",
     "Goal's description is required": "Описание цели обязательно",

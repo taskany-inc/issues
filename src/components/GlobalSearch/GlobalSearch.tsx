@@ -82,7 +82,7 @@ export const GlobalSearch = () => {
                                                                     },
                                                                     {
                                                                         name: 'priority',
-                                                                        columnProps: { width: '12ch' },
+                                                                        columnProps: { width: '19%' },
                                                                     },
                                                                     {
                                                                         name: 'projectId',

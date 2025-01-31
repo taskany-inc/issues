@@ -254,7 +254,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                     </FormActions>
                 ))}
 
-                <FormActions className={s.FormActions} {...combobox.attr}>
+                <FormActions align="left" className={s.FormActions} {...combobox.attr}>
                     {nullable(!id && mode === goalTypeMap.default, () => (
                         <Controller
                             name="parent"
@@ -344,7 +344,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                     />
                 </FormActions>
 
-                <FormActions className={s.FormActions}>
+                <FormActions align="left" className={s.FormActions}>
                     <TagsList {...goalTagList.attr}>
                         {tagsWatcher.map((tag) => (
                             <Tag
@@ -371,7 +371,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({
                         />
                     </TagsList>
 
-                    {actionButton}
+                    <div className={s.FormActionsShiftRight}>{actionButton}</div>
                 </FormActions>
             </form>
         </ModalContent>
