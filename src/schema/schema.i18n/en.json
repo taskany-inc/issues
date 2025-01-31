@@ -6,7 +6,7 @@
     "Comments's description must be a string": "Comments's description must be a string",
     "Comments's description must be longer than 1 symbol": "Comments's description must be longer than 1 symbol",
     "Title must be longer than 2 symbols": "Title must be longer than 2 symbols",
-    "Title can be 50 symbols maximum": "Title can be 50 symbols maximum",
+    "Title can be 120 symbols maximum": "Title can be 120 symbols maximum",
     "Goal's title must be a string": "Goal's title must be a string",
     "Goal's title must be longer than 6 symbols": "Goal's title must be longer than 6 symbols",
     "Goal's description is required": "Goal's description is required",

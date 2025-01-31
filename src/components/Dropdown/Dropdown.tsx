@@ -24,10 +24,12 @@ import {
 } from 'react';
 import { IconSearchOutline } from '@taskany/icons';
 import { KeyCode, nullable, useKeyboard } from '@taskany/bricks';
+import cn from 'classnames';
 
 import { comboboxInput, comboboxItem } from '../../utils/domObjects';
 
 import { tr, I18nKey } from './Dropdown.i18n';
+import s from './Dropdow.module.css';
 
 interface DropdownContextProps {
     open?: boolean;
@@ -93,7 +95,7 @@ export const DropdownTrigger = ({
                 label={nullable(label, (l) => tr(l))}
                 view={view}
                 onClick={toggle}
-                className={className}
+                className={cn(s.DropdownTrigger, className)}
                 error={Boolean(error)}
                 renderTrigger={
                     renderTrigger ? ({ ref, ...props }) => renderTrigger({ ...props, ref, onClick: toggle }) : undefined

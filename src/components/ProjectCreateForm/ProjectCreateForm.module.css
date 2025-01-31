@@ -18,4 +18,5 @@
 
 .ProjectFormParentDropdown {
     min-width: 190px;
+    max-width: 300px;
 }

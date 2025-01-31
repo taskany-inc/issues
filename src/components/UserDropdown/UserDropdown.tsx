@@ -8,7 +8,6 @@ import { Dropdown, DropdownTrigger, DropdownPanel, DropdownGuardedProps } from '
 import { useUserResource } from '../../hooks/useUserResource';
 import { CrewUser } from '../../utils/db/types';
 
-import s from './UserDropdown.module.css';
 import { tr } from './UserDropdown.i18n';
 
 interface UserValue extends Omit<CrewUser, 'login'> {}
@@ -125,7 +124,14 @@ export const UserDropdown = ({
                         <UserGroup users={userGroup} />
                     ),
                     nullable(safeUserData(values[0]), (user) => (
-                        <User name={user.name} src={user.image} email={user.email} className={s.Owner} />
+                        <User
+                            name={user.name}
+                            src={user.image}
+                            email={user.email}
+                            wordBreak="break-all"
+                            wordWrap="break-word"
+                            ellipsis
+                        />
                     )),
                 )}
             </DropdownTrigger>
@@ -142,9 +148,7 @@ export const UserDropdown = ({
                 placement={placement}
                 onChange={handleChange}
                 renderItem={({ item }) =>
-                    nullable(item.user, ({ name, image, email }) => (
-                        <User name={name} src={image} email={email} className={s.Owner} />
-                    ))
+                    nullable(item.user, ({ name, image, email }) => <User name={name} src={image} email={email} />)
                 }
             />
         </Dropdown>
