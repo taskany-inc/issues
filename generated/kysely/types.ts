@@ -58,6 +58,8 @@ export type AppConfig = {
     id: string;
     favicon: string | null;
     logo: string | null;
+    supportLink: string | null;
+    documentLink: string | null;
 };
 export type Comment = {
     id: string;
