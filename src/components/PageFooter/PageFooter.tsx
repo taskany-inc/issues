@@ -11,12 +11,14 @@ import s from './PageFooter.module.css';
 import { tr } from './PageFooter.i18n';
 
 export const PageFooter: FC = () => {
+    const config = trpc.appConfig.get.useQuery(undefined, {
+        staleTime: Infinity,
+    });
+
     const menuItems = [
-        { title: tr('Terms'), url: '/terms' },
-        { title: tr('Docs'), url: '/docs' },
-        { title: tr('Contact us'), url: '/contactTaskany' },
-        { title: tr('API'), url: '/api' },
-        { title: tr('About'), url: '/about' },
+        { title: tr('Docs'), url: config.data?.documentLink ?? undefined },
+        { title: tr('Support'), url: config.data?.supportLink ?? undefined },
+        { title: tr('API'), url: '/api-docs' },
     ];
 
     const router = useRouter();
