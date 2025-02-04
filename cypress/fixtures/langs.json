@@ -208,14 +208,6 @@
         }
     },
     "ExplorePageHeader": {
-        "Top": {
-            "ru": "Топ",
-            "en": "Top"
-        },
-        "Projects": {
-            "ru": "Проекты",
-            "en": "Projects"
-        },
         "Explore": {
             "ru": "Обзор",
             "en": "Explore"
@@ -938,25 +930,17 @@
         }
     },
     "PageFooter": {
-        "Terms": {
-            "ru": "Условия",
-            "en": "Terms"
-        },
         "Docs": {
             "ru": "Документация",
             "en": "Docs"
         },
-        "Contact us": {
-            "ru": "Связаться с нами",
+        "Support": {
+            "ru": "",
             "en": ""
         },
         "API": {
             "ru": "API",
             "en": "API"
-        },
-        "About": {
-            "ru": "О нас",
-            "en": "About"
         },
         "Organization": {
             "ru": "SD Goals",
@@ -1590,9 +1574,9 @@
             "ru": "Заголовок должен быть длиннее 2 символов",
             "en": "Title must be longer than 2 symbols"
         },
-        "Title can be 50 symbols maximum": {
-            "ru": "Заголовок может содержать не более 50 символов",
-            "en": "Title can be 50 symbols maximum"
+        "Title can be 120 symbols maximum": {
+            "ru": "Заголовок может содержать не более 120 символов",
+            "en": "Title can be 120 symbols maximum"
         }
     }
 }
