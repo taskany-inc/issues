@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.67.2](https://github.com/taskany-inc/issues/compare/v2.67.1...v2.67.2) (2025-02-06)
+
+
+### Bug Fixes
+
+* **Footer:** update footer ([5a04a33](https://github.com/taskany-inc/issues/commit/5a04a3322b2411fe93b6a648a33a3bf73827abf3))
+* **INTERNAL-1616:** fix file uploads in comments ([f2c028e](https://github.com/taskany-inc/issues/commit/f2c028e1b63b3afbd866d848507f18ffdaf12aa8))
+
 ## [2.67.1](https://github.com/taskany-inc/issues/compare/v2.67.0...v2.67.1) (2025-01-31)
 
 
