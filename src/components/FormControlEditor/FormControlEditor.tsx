@@ -120,6 +120,7 @@ export const FormControlEditor = React.forwardRef<HTMLDivElement, React.Componen
                     attachmentsUploading: tr('Uploading...'),
                 }}
                 onMount={onMountCallback}
+                uploadLink="/api/upload"
                 {...props}
             />
         );
