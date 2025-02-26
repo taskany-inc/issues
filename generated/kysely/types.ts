@@ -114,6 +114,7 @@ export type Filter = {
     title: string;
     description: string | null;
     params: string;
+    target: string | null;
     default: Generated<boolean>;
     activityId: string | null;
     createdAt: Generated<Timestamp>;

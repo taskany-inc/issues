@@ -32,6 +32,8 @@ export const routes = {
     crewUser: (login: string) => `${process.env.NEXT_PUBLIC_CREW_URL}${login}`,
 
     jiraTask: (id: string) => `${process.env.NEXT_PUBLIC_JIRA_URL}browse/${id}`,
+
+    preset: (filterId: string, target?: string) => `${target}?filter=${filterId}`,
 };
 
 export const useRouter = () => {
@@ -55,6 +57,9 @@ export const useRouter = () => {
             exploreGoals: () => router.push(routes.exploreGoals()),
 
             help: (slug: AvailableHelpPages) => router.push(slug),
+
+            preset: (filterId: string, target?: string) => router.push(routes.preset(filterId, target)),
+
             appRouter: router,
         }),
         [router],

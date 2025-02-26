@@ -18,6 +18,7 @@ export const createFilterSchema = z.object({
         }),
     mode: z.nativeEnum(FilterMode),
     params: z.string().min(1),
+    target: z.string(),
     description: z.string().optional(),
 });
 

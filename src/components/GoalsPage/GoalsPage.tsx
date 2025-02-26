@@ -48,8 +48,7 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback, baseQueryState
                 <FiltersPanel
                     title={getPageTitle({
                         title: tr('Goals'),
-                        shadowPresetTitle: currentPreset?.title,
-                        currentPresetTitle: currentPreset?.title,
+                        presetTitle: currentPreset?.title,
                     })}
                     total={data?.count || 0}
                     counter={data?.filtered || 0}
