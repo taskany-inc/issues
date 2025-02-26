@@ -55,7 +55,7 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
     const { goalsRoutes, presetRoutes, projectsRoutes, isPresetActive } = useMemo(() => {
         const presetRoutes = presets.map((preset) => ({
             title: preset.title,
-            href: routes.goals(preset.id),
+            href: routes.preset(preset.id, preset.target ?? ''),
         }));
 
         return {

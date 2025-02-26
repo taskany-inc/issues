@@ -1,18 +1,6 @@
-export const getPageTitle = ({
-    title = '',
-    currentPresetTitle,
-    shadowPresetTitle,
-}: {
-    title?: string;
-    shadowPresetTitle?: string;
-    currentPresetTitle?: string;
-}): string => {
-    if (currentPresetTitle) {
-        return `${title}: ${currentPresetTitle}`;
-    }
-
-    if (shadowPresetTitle) {
-        return `${title}: ${shadowPresetTitle}`;
+export const getPageTitle = ({ title = '', presetTitle }: { title?: string; presetTitle?: string }): string => {
+    if (presetTitle) {
+        return `${title}: ${presetTitle}`;
     }
 
     return title;

@@ -241,6 +241,7 @@ model Filter {
   title       String
   description String?
   params      String
+  target      String?
   default     Boolean    @default(false)
   activity    Activity?  @relation(fields: [activityId], references: [id])
   activityId  String?

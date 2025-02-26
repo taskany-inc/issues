@@ -1,16 +1,19 @@
 import { useEffect, useMemo } from 'react';
-import { useRouter } from 'next/router';
 import { deleteCookie } from '@taskany/bricks';
 
 import { trpc } from '../utils/trpcClient';
 import { refreshInterval } from '../utils/config';
 import { filtersNoSearchPresetCookie } from '../utils/parseUrlParams';
 
-export const useFiltersPreset = ({ defaultPresetFallback = true }: { defaultPresetFallback?: boolean }) => {
-    const router = useRouter();
-    const queryString = router.asPath.split('?')[1];
+import { useRouter } from './router';
 
-    const userPreset = trpc.filter.getById.useQuery(router.query.filter as string, { enabled: !!router.query.filter });
+export const useFiltersPreset = ({ defaultPresetFallback = true }: { defaultPresetFallback?: boolean }) => {
+    const { appRouter, preset: goToPreset } = useRouter();
+    const [baseRoute, queryString] = appRouter.asPath.split('?');
+
+    const userPreset = trpc.filter.getById.useQuery(appRouter.query.filter as string, {
+        enabled: !!appRouter.query.filter,
+    });
     const defaultPreset = trpc.filter.getDefaultFilter.useQuery(undefined, {
         enabled: defaultPresetFallback,
     });
@@ -28,14 +31,25 @@ export const useFiltersPreset = ({ defaultPresetFallback = true }: { defaultPres
         }
     }, [defaultPresetFallback]);
 
+    const shadowPreset = useMemo(
+        () =>
+            userFilters.data?.find(
+                (f) => decodeURIComponent(f.params) === decodeURIComponent(queryString) && baseRoute === f.target,
+            ),
+        [baseRoute, userFilters, queryString],
+    );
+
+    useEffect(() => {
+        if (shadowPreset) {
+            goToPreset(shadowPreset.id, shadowPreset.target ?? '');
+        }
+    }, [shadowPreset, goToPreset]);
+
     return useMemo(
         () => ({
             preset: preset.data,
-            shadowPreset: userFilters.data?.find(
-                (f) => decodeURIComponent(f.params) === decodeURIComponent(queryString),
-            ),
             userFilters: userFilters.data,
         }),
-        [preset.data, userFilters.data, queryString],
+        [preset.data, userFilters.data],
     );
 };

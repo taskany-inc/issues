@@ -322,17 +322,9 @@ const getGoalsFiltersWhereExpressionBuilder =
     ): ExpressionFactory<
         DB & {
             participant: Nullable<Activity>;
-            tag: Nullable<{
-                id: string;
-                title: string;
-                description: string | null;
-                activityId: string;
-                createdAt: Date;
-                updatedAt: Date;
-            }>;
             cte_projects: any;
         },
-        'Goal' | 'tag' | 'participant' | 'cte_projects',
+        'Goal' | 'participant' | 'cte_projects',
         SqlBool
     > =>
     ({ or, and, eb, selectFrom, cast, val }) => {
@@ -372,7 +364,11 @@ const getGoalsFiltersWhereExpressionBuilder =
                     .select('State.id')
                     .where('State.type', 'in', goalsQuery?.stateType || []),
             ),
-            tag: eb('tag.id', 'in', goalsQuery?.tag || []),
+            tag: eb('Goal.id', 'in', ({ selectFrom }) =>
+                selectFrom('_GoalToTag')
+                    .select('A')
+                    .where('B', 'in', goalsQuery?.tag || []),
+            ),
             estimate:
                 // eslint-disable-next-line no-nested-ternary
                 estimate.length > 0

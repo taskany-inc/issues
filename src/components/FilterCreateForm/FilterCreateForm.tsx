@@ -17,6 +17,7 @@ import { createFilterSchema, CreateFilter } from '../../schema/filter';
 import { useFilterResource } from '../../hooks/useFilterResource';
 import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { FormAction, FormActions } from '../FormActions/FormActions';
+import { useRouter } from '../../hooks/router';
 
 import { tr } from './FilterCreateForm.i18n';
 
@@ -30,6 +31,8 @@ interface FilterCreateFormProps {
 const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSubmit }) => {
     const { createFilter } = useFilterResource();
     const [formBusy, setFormBusy] = useState(false);
+
+    const { appRouter } = useRouter();
 
     const {
         control,
@@ -45,6 +48,7 @@ const FilterCreateForm: React.FC<FilterCreateFormProps> = ({ mode, params, onSub
         defaultValues: {
             mode,
             params,
+            target: appRouter.asPath.split('?')[0] ?? '',
         },
     });
 

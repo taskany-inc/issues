@@ -80,8 +80,7 @@ export const DashboardPage = ({ user, ssrTime, defaultPresetFallback }: External
                 <FiltersPanel
                     title={getPageTitle({
                         title: tr('Dashboard'),
-                        shadowPresetTitle: currentPreset?.title,
-                        currentPresetTitle: currentPreset?.title,
+                        presetTitle: currentPreset?.title,
                     })}
                     total={totalGoalsCount}
                     counter={goalsCount}
