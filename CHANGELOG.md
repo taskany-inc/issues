@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.68.0](https://github.com/taskany-inc/issues/compare/v2.67.3...v2.68.0) (2025-02-27)
+
+
+### Features
+
+* **INTERNAL-1624:** support preset target ([b19f67b](https://github.com/taskany-inc/issues/commit/b19f67b98d2f25af00ca3b91ef5f7ad2e0fa6fe4))
+
 ## [2.67.3](https://github.com/taskany-inc/issues/compare/v2.67.2...v2.67.3) (2025-02-20)
 
 
