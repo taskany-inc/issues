@@ -50,7 +50,7 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
 
     const { preset } = useFiltersPreset({ defaultPresetFallback });
 
-    const { queryState, view } = useUrlFilterParams({
+    const { view } = useUrlFilterParams({
         preset,
     });
 
@@ -59,7 +59,6 @@ export const ProjectPage = ({ user, ssrTime, params: { id }, defaultPresetFallba
         ctx.v2.project.getProjectChildrenTree(
             {
                 id,
-                goalsQuery: queryState,
             },
             {
                 keepPreviousData: true,
