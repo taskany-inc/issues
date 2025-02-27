@@ -21,7 +21,6 @@ export const ExploreProjectsPage = ({ user, ssrTime }: ExternalPageProps) => {
     const { data, hasNextPage, fetchNextPage, fetchStatus } = trpc.v2.project.getAll.useInfiniteQuery(
         {
             limit: pageSize,
-            firstLevel: false,
         },
         {
             getNextPageParam: ({ pagination }) => pagination.offset,

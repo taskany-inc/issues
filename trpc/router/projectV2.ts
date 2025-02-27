@@ -322,19 +322,18 @@ export const project = router({
                 limit: z.number().optional(),
                 goalsQuery: queryWithFiltersSchema.optional(),
                 projectsSort: sortableProjectsPropertiesArraySchema.optional(),
-                firstLevel: z.boolean(),
                 cursor: z.number().optional(),
             }),
         )
         .query(async ({ input, ctx }) => {
-            const { limit = 20, cursor = 0, goalsQuery, projectsSort, firstLevel: _ = true } = input;
+            const { limit = 20, cursor = 0, goalsQuery, projectsSort } = input;
 
             const projects = await getAllProjectsQuery({
                 ...ctx.session.user,
                 firstLevel: goalsQuery?.project == null,
                 limit: limit + 1,
                 cursor,
-                ids: goalsQuery?.project,
+                goalsQuery,
                 projectsSort,
             })
                 .$castTo<Omit<ProjectResponse, 'children'> & Pick<DashboardProject, '_count'>>()
