@@ -96,7 +96,7 @@ export const GoalTableList = <T extends GoalTableListItem>({
     const onSortableMove = useCallback<NonNullable<ComponentProps<typeof ReactSortable>['onMove']>>(
         (event) => {
             if (enableManualSorting && event.dragged.classList.contains(s.SortableListItem_enable)) {
-                return -1;
+                return true;
             }
             return false;
         },
