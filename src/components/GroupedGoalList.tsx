@@ -49,7 +49,6 @@ export const GroupedGoalList: React.FC<GroupedGoalListProps> = ({ filterPreset }
         {
             limit: projectsSize,
             goalsQuery: queryState,
-            firstLevel: !!queryState?.project?.length,
             projectsSort,
         },
         {
