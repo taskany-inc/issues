@@ -38,7 +38,7 @@ const createEntityCheckMiddleware = <TInput, TId, TEntity>(
             throw new TRPCError({ code: accessErrorCode, message: tr('No entity to check access') });
         }
 
-        const check = checker(session, entity);
+        const check = await checker(session, entity);
 
         if (!check.allowed) {
             throw new TRPCError({ code: accessErrorCode, message: check.errorMessage });

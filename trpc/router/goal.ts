@@ -48,7 +48,7 @@ import {
     goalByShortIdAccessMiddleware,
     goalParticipantEditAccessMiddleware,
 } from '../access/accessMiddlewares';
-import { addCalculatedProjectFields, nonArchivedPartialQuery } from '../queries/project';
+import { nonArchivedPartialQuery } from '../queries/project';
 import { recalculateCriteriaScore, goalIncludeCriteriaParams } from '../../src/utils/recalculateCriteriaScore';
 import { getProjectAccessFilter, goalAchiveCriteriaFilter } from '../queries/access';
 import { prepareRecipients } from '../../src/utils/prepareRecipients';
@@ -179,62 +179,6 @@ export const goal = router({
             return {
                 count,
                 filtered,
-            };
-        }),
-    getBatch: protectedProcedure
-        .input(batchGoalsSchema)
-        .query(async ({ ctx, input: { query, limit, skip, cursor } }) => {
-            const { activityId, role } = ctx.session.user;
-
-            let hideCriteriaFilterIds: string[] = [];
-
-            if (query?.hideCriteria) {
-                const ids = await getGoalActivityFilterIdsQuery.execute();
-                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
-            }
-
-            const [items, count] = await Promise.all([
-                prisma.goal.findMany({
-                    take: limit + 1,
-                    skip,
-                    cursor: cursor ? { id: cursor } : undefined,
-                    orderBy: {
-                        id: 'asc',
-                    },
-                    ...(query ? goalsFilter({ ...query, hideCriteriaFilterIds }, activityId, role) : {}),
-                    include: getGoalDeepQuery({
-                        activityId,
-                        role,
-                    }),
-                }),
-                prisma.goal.count(),
-            ]);
-
-            let nextCursor: typeof cursor | undefined;
-
-            if (items.length > limit) {
-                const nextItem = items.pop(); // return the last item from the array
-                nextCursor = nextItem?.id;
-            }
-
-            return {
-                items: items.map((g) => ({
-                    ...g,
-                    ...addCalculatedGoalsFields(g, activityId, role),
-                    _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
-                })),
-                nextCursor,
-                meta: {
-                    count,
-                    tags: [],
-                    owners: [],
-                    participants: [],
-                    issuers: [],
-                    priority: [],
-                    states: [],
-                    projects: [],
-                    estimates: [],
-                },
             };
         }),
     getById: protectedProcedure
@@ -378,7 +322,6 @@ export const goal = router({
                     ...addCalculatedGoalsFields(goal, activityId, role),
                     ...applyLastStateUpdateComment(goal),
                     _hasPrivateDeps,
-                    _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                     _relations: makeGoalRelationMap(
                         {
                             dependsOn: goal.dependsOn,
@@ -833,7 +776,6 @@ export const goal = router({
 
                 return {
                     ...updatedGoal,
-                    _project: goal.project ? addCalculatedProjectFields(goal.project, activityId, role) : null,
                     _activityFeed: [],
                 };
             } catch (error: any) {

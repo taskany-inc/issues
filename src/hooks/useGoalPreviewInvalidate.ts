@@ -11,7 +11,7 @@ export const useGoalPreviewInvalidate = <T extends { _shortId: string; projectId
         const unsubUpdate = on('on:goal:update', (updatedId) => {
             const idInList = goals.find(({ _shortId }) => _shortId === updatedId);
             if (idInList?.projectId != null) {
-                utils.project.getDeepInfo.invalidate({ id: idInList.projectId });
+                utils.v2.project.getProjectGoalsById.invalidate({ id: idInList.projectId });
                 utils.project.getByIds.invalidate({ ids: [idInList.projectId] });
             }
         });
@@ -19,7 +19,7 @@ export const useGoalPreviewInvalidate = <T extends { _shortId: string; projectId
         const unsubDelete = on('on:goal:delete', (updatedId) => {
             const idInList = goals.find(({ _shortId }) => _shortId === updatedId);
             if (idInList?.projectId != null) {
-                utils.project.getDeepInfo.invalidate({ id: idInList.projectId });
+                utils.v2.project.getProjectGoalsById.invalidate({ id: idInList.projectId });
             }
         });
 
@@ -27,5 +27,5 @@ export const useGoalPreviewInvalidate = <T extends { _shortId: string; projectId
             unsubDelete();
             unsubUpdate();
         };
-    }, [on, goals, utils.project.getByIds, utils.project.getDeepInfo]);
+    }, [on, goals, utils.project.getByIds, utils.v2.project.getProjectGoalsById]);
 };

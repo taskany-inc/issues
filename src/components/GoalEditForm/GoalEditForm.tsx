@@ -51,8 +51,8 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
 
         onSubmit(updatedGoal);
 
-        utils.project.getAll.invalidate();
-        utils.goal.getBatch.invalidate();
+        utils.v2.project.getAll.invalidate();
+        utils.v2.goal.getAllGoals.invalidate();
 
         if (!updatedGoal) {
             return;
@@ -63,13 +63,13 @@ const GoalEditForm: React.FC<GoalEditFormProps> = ({ goal, onSubmit }) => {
         }
 
         if (updatedGoal.projectId) {
-            utils.project.getDeepInfo.invalidate({ id: updatedGoal.projectId });
-            utils.project.getById.invalidate({ id: updatedGoal.projectId });
+            utils.v2.project.getProjectGoalsById.invalidate({ id: updatedGoal.projectId });
+            utils.v2.project.getById.invalidate({ id: updatedGoal.projectId });
         }
 
         if (updatedGoal.projectId !== goal.projectId && goal.projectId) {
-            utils.project.getDeepInfo.invalidate({ id: goal.projectId });
-            utils.project.getById.invalidate({ id: goal.projectId });
+            utils.v2.project.getProjectGoalsById.invalidate({ id: goal.projectId });
+            utils.v2.project.getById.invalidate({ id: goal.projectId });
         }
 
         await invalidate();
