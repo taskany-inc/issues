@@ -41,17 +41,17 @@ export const FlatGoalList: React.FC<GoalListProps> = ({ filterPreset }) => {
 
     useEffect(() => {
         const unsubUpdate = on('on:goal:update', () => {
-            utils.goal.getBatch.invalidate();
+            utils.v2.goal.getAllGoals.invalidate();
         });
         const unsubDelete = on('on:goal:delete', () => {
-            utils.goal.getBatch.invalidate();
+            utils.v2.goal.getAllGoals.invalidate();
         });
 
         return () => {
             unsubUpdate();
             unsubDelete();
         };
-    }, [on, utils.goal.getBatch]);
+    }, [on, utils.v2.goal.getAllGoals]);
 
     useFMPMetric(!!data);
 

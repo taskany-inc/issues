@@ -14,34 +14,6 @@ interface WithId {
     id: string;
 }
 
-export const addCalculatedProjectFields = <
-    T extends {
-        watchers?: WithId[];
-        participants?: WithId[];
-        stargizers?: WithId[];
-        activityId?: string;
-        personal?: boolean | null;
-    },
->(
-    project: T,
-    activityId: string,
-    role: Role,
-) => {
-    const _isWatching = project.watchers?.some((watcher) => watcher.id === activityId) || false;
-    const _isStarred = project.stargizers?.some((stargizer) => stargizer.id === activityId) || false;
-    const _isParticipant = project.participants?.some((participant) => participant?.id === activityId);
-    const _isOwner = project.activityId === activityId;
-    const _isEditable = (_isOwner || _isParticipant || role === 'ADMIN') && !project.personal;
-
-    return {
-        ...project,
-        _isWatching,
-        _isStarred,
-        _isOwner,
-        _isEditable,
-    };
-};
-
 interface ProjectAccessEntity {
     accessUsers: WithId[];
     activityId: string;

@@ -12,10 +12,10 @@ import {
     participantsToProjectSchema,
     teamsToProjectSchema,
 } from '../../src/schema/project';
-import { getGoalDeepQuery, goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
+import { goalsFilter, nonArchievedGoalsPartialQuery } from '../queries/goals';
 import { ToggleSubscriptionSchema, queryWithFiltersSchema } from '../../src/schema/common';
 import { connectionMap } from '../queries/connections';
-import { addCalculatedProjectFields, getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
+import { getProjectSchema, nonArchivedPartialQuery } from '../queries/project';
 import { createEmail } from '../../src/utils/createEmail';
 import { FieldDiff } from '../../src/types/common';
 import { updateLinkedGoalsByProject } from '../../src/utils/db';
@@ -30,158 +30,6 @@ import { processEvent } from '../../src/utils/analyticsEvent';
 import { tr } from './router.i18n';
 
 export const project = router({
-    getAll: protectedProcedure
-        .input(
-            z
-                .object({
-                    limit: z.number().optional(),
-                    cursor: z.string().nullish(),
-                    skip: z.number().optional(),
-                    firstLevel: z.boolean().optional(),
-                    includePersonal: z.boolean().optional(),
-                    goalsQuery: queryWithFiltersSchema.optional(),
-                })
-                .optional(),
-        )
-        .query(
-            async ({
-                ctx,
-                input: { cursor, skip = 0, limit = 20, firstLevel, goalsQuery, includePersonal = false } = {},
-            }) => {
-                const { activityId, role } = ctx.session.user;
-                const projectIds = goalsQuery?.project ?? [];
-
-                if (goalsQuery && goalsQuery.stateType) {
-                    const stateByTypes = await prisma.state.findMany({
-                        where: {
-                            type: {
-                                in: goalsQuery.stateType,
-                            },
-                        },
-                    });
-                    stateByTypes.forEach((state) => {
-                        if (!goalsQuery.state) {
-                            goalsQuery.state = [];
-                        }
-                        if (!goalsQuery.state.includes(state.id)) {
-                            goalsQuery.state.push(state.id);
-                        }
-                    });
-                }
-
-                const projectPagination = limit
-                    ? { take: limit + 1, skip, cursor: cursor ? { id: cursor } : undefined }
-                    : undefined;
-
-                let hideCriteriaFilterIds: string[] = [];
-                if (goalsQuery?.hideCriteria) {
-                    const ids = await getGoalActivityFilterIdsQuery.execute();
-                    hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
-                }
-
-                const whereQuery = {
-                    personal: includePersonal ? {} : false,
-                    id: projectIds.length
-                        ? {
-                              in: projectIds,
-                          }
-                        : {},
-                    goals: goalsQuery
-                        ? {
-                              some: goalsFilter({ ...goalsQuery, hideCriteriaFilterIds }, activityId, role).where,
-                          }
-                        : {},
-                };
-
-                const projects = await prisma.project
-                    .findMany({
-                        ...projectPagination,
-                        orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
-                        ...getProjectSchema({
-                            role,
-                            activityId,
-                            goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
-                            firstLevel,
-                            whereQuery,
-                        }),
-                    })
-                    .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
-
-                let nextCursor: typeof cursor | undefined;
-
-                if (limit && projects.length > limit) {
-                    const nextItem = projects.pop();
-                    nextCursor = nextItem?.id;
-                }
-
-                return { projects, nextCursor };
-            },
-        ),
-    getTop: protectedProcedure
-        .input(
-            z
-                .object({
-                    firstLevel: z.boolean().optional(),
-                    goalsQuery: queryWithFiltersSchema.optional(),
-                })
-                .optional(),
-        )
-        .query(async ({ ctx, input: { firstLevel = true, goalsQuery } = {} }) => {
-            const { activityId, role } = ctx.session.user;
-            let hideCriteriaFilterIds: string[] = [];
-            if (goalsQuery?.hideCriteria) {
-                const ids = await getGoalActivityFilterIdsQuery.execute();
-                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
-            }
-
-            return prisma.project
-                .findMany({
-                    orderBy: {
-                        createdAt: 'asc',
-                    },
-                    ...getProjectSchema({
-                        role,
-                        activityId,
-                        goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
-                        firstLevel,
-                    }),
-                })
-                .then((res) => res.map((project) => addCalculatedProjectFields(project, activityId, role)));
-        }),
-    getById: protectedProcedure
-        .input(
-            z.object({
-                id: z.string(),
-                goalsQuery: queryWithFiltersSchema.optional(),
-            }),
-        )
-        .use(projectAccessMiddleware)
-        .query(async ({ ctx, input: { id, goalsQuery } }) => {
-            const { activityId, role } = ctx.session.user;
-
-            let hideCriteriaFilterIds: string[] = [];
-            if (goalsQuery?.hideCriteria) {
-                const ids = await getGoalActivityFilterIdsQuery.execute();
-                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
-            }
-
-            const { include } = getProjectSchema({
-                role,
-                activityId,
-                goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
-            });
-
-            const project = await prisma.project.findUnique({
-                include,
-                where: {
-                    id,
-                },
-            });
-
-            if (!project) return null;
-
-            return addCalculatedProjectFields(project, activityId, role);
-        }),
     getByIds: protectedProcedure
         .input(
             z.object({
@@ -246,51 +94,7 @@ export const project = router({
                 }),
             });
 
-            return projects.map((project) => addCalculatedProjectFields(project, activityId, role));
-        }),
-    getDeepInfo: protectedProcedure
-        .input(
-            z.object({
-                id: z.string(),
-                goalsQuery: queryWithFiltersSchema.optional(),
-            }),
-        )
-        .use(projectAccessMiddleware)
-        .query(async ({ ctx, input: { id, goalsQuery = {} } }) => {
-            const { activityId, role } = ctx.session.user;
-            const goalsWhere = {
-                OR: [{ projectId: id }, { partnershipProjects: { some: { id } } }],
-            };
-
-            let hideCriteriaFilterIds: string[] = [];
-            if (goalsQuery?.hideCriteria) {
-                const ids = await getGoalActivityFilterIdsQuery.execute();
-                hideCriteriaFilterIds = ids.map(({ criteriaGoalId }) => criteriaGoalId).filter(Boolean);
-            }
-
-            const [allProjectGoals, filtredProjectGoals] = await Promise.all([
-                prisma.goal.count({
-                    where: goalsWhere,
-                }),
-                prisma.goal.findMany({
-                    ...goalsFilter({ ...goalsQuery, hideCriteriaFilterIds }, activityId, role, goalsWhere),
-                    include: getGoalDeepQuery({
-                        activityId,
-                        role,
-                    }),
-                }),
-            ]);
-
-            return {
-                goals: filtredProjectGoals.map((g) => ({
-                    ...g,
-                    _project: g.project ? addCalculatedProjectFields(g.project, activityId, role) : null,
-                    ...addCalculatedGoalsFields(g, activityId, role),
-                })),
-                meta: {
-                    count: allProjectGoals,
-                },
-            };
+            return projects;
         }),
     create: protectedProcedure
         .input(projectCreateSchema)

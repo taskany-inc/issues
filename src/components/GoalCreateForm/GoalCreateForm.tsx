@@ -111,15 +111,15 @@ const GoalCreateForm: React.FC<GoalCreateFormProps> = ({
             return;
         }
 
-        utils.project.getAll.invalidate();
-        utils.goal.getBatch.invalidate();
+        utils.v2.project.getAll.invalidate();
+        utils.v2.goal.getAllGoals.invalidate();
         utils.v2.project.userProjects.invalidate();
         utils.v2.project.getProjectChildrenTree.invalidate();
         utils.v2.project.getProjectGoalsById.invalidate();
         utils.v2.project.getUserDashboardProjects.invalidate();
 
         if (form.parent && form.mode === 'default') {
-            utils.project.getDeepInfo.invalidate({ id: form.parent.id });
+            utils.v2.project.getProjectGoalsById.invalidate({ id: form.parent.id });
         }
 
         if (createGoalType === 1) {

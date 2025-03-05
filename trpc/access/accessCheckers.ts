@@ -1,14 +1,19 @@
 import { Session } from 'next-auth';
 
-import { addCalculatedProjectFields, checkProjectAccess } from '../queries/project';
+import { checkProjectAccess } from '../queries/project';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
+import { db } from '../connection/kysely';
+import { getProjectEditableSql } from '../queries/projectV2';
 
 import { CommentEntity, GoalEntity, ProjectEntity } from './accessEntityGetters';
 import { tr } from './access.i18n';
 
 type AccessCheckerResult = Readonly<{ allowed: true } | { allowed: false; errorMessage: string }>;
 
-export type EntityAccessChecker<TEntity> = (session: Session, entity: TEntity) => AccessCheckerResult;
+export type EntityAccessChecker<TEntity> = (
+    session: Session,
+    entity: TEntity,
+) => AccessCheckerResult | Promise<AccessCheckerResult>;
 
 const allowed = (): AccessCheckerResult => ({
     allowed: true,
@@ -56,12 +61,16 @@ export const projectAccessChecker = (session: Session, project: ProjectEntity) =
     return checkProjectAccess(project, activityId, role) ? allowed() : notAllowed(tr('No access to update Project'));
 };
 
-export const projectEditAccessChecker = (session: Session, project: ProjectEntity) => {
+export const projectEditAccessChecker = async (session: Session, project: ProjectEntity) => {
     const { activityId, role } = session.user;
 
-    const { _isEditable } = addCalculatedProjectFields(project, activityId, role);
+    const result = await db
+        .selectFrom('Project')
+        .select(() => [getProjectEditableSql(activityId, role).as('_isEditable')])
+        .where('Project.id', '=', project.id)
+        .executeTakeFirst();
 
-    return checkProjectAccess(project, activityId, role) && _isEditable
+    return checkProjectAccess(project, activityId, role) && result?._isEditable
         ? allowed()
         : notAllowed(tr('No access to update Project'));
 };

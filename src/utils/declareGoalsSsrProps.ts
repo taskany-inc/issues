@@ -16,7 +16,7 @@ export const declareGoalsSsrProps = (baseQueryState: Partial<QueryState> = {}) =
             };
 
             if (queryState.groupBy === 'project') {
-                await ssrHelpers.project.getAll.fetchInfinite({
+                await ssrHelpers.v2.project.getAll.fetchInfinite({
                     limit: pageSize,
                     goalsQuery: queryState,
                     firstLevel: !queryState.project?.length,
