@@ -1,6 +1,6 @@
 import { JiraUser, searchIssue } from '../../src/utils/integration/jira';
-import { db } from '../connection/kysely';
-import { ExternalTask } from '../../generated/kysely/types';
+import { db } from '../../src/utils/db/connection/kysely';
+import { ExternalTask } from '../../src/utils/db/generated/kysely/types';
 import { ExtractTypeFromGenerated } from '../utils';
 
 type ExtractedTask = ExtractTypeFromGenerated<ExternalTask>;

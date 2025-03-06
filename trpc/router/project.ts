@@ -26,6 +26,7 @@ import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFiel
 import { getDeepChildrenProjectsId } from '../queries/projectV2';
 import { getGoalActivityFilterIdsQuery } from '../queries/goalV2';
 import { processEvent } from '../../src/utils/analyticsEvent';
+import { getProjectsEditableStatus } from '../../src/utils/db/getProjectEditable';
 
 import { tr } from './router.i18n';
 
@@ -502,12 +503,20 @@ export const project = router({
                         ...nonArchievedGoalsPartialQuery,
                     },
                 })
-                .then((goals) =>
-                    goals.map((g) => ({
+                .then(async (goals) => {
+                    const projectIds = goals.map((g) => g.projectId ?? '');
+                    const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+
+                    return goals.map((g) => ({
                         ...g,
-                        ...addCalculatedGoalsFields(g, activityId, role),
-                    })),
-                );
+                        ...addCalculatedGoalsFields(
+                            g,
+                            { _isEditable: Boolean(g.projectId && editableMap.get(g.projectId)) },
+                            activityId,
+                            role,
+                        ),
+                    }));
+                });
         }),
     updateTeams: protectedProcedure
         .input(teamsToProjectSchema)

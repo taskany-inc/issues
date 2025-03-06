@@ -4,47 +4,13 @@ import { OrderByDirection } from 'kysely/dist/cjs/parser/order-by-parser';
 import { decodeUrlDateRange, getDateString } from '@taskany/bricks';
 import { ExpressionFactory } from 'kysely/dist/cjs/parser/expression-parser';
 
-import { db } from '../connection/kysely';
-import { DB, Role } from '../../generated/kysely/types';
+import { db } from '../../src/utils/db/connection/kysely';
+import { DB, Role } from '../../src/utils/db/generated/kysely/types';
+import { getProjectEditableSql } from '../../src/utils/db/getProjectEditable';
 import { QueryWithFilters, SortableProjectsPropertiesArray } from '../../src/schema/common';
 import { ProjectRoles, ProjectRules } from '../utils';
 
 import { getUserActivity } from './activity';
-
-export const getProjectEditableSql = (activityId: string, role: Role) => {
-    return sql<boolean>`(
-        ${sql.val(role === Role.ADMIN)}
-        OR (
-            "Project"."activityId" = ${activityId}
-            OR EXISTS(
-                SELECT "A" FROM "_projectParticipants" 
-                WHERE "B" = "Project"."id" AND "A" = ${activityId}
-            )
-        ) AND NOT "Project"."personal"
-        OR EXISTS(
-            WITH RECURSIVE parent_chain AS (
-                SELECT "A" AS parent_id
-                FROM "_parentChildren"
-                WHERE "B" = "Project"."id"
-                
-                UNION
-                
-                SELECT "_parentChildren"."A" AS parent_id
-                FROM "_parentChildren"
-                JOIN parent_chain ON "_parentChildren"."B" = parent_chain.parent_id
-            )
-            SELECT * FROM "Project" AS parent_project
-            WHERE parent_project.id IN (SELECT parent_id FROM parent_chain)
-            AND (
-                parent_project."activityId" = ${activityId}
-                OR EXISTS(
-                    SELECT "A" FROM "_projectParticipants" 
-                    WHERE "B" = parent_project."id" AND "A" = ${activityId}
-                )
-            ) AND NOT parent_project."personal"
-        )
-    )`;
-};
 
 export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId: string; role: Role }) => {
     return db

@@ -4,9 +4,9 @@ import { OrderByDirection } from 'kysely/dist/cjs/parser/order-by-parser';
 import { decodeUrlDateRange, getDateString } from '@taskany/bricks';
 import { ExpressionFactory } from 'kysely/dist/cjs/parser/expression-parser';
 
-import { db } from '../connection/kysely';
+import { db } from '../../src/utils/db/connection/kysely';
 import { QueryWithFilters } from '../../src/schema/common';
-import { DB, Role } from '../../generated/kysely/types';
+import { DB, Role } from '../../src/utils/db/generated/kysely/types';
 import { calculateProjectRules, ProjectRoles } from '../utils';
 
 import { Activity, getUserActivity } from './activity';

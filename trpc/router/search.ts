@@ -6,6 +6,7 @@ import { protectedProcedure, router } from '../trpcBackend';
 import { getGoalDeepQuery } from '../queries/goals';
 import { getProjectAccessFilter } from '../queries/access';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
+import { getProjectsEditableStatus } from '../../src/utils/db/getProjectEditable';
 import { nonArchivedPartialQuery } from '../queries/project';
 
 export const search = router({
@@ -113,10 +114,18 @@ export const search = router({
             }),
         ]);
 
+        const projectIds = goals.map((g) => g.projectId || '').filter(Boolean);
+        const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+
         return {
             goals: goals.map((g) => ({
                 ...g,
-                ...addCalculatedGoalsFields(g, activityId, role),
+                ...addCalculatedGoalsFields(
+                    g,
+                    { _isEditable: Boolean(g.projectId && editableMap.get(g.projectId)) },
+                    activityId,
+                    role,
+                ),
             })),
             projects,
         };

@@ -1,6 +1,6 @@
 import { sql } from 'kysely';
 
-import { db } from '../connection/kysely';
+import { db } from '../../src/utils/db/connection/kysely';
 
 interface FilterQueryParams {
     isDefault?: boolean;

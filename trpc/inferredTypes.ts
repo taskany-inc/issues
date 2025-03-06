@@ -1,6 +1,6 @@
 import { inferRouterOutputs } from '@trpc/server';
 
-import { DB } from '../generated/kysely/types';
+import { DB } from '../src/utils/db/generated/kysely/types';
 
 import { TrpcRouter } from './router';
 import { ExtractTypeFromGenerated } from './utils';

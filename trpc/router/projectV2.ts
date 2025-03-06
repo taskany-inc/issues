@@ -31,7 +31,7 @@ import {
     Activity,
     Priority,
     Team,
-} from '../../generated/kysely/types';
+} from '../../src/utils/db/generated/kysely/types';
 import { calculateProjectRules, ExtractTypeFromGenerated, pickUniqueValues, ProjectRoles } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { getGoalsQuery } from '../queries/goalV2';

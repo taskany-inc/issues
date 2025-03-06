@@ -1,9 +1,9 @@
 import { Pool } from 'pg';
 import { Kysely, PostgresDialect } from 'kysely';
 
-import { DB as Database } from '../../generated/kysely/types'; // this is the Database interface we defined earlier
+import { DB as Database } from '../generated/kysely/types'; // this is the Database interface we defined earlier
 
-import { parseConnectionURL } from './utils';
+import { parseConnectionURL } from './parseConnectionURL';
 
 const connectionConfig = parseConnectionURL();
 

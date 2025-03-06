@@ -5,7 +5,7 @@ import { IconGitBranchOutline, IconMessageTextOutline } from '@taskany/icons';
 import { ReactSortable } from 'react-sortablejs';
 import cn from 'classnames';
 
-import { DateType } from '../../../generated/kysely/types';
+import { DateType } from '../../utils/db/generated/kysely/types';
 import { State as StateType } from '../../../trpc/inferredTypes';
 import { TableListItem, TableListItemElement } from '../TableListItem/TableListItem';
 import { safeUserData } from '../../utils/getUserName';

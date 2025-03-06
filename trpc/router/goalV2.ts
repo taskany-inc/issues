@@ -9,7 +9,7 @@ import {
     getAllGoalsQuery,
 } from '../queries/goalV2';
 import { goalEditAccessMiddleware } from '../access/accessMiddlewares';
-import { db } from '../connection/kysely';
+import { db } from '../../src/utils/db/connection/kysely';
 import { getMiddleRank } from '../../src/utils/ranking';
 import { getGoalRank, updateGoalRanks } from '../queries/ranking';
 import { filterQuery } from '../queries/filter';
@@ -18,7 +18,14 @@ import { ExtractTypeFromGenerated, pickUniqueValues } from '../utils';
 import { queryWithFiltersSchema } from '../../src/schema/common';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
 import { Activity } from '../queries/activity';
-import { Tag, State, Priority, Project, GoalAchieveCriteria, Goal as DbGoal } from '../../generated/kysely/types';
+import {
+    Tag,
+    State,
+    Priority,
+    Project,
+    GoalAchieveCriteria,
+    Goal as DbGoal,
+} from '../../src/utils/db/generated/kysely/types';
 
 import { tr } from './router.i18n';
 

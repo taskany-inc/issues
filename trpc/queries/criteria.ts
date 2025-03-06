@@ -1,7 +1,7 @@
 import { sql } from 'kysely';
 
-import { db } from '../connection/kysely';
-import { Activity, ExternalTask, Ghost, Goal, State, User } from '../../generated/kysely/types';
+import { db } from '../../src/utils/db/connection/kysely';
+import { Activity, ExternalTask, Ghost, Goal, State, User } from '../../src/utils/db/generated/kysely/types';
 import { ExtractTypeFromGenerated } from '../utils';
 
 import { getUserActivity } from './activity';
