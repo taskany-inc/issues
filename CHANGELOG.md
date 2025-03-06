@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.69.0](https://github.com/taskany-inc/issues/compare/v2.68.0...v2.69.0) (2025-03-06)
+
+
+### Features
+
+* **INTERNAL-1573:** support Groupped Goals filters ([b122ebe](https://github.com/taskany-inc/issues/commit/b122ebe2f968865bfcbbb4afaa4183511a2030e0))
+
+
+### Bug Fixes
+
+* **INTERNAL-1518:** fix movement on end of list ([f1243c2](https://github.com/taskany-inc/issues/commit/f1243c21ff988435394ee5ddf9fdcf9acbeff757))
+
 ## [2.68.0](https://github.com/taskany-inc/issues/compare/v2.67.3...v2.68.0) (2025-02-27)
 
 
