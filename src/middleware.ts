@@ -34,15 +34,26 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        /*
+        /**
          * Match all request paths except for the ones starting with:
          * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
+         * - _next/* (static files, image optimization files, preload pages data)
+         * - favicon.* (favicon file)
+         * - avatar (user avatars)
+         * - static (any static files)
          */
         {
-            source: '/((?!api|_next/static|_next/image|_next/data|favicon|theme|whatsnew).*)',
+            source: '/((?!api|_next|favicon|theme|whatsnew|avatar|static).*)',
+            missing: [
+                { type: 'header', key: 'next-router-prefetch' },
+                { type: 'header', key: 'purpose', value: 'prefetch' },
+            ],
+        },
+        /**
+         * Also add strict route handler for root path
+         */
+        {
+            source: '/',
             missing: [
                 { type: 'header', key: 'next-router-prefetch' },
                 { type: 'header', key: 'purpose', value: 'prefetch' },

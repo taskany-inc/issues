@@ -25,6 +25,8 @@ type EventType =
     | 'goalCriteriaConvert'
     | 'goalCriteriaOwnerChange'
     | 'goalAddDependency'
+    | 'goalNewComment'
+    | 'goalUpdateComment'
     | 'goalRemoveDependency'
     | 'goalAddParticipant'
     | 'goalRemoveParticipant'
@@ -45,7 +47,7 @@ export interface AnalyticsEvent {
         session_id?: string | number;
         path?: string;
         locale?: string;
-        [key: string]: string | number | undefined;
+        [key: string]: string | number | boolean | undefined | null;
     };
     device_type?: string;
     device_brand?: string;
@@ -61,7 +63,7 @@ interface ProcessEventOptions {
     pathname?: string;
     searchParams?: Record<string, string | number>;
     uaHeader?: string;
-    additionalData?: Record<string, string>;
+    additionalData?: Record<string, string | number | boolean | null>;
 }
 
 const constructEvent = ({
@@ -76,10 +78,15 @@ const constructEvent = ({
     const parts = url.split('/');
     let locale = parts[3];
     const host = parts[2];
+
     let path = parts.slice(4).join('/');
     if (!['ru', 'en'].includes(locale)) {
         locale = 'en';
         path = parts.slice(3).join('/');
+    }
+
+    if (!path.startsWith('/')) {
+        path = `/${path}`;
     }
 
     const ua = userAgentFromString(uaHeader);

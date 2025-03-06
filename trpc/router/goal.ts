@@ -371,6 +371,20 @@ export const goal = router({
             return null;
         }
 
+        if (input.mode === 'personal' && input.parent == null) {
+            processEvent({
+                eventType: 'projectCreate',
+                url: ctx.headers.referer || '',
+                session: ctx.session,
+                uaHeader: ctx.headers['user-agent'],
+                additionalData: {
+                    projectId: actualProject.id,
+                    ownerId: actualProject.activityId,
+                    personal: actualProject.personal,
+                },
+            });
+        }
+
         if (actualProject.archived) {
             throw new TRPCError({
                 code: 'PRECONDITION_FAILED',
@@ -429,6 +443,7 @@ export const goal = router({
                     goalId: newGoal.id,
                     scopedId: newGoal._shortId,
                     projectId: newGoal.projectId || '',
+                    personal: input.mode === 'personal',
                 },
             });
 
@@ -662,6 +677,18 @@ export const goal = router({
                 });
                 await changeGoalProject(actualGoal.id, newParent.id);
                 await updateProjectUpdatedAt(newParent.id);
+
+                processEvent({
+                    eventType: 'projectCreate',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        projectId: newParent.id,
+                        ownerId: newParent.activityId,
+                        personal: newParent.personal,
+                    },
+                });
             }
 
             try {
@@ -770,6 +797,7 @@ export const goal = router({
                         goalId: updatedGoal.id,
                         scopedId: updatedGoal._shortId,
                         projectId: updatedGoal.projectId || '',
+                        personal: updatedGoal.project?.personal ?? false,
                         changes: history.map(({ subject }) => subject).join(','),
                     },
                 });
@@ -1040,13 +1068,29 @@ export const goal = router({
             const { activityId, role } = ctx.session.user;
 
             try {
-                return createComment({
+                const newComment = await createComment({
                     description: input.description,
                     stateId: input.stateId,
                     activityId,
                     goalId: input.goalId,
                     role,
                 });
+
+                if (newComment != null) {
+                    processEvent({
+                        eventType: 'goalNewComment',
+                        url: ctx.headers.referer || '',
+                        session: ctx.session,
+                        uaHeader: ctx.headers['user-agent'],
+                        additionalData: {
+                            commentId: newComment.id ?? null,
+                            goalId: newComment.goalId ?? null,
+                            newState: newComment.state?.type ?? null,
+                        },
+                    });
+                }
+
+                return newComment;
             } catch (error: any) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: String(error.message), cause: error });
             }
@@ -1054,7 +1098,7 @@ export const goal = router({
     updateComment: protectedProcedure
         .input(commentEditSchema)
         .use(commentAccessMiddleware)
-        .mutation(async ({ input: { id, description } }) => {
+        .mutation(async ({ input: { id, description }, ctx }) => {
             try {
                 const newComment = await prisma.comment.update({
                     where: {
@@ -1063,7 +1107,24 @@ export const goal = router({
                     data: {
                         description,
                     },
+                    include: {
+                        state: true,
+                    },
                 });
+
+                if (newComment != null) {
+                    processEvent({
+                        eventType: 'goalUpdateComment',
+                        url: ctx.headers.referer || '',
+                        session: ctx.session,
+                        uaHeader: ctx.headers['user-agent'],
+                        additionalData: {
+                            commentId: newComment.id ?? null,
+                            goalId: newComment.goalId ?? null,
+                            newState: newComment.state?.type ?? null,
+                        },
+                    });
+                }
 
                 return newComment;
             } catch (error: any) {
@@ -1077,7 +1138,7 @@ export const goal = router({
             }),
         )
         .use(commentAccessMiddleware)
-        .mutation(async ({ input: { id } }) => {
+        .mutation(async ({ input: { id }, ctx }) => {
             try {
                 const deletedComment = await prisma.comment.delete({
                     where: {
@@ -1087,6 +1148,17 @@ export const goal = router({
 
                 const actualGoal = await prisma.goal.findUnique({ where: { id: deletedComment.goalId } });
                 await updateProjectUpdatedAt(actualGoal?.projectId);
+
+                processEvent({
+                    eventType: 'goalUpdateComment',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        commentId: id,
+                        goalId: actualGoal?.id ?? null,
+                    },
+                });
 
                 return deletedComment;
             } catch (error: any) {
@@ -2124,6 +2196,18 @@ export const goal = router({
                     await updateProjectUpdatedAt(actualGoal.projectId);
                     await clearEmptyPersonalProject(actualGoal.projectId);
                 }
+
+                processEvent({
+                    eventType: 'projectCreate',
+                    url: ctx.headers.referer || '',
+                    session: ctx.session,
+                    uaHeader: ctx.headers['user-agent'],
+                    additionalData: {
+                        projectId: newProject.id,
+                        ownerId: newProject.activityId,
+                        personal: newProject.personal,
+                    },
+                });
             }
 
             const history = {

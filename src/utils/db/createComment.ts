@@ -65,6 +65,7 @@ export const createComment = async ({
                     user: true,
                 },
             },
+            state: true,
         },
     });
 

@@ -144,7 +144,7 @@ export const createPersonalProject = async ({
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'No suggested flow' });
     }
 
-    return prisma.project.create({
+    const newProject = prisma.project.create({
         data: {
             id: owner.user?.nickname?.replace(/\s/g, '') || customAlphabet(alphanumeric)(),
             title: `Personal for ${safeGetUserName(owner) || safeGetUserEmail(owner)}`,
@@ -161,6 +161,8 @@ export const createPersonalProject = async ({
         },
         include: usersInclude,
     });
+
+    return newProject;
 };
 
 export const countPrivateDependencies = async ({
