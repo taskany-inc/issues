@@ -1,6 +1,6 @@
 import { sql } from 'kysely';
 
-import { db } from '../connection/kysely';
+import { db } from '../../src/utils/db/connection/kysely';
 import { ExtractTypeFromGenerated } from '../utils';
 import {
     Goal,
@@ -11,7 +11,7 @@ import {
     State,
     Tag,
     ExternalTask,
-} from '../../generated/kysely/types';
+} from '../../src/utils/db/generated/kysely/types';
 import { calcStatusColorForExternalTask } from '../../src/utils/db/calculatedGoalsFields';
 
 import { Activity, getUserActivity } from './activity';

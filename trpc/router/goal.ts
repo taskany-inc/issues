@@ -67,6 +67,7 @@ import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../q
 import { getOrCreateExternalTask, updateExternalTask } from '../queries/external';
 import { jiraService, JiraUser, searchIssue } from '../../src/utils/integration/jira';
 import { processEvent } from '../../src/utils/analyticsEvent';
+import { getProjectsEditableStatus } from '../../src/utils/db/getProjectEditable';
 
 import { tr } from './router.i18n';
 
@@ -132,19 +133,24 @@ export const goal = router({
                 }),
             });
 
-            const checkEnableGoalByProjectOwner = (goal: (typeof data)[number]) => {
-                const { _isEditable } = addCalculatedGoalsFields(goal, activityId, role);
+            const projectIds = data.map((goal) => goal.projectId || '');
+            const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
 
-                return _isEditable;
-            };
+            const projectsWithEditable = data.map((goal) => ({
+                ...goal,
+                ...addCalculatedGoalsFields(
+                    goal,
+                    { _isEditable: Boolean(goal.projectId && editableMap.get(goal.projectId)) },
+                    activityId,
+                    role,
+                ),
+            }));
 
             if (onlyCurrentUser) {
-                return data
-                    .filter(checkEnableGoalByProjectOwner)
-                    .map((goal) => ({ ...goal, ...addCalculatedGoalsFields(goal, activityId, role) }));
+                return projectsWithEditable.filter((goal) => goal._isEditable);
             }
 
-            return data.map((goal) => ({ ...goal, ...addCalculatedGoalsFields(goal, activityId, role) }));
+            return projectsWithEditable;
         }),
     getGoalsCount: protectedProcedure
         .input(batchGoalsSchema.pick({ query: true, baseQuery: true }))
@@ -317,12 +323,20 @@ export const goal = router({
                         privateDepsCount.goalAchiveCriteria,
                 );
 
+                const projectIds = [goal.projectId ?? ''];
+                const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+
                 return {
                     ...goal,
-                    ...addCalculatedGoalsFields(goal, activityId, role),
+                    ...addCalculatedGoalsFields(
+                        goal,
+                        { _isEditable: Boolean(goal.projectId && editableMap.get(goal.projectId)) },
+                        activityId,
+                        role,
+                    ),
                     ...applyLastStateUpdateComment(goal),
                     _hasPrivateDeps,
-                    _relations: makeGoalRelationMap(
+                    _relations: await makeGoalRelationMap(
                         {
                             dependsOn: goal.dependsOn,
                             blocks: goal.blocks,
@@ -499,9 +513,17 @@ export const goal = router({
 
                 await recalculateCriteriaScore(goal.id).recalcLinkedGoalsScores().recalcAverageProjectScore().run();
 
+                const projectIds = [goal.projectId ?? ''];
+                const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+
                 const newGoal = {
                     ...goal,
-                    ...addCalculatedGoalsFields(goal, activityId, role),
+                    ...addCalculatedGoalsFields(
+                        goal,
+                        { _isEditable: Boolean(goal.projectId && editableMap.get(goal.projectId)) },
+                        activityId,
+                        role,
+                    ),
                 };
 
                 processEvent({
@@ -549,7 +571,14 @@ export const goal = router({
 
             if (!actualGoal) return null;
 
-            const { _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
+            const projectIds = [actualGoal.projectId || ''].filter(Boolean);
+            const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+            const { _shortId } = addCalculatedGoalsFields(
+                actualGoal,
+                { _isEditable: Boolean(actualGoal.projectId && editableMap.get(actualGoal.projectId)) },
+                activityId,
+                role,
+            );
 
             const tagsToDisconnect = calculateDiffBetweenArrays(actualGoal.tags, input.tags);
             const tagsToConnect = calculateDiffBetweenArrays(input.tags, actualGoal.tags);
@@ -758,7 +787,12 @@ export const goal = router({
 
                 const updatedGoal = {
                     ...goal,
-                    ...addCalculatedGoalsFields(goal, activityId, role),
+                    ...addCalculatedGoalsFields(
+                        goal,
+                        { _isEditable: Boolean(goal.projectId && editableMap.get(goal.projectId)) },
+                        activityId,
+                        role,
+                    ),
                 };
 
                 processEvent({
@@ -842,7 +876,14 @@ export const goal = router({
                 return null;
             }
 
-            const { _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
+            const projectIds = [actualGoal.projectId || ''].filter(Boolean);
+            const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+            const { _shortId } = addCalculatedGoalsFields(
+                actualGoal,
+                { _isEditable: Boolean(actualGoal.projectId && editableMap.get(actualGoal.projectId)) },
+                activityId,
+                role,
+            );
 
             try {
                 const updatedGoal = await prisma.goal.update({
@@ -933,7 +974,14 @@ export const goal = router({
 
             await updateProjectUpdatedAt(actualGoal.projectId);
 
-            const { _shortId } = addCalculatedGoalsFields(actualGoal, activityId, role);
+            const projectIds = [actualGoal.projectId || ''].filter(Boolean);
+            const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+            const { _shortId } = addCalculatedGoalsFields(
+                actualGoal,
+                { _isEditable: Boolean(actualGoal.projectId && editableMap.get(actualGoal.projectId)) },
+                activityId,
+                role,
+            );
 
             const promises: Promise<any>[] = [
                 prisma.goal.update({
@@ -2172,7 +2220,18 @@ export const goal = router({
                     },
                 });
 
-                return { ...updatedGoal, ...addCalculatedGoalsFields(updatedGoal, activityId, role) };
+                const projectIds = [updatedGoal.projectId || ''].filter(Boolean);
+                const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+
+                return {
+                    ...updatedGoal,
+                    ...addCalculatedGoalsFields(
+                        updatedGoal,
+                        { _isEditable: Boolean(updatedGoal.projectId && editableMap.get(updatedGoal.projectId)) },
+                        activityId,
+                        role,
+                    ),
+                };
             } catch (error: any) {
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',

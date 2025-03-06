@@ -1,6 +1,6 @@
 import { jsonArrayFrom } from 'kysely/helpers/postgres';
 
-import { db } from '../connection/kysely';
+import { db } from '../../src/utils/db/connection/kysely';
 
 interface FlowQueryParams {
     id?: string;

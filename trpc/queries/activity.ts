@@ -1,7 +1,7 @@
 import { sql } from 'kysely';
 
-import { Activity as ActivityDTO, User, Ghost } from '../../generated/kysely/types';
-import { db } from '../connection/kysely';
+import { Activity as ActivityDTO, User, Ghost } from '../../src/utils/db/generated/kysely/types';
+import { db } from '../../src/utils/db/connection/kysely';
 import { ExtractTypeFromGenerated } from '../utils';
 
 export interface Activity extends ExtractTypeFromGenerated<ActivityDTO> {

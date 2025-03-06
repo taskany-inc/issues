@@ -9,6 +9,7 @@ import { parseCrewLoginFromText } from '../crew';
 import { updateProjectUpdatedAt } from './updateProjectUpdatedAt';
 import { addCalculatedGoalsFields } from './calculatedGoalsFields';
 import { getLocalUsersByCrewLogin } from './crewIntegration';
+import { getProjectsEditableStatus } from './getProjectEditable';
 
 export const createComment = async ({
     description,
@@ -48,7 +49,14 @@ export const createComment = async ({
     if (!commentAuthor) return null;
     if (!actualGoal) return null;
 
-    const { _isEditable, _shortId, _isParticipant } = addCalculatedGoalsFields(actualGoal, activityId, role);
+    const projectIds = [actualGoal.projectId ?? ''];
+    const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+    const { _isEditable, _shortId, _isParticipant } = addCalculatedGoalsFields(
+        actualGoal,
+        { _isEditable: Boolean(actualGoal.projectId && editableMap.get(actualGoal.projectId)) },
+        activityId,
+        role,
+    );
 
     const canEdit = _isEditable || _isParticipant;
 

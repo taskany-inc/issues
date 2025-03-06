@@ -1,6 +1,7 @@
 import { Goal, PrismaClient } from '@prisma/client';
 
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
+import { getProjectsEditableStatus } from '../../src/utils/db/getProjectEditable';
 
 type TaskParams<K extends string, D, R> = {
     [key in K]: D extends void ? (data?: D) => R : (data: D) => R;
@@ -148,9 +149,17 @@ export const initDb = (on: DbPluginEvents) => {
                 },
             });
 
+            const projectIds = [goal.projectId ?? ''];
+            const editableMap = await getProjectsEditableStatus(projectIds, user.activityId, user.role);
+
             return {
                 ...goal,
-                ...addCalculatedGoalsFields(goal, user.activityId, user.role),
+                ...addCalculatedGoalsFields(
+                    goal,
+                    { _isEditable: Boolean(goal.projectId && editableMap.get(goal.projectId)) },
+                    user.activityId,
+                    user.role,
+                ),
             };
         },
 

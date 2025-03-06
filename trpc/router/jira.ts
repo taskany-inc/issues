@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { protectedProcedure, router } from '../trpcBackend';
 import { JiraIssue, searchIssue, jiraService, JiraUser } from '../../src/utils/integration/jira';
-import { ExternalTask } from '../../generated/kysely/types';
+import { ExternalTask } from '../../src/utils/db/generated/kysely/types';
 import { ExtractTypeFromGenerated } from '../utils';
 
 const jiraIssueToExternalTask = (

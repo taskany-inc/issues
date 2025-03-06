@@ -1,4 +1,4 @@
 /graphql/generated/*
 /public/*
-/generated/*
+/src/utils/db/generated/*
 

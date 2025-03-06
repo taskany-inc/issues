@@ -9,8 +9,9 @@ import { getProjectSchema } from '../../../trpc/queries/project';
 import { prisma } from '../prisma';
 import { safeGetUserEmail, safeGetUserName } from '../getUserName';
 import { calcAchievedWeight } from '../recalculateCriteriaScore';
-import { db } from '../../../trpc/connection/kysely';
 
+import { db } from './connection/kysely';
+import { getProjectsEditableStatus } from './getProjectEditable';
 import { addCalculatedGoalsFields } from './calculatedGoalsFields';
 
 /**
@@ -70,9 +71,17 @@ export const createGoal = async (input: GoalCommon, projectId: string, activityI
         },
     });
 
+    const projectIds = [goal?.projectId || ''].filter(Boolean);
+    const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+
     return {
         ...goal,
-        ...addCalculatedGoalsFields(goal, activityId, role),
+        ...addCalculatedGoalsFields(
+            goal,
+            { _isEditable: Boolean(goal?.projectId && editableMap.get(goal.projectId)) },
+            activityId,
+            role,
+        ),
     };
 };
 
@@ -269,20 +278,32 @@ export const clearEmptyPersonalProject = async (id?: string | null) => {
 type GoalRelation<T> = T & { _kind: dependencyKind | exceptionsDependencyKind } & ReturnType<
         typeof addCalculatedGoalsFields
     >;
-export const makeGoalRelationMap = <T extends Goal>(
+export const makeGoalRelationMap = async <T extends Goal>(
     values: Record<dependencyKind | exceptionsDependencyKind, T[]>,
     activityId: string,
     role: Role,
-): Array<{ kind: dependencyKind; goals: GoalRelation<T>[] }> => {
+): Promise<Array<{ kind: dependencyKind; goals: GoalRelation<T>[] }>> => {
     const entriesValues = Object.entries(values) as [dependencyKind | exceptionsDependencyKind, T[]][];
+
+    const allGoals = entriesValues.flatMap(([_, goals]) => goals);
+    const allProjectIds = allGoals.map((goal) => goal.projectId || '').filter(Boolean);
+
+    const editableMap = await getProjectsEditableStatus(allProjectIds, activityId, role);
 
     const dependenciesMap = entriesValues.reduce<Record<dependencyKind, GoalRelation<T>[]>>(
         (acc, [kind, goals]) => {
-            const goalsWithKindByDependency = goals.map((goal) => ({
-                ...goal,
-                ...addCalculatedGoalsFields(goal, activityId, role),
-                _kind: kind,
-            }));
+            const goalsWithKindByDependency = goals.map((goal) => {
+                return {
+                    ...goal,
+                    ...addCalculatedGoalsFields(
+                        goal,
+                        { _isEditable: Boolean(goal.projectId && editableMap.get(goal.projectId)) },
+                        activityId,
+                        role,
+                    ),
+                    _kind: kind,
+                };
+            });
 
             if (kind === exceptionsDependencyKind.connected) {
                 acc[dependencyKind.relatedTo].push(...goalsWithKindByDependency);

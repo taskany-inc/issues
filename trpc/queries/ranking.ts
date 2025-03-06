@@ -1,7 +1,7 @@
 import { Expression, SqlBool } from 'kysely';
 
 import { getRankSeries } from '../../src/utils/ranking';
-import { db } from '../connection/kysely';
+import { db } from '../../src/utils/db/connection/kysely';
 
 export const getGoalRank = (goalId: string, activityId?: string) => {
     return db

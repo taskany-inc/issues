@@ -1,5 +1,5 @@
-import { db } from '../connection/kysely';
-import { Comment as CommentDTO, Reaction as ReactionDTO, State } from '../../generated/kysely/types';
+import { db } from '../../src/utils/db/connection/kysely';
+import { Comment as CommentDTO, Reaction as ReactionDTO, State } from '../../src/utils/db/generated/kysely/types';
 import { ExtractTypeFromGenerated } from '../utils';
 
 import { getUserActivity, Activity } from './activity';

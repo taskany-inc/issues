@@ -1,4 +1,4 @@
-import { db } from '../connection/kysely';
+import { db } from '../../src/utils/db/connection/kysely';
 
 interface TagQueryParams {
     excludedIds?: string[];

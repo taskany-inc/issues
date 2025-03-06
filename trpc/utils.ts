@@ -1,11 +1,10 @@
 import { ColumnType } from 'kysely';
 import prisma from '@prisma/client';
 
-import { Timestamp } from '../generated/kysely/types';
+import { Timestamp } from '../src/utils/db/generated/kysely/types';
 import { ReactionsMap } from '../src/types/reactions';
 import { safeGetUserName } from '../src/utils/getUserName';
-
-import { db } from './connection/kysely';
+import { db } from '../src/utils/db/connection/kysely';
 
 interface UserActivity {
     activity: prisma.Activity & { user: prisma.User; ghost: prisma.Ghost | null };

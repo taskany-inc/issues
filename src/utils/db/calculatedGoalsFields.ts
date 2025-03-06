@@ -37,8 +37,12 @@ export const addCalculatedGoalsFields = <
         activityId: string | null;
         parent?: P[];
     },
+    Q extends {
+        _isEditable?: boolean | null;
+    },
 >(
     goal: T,
+    project: Q,
     activityId: string,
     role: Role,
 ) => {
@@ -48,12 +52,7 @@ export const addCalculatedGoalsFields = <
     const _isStarred = goal.stargizers?.some((stargizer) => stargizer?.id === activityId);
     const _isIssuer = goal.activityId === activityId;
 
-    const parentOwner = goal.project?.activityId === activityId;
-    const parentParticipant = goal.project?.participants?.some(
-        (participant: { id: string }) => participant?.id === activityId,
-    );
-
-    const _isEditable = _isParticipant || parentParticipant || _isOwner || _isIssuer || parentOwner || role === 'ADMIN';
+    const _isEditable = project._isEditable || _isParticipant || _isOwner || _isIssuer || role === 'ADMIN';
 
     return {
         _isOwner,

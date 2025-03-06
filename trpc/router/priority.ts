@@ -1,4 +1,4 @@
-import { db } from '../connection/kysely';
+import { db } from '../../src/utils/db/connection/kysely';
 import { protectedProcedure, router } from '../trpcBackend';
 
 export const priority = router({
