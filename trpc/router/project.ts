@@ -137,6 +137,8 @@ export const project = router({
                     uaHeader: ctx.headers['user-agent'],
                     additionalData: {
                         projectId: project.id,
+                        personal: project.personal,
+                        ownerId: project.activityId,
                     },
                 });
 
@@ -333,6 +335,8 @@ export const project = router({
                     uaHeader: ctx.headers['user-agent'],
                     additionalData: {
                         projectId: project.id,
+                        ownerId: project.activityId,
+                        personal: project.personal,
                     },
                 });
 
@@ -369,6 +373,8 @@ export const project = router({
                     uaHeader: ctx.headers['user-agent'],
                     additionalData: {
                         projectId: input.id,
+                        ownerId: currentProject.activityId,
+                        personal: currentProject.personal,
                     },
                 });
 
