@@ -34,7 +34,6 @@ export const TitleLogo: React.FC<TitleLogoProps> = ({ className }) => {
                     className={className}
                 />
             </svg>
-            ;
         </>
     );
 };
