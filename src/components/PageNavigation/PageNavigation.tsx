@@ -7,7 +7,6 @@ import {
     NavigationSidebar,
     NavigationSidebarContent,
     NavigationSidebarHeader,
-    NavigationSidebarTitle,
     TaskanyLogo,
 } from '@taskany/bricks/harmony';
 import { useRouter } from 'next/router';
@@ -19,6 +18,7 @@ import { refreshInterval } from '../../utils/config';
 import { NextLink } from '../NextLink';
 import { trpc } from '../../utils/trpcClient';
 import { header, headerMenuExplore, headerMenuGoals } from '../../utils/domObjects';
+import { TitleLogo } from '../TitleLogo';
 
 import { tr } from './PageNavigation.i18n';
 import s from './PageNavigation.module.css';
@@ -103,8 +103,8 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
             <NavigationSidebarHeader>
                 <NextLink href={routes.index()} className={s.PageNavigationLogo}>
                     <TaskanyLogo src={logo} size="m" />
+                    <TitleLogo className={s.TitleLogo} />
                 </NextLink>
-                <NavigationSidebarTitle>{tr('Goals')}</NavigationSidebarTitle>
                 <IconBellOutline size="s" />
             </NavigationSidebarHeader>
             <NavigationSidebarContent>
