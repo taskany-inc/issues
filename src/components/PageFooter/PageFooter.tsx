@@ -6,7 +6,6 @@ import { ModalEvent, dispatchModalEvent } from '../../utils/dispatchModal';
 import { defaultLocale, languages } from '../../utils/getLang';
 import { trpc } from '../../utils/trpcClient';
 import { notifyPromise } from '../../utils/notifyPromise';
-import RotatableTip from '../RotatableTip/RotatableTip';
 
 import s from './PageFooter.module.css';
 import { tr } from './PageFooter.i18n';
@@ -64,9 +63,7 @@ export const PageFooter: FC = () => {
                     </Link>
                 </FooterItem>
             </FooterMenu>
-            <RotatableTip>
-                <SheepLogo />
-            </RotatableTip>
+            <SheepLogo />
         </Footer>
     );
 };
