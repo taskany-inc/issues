@@ -1,26 +1,38 @@
-import { FC, useRef, useState } from 'react';
+import { FC, useMemo, useRef, useState } from 'react';
 import { Popup } from '@taskany/bricks/harmony';
 import { SheepLogo } from '@taskany/bricks';
 
-import { tr } from './SheepLogoWithTips.i18n';
-import s from './SheepLogoWithTips.module.css';
+import { getRandomIndex } from '../../utils/getRandomIndex';
 
-const AllTips = [
-    tr('Your smile is my favorite kind of sunlight. Have a nice day!'),
-    tr('Good day!'),
-    tr('Hurray! Something interesting awaits you today!'),
-    tr('Life is wonderful!'),
-    tr("Don't worry, be happy"),
-];
+import s from './SheepLogoWithTips.module.css';
+import { tr } from './SheepLogoWithTips.i18n';
 
 const SheepLogoWithTips: FC = () => {
-    const getRandomIndex = () => Math.floor(Math.random() * AllTips.length);
-    const [index, setIndex] = useState(getRandomIndex());
     const [popupVisible, setPopupVisibility] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
+    const allTips = useMemo(() => {
+        return [
+            tr('Your smile is my favorite kind of sunlight. Have a nice day!'),
+            tr('Good day!'),
+            tr('Hurray! Something interesting awaits you today!'),
+            tr('Life is wonderful!'),
+            tr("Don't worry, be happy"),
+        ];
+    }, []);
+    const [index, setIndex] = useState(getRandomIndex(allTips.length));
 
     return (
         <>
+            <div ref={popupRef}>
+                <a
+                    onClick={() => {
+                        setPopupVisibility(true);
+                        setIndex(getRandomIndex(allTips.length));
+                    }}
+                >
+                    <SheepLogo />
+                </a>
+            </div>
             <Popup
                 visible={popupVisible}
                 placement="bottom-start"
@@ -29,17 +41,8 @@ const SheepLogoWithTips: FC = () => {
                 className={s.TipIcon}
                 onClickOutside={() => setPopupVisibility(false)}
             >
-                {AllTips[index]}
+                {allTips[index]}
             </Popup>
-            <div
-                onClick={() => {
-                    setPopupVisibility(true);
-                    setIndex(getRandomIndex());
-                }}
-                ref={popupRef}
-            >
-                <SheepLogo />
-            </div>
         </>
     );
 };

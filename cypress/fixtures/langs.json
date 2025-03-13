@@ -241,12 +241,6 @@
             "en": "All projects page"
         }
     },
-    "ExploreTopProjectsPage": {
-        "title": {
-            "ru": "SD Goals — Обзор — Проекты",
-            "en": "SD Goals — Explore — Projects"
-        }
-    },
     "FeedbackCreateForm": {
         "Feedback title": {
             "ru": "Заголовок заявки",
@@ -931,24 +925,24 @@
     },
     "PageFooter": {
         "Docs": {
-            "ru": "Документация",
-            "en": "Docs"
+            "ru": "Документы",
+            "en": ""
         },
         "Support": {
-            "ru": "",
+            "ru": "Поддержка",
             "en": ""
         },
         "API": {
             "ru": "API",
-            "en": "API"
+            "en": ""
         },
-        "Organization": {
-            "ru": "SD Goals",
-            "en": "SD Goals"
+        "SD Goals": {
+            "ru": "",
+            "en": ""
         },
         "Feedback": {
             "ru": "Обратная связь",
-            "en": "Feedback"
+            "en": ""
         },
         "Locale change title": {
             "ru": "En",
@@ -1303,6 +1297,28 @@
         "Pro tip!": {
             "ru": "Держи совет!",
             "en": "Pro tip!"
+        }
+    },
+    "SheepLogoWithTips": {
+        "Your smile is my favorite kind of sunlight. Have a nice day!": {
+            "ru": "",
+            "en": ""
+        },
+        "Good day!": {
+            "ru": "",
+            "en": ""
+        },
+        "Hurray! Something interesting awaits you today!": {
+            "ru": "",
+            "en": ""
+        },
+        "Life is wonderful!": {
+            "ru": "",
+            "en": ""
+        },
+        "Don't worry, be happy": {
+            "ru": "",
+            "en": ""
         }
     },
     "SortList": {

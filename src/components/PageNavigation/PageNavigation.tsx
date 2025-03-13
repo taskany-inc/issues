@@ -105,7 +105,7 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
                     <TaskanyLogo src={logo} size="m" />
                     <TitleLogo className={s.TitleLogo} />
                 </NextLink>
-                <IconBellOutline size="s" />
+                <IconBellOutline className={s.IconBellOutline} size="s" />
             </NavigationSidebarHeader>
             <NavigationSidebarContent>
                 <NavigationSidebarActionButton />
