@@ -187,6 +187,38 @@ export const goal = router({
                 filtered,
             };
         }),
+    recognizeGoalScopeIdById: protectedProcedure.input(z.string()).query(async ({ input }) => {
+        const scopedIdRe = /^(([A-Z]+)-\d+)$/;
+        const whereParams: Prisma.GoalWhereInput = {
+            archived: false,
+        };
+
+        // try to recognize shot id like: FRNTND-23
+        if (scopedIdRe.test(input)) {
+            const [projectId, scopeIdStr] = input.split('-');
+
+            if (!projectId) return null;
+
+            const scopeId = parseInt(scopeIdStr, 10);
+
+            if (Number.isNaN(scopeId)) {
+                return null;
+            }
+
+            whereParams.projectId = projectId;
+            whereParams.scopeId = scopeId;
+        } else {
+            whereParams.id = input;
+        }
+
+        return prisma.goal.findFirst({
+            where: whereParams,
+            select: {
+                projectId: true,
+                scopeId: true,
+            },
+        });
+    }),
     getById: protectedProcedure
         .input(z.string())
         .use(goalByShortIdAccessMiddleware)
