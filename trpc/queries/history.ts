@@ -94,6 +94,8 @@ type HistoryRecord = {
 
 export type HistoryRecordWithActivity = HistoryRecord & { activity: Activity };
 
+type ExtendedData = Array<HistoryRecordMeta[Exclude<keyof HistoryRecordMeta, 'title' | 'description' | 'estimate'>]>;
+
 export const castToSubject = (value: unknown): value is HistoryRecordWithActivity => {
     if (value != null && typeof value === 'object') {
         if ('subject' in value && value.subject != null && typeof value.subject === 'string') {
@@ -152,12 +154,16 @@ export const extraDataForEachRecord = async <T extends HisrotyRecord>(
     const replacedValueIdx = needRequestForSubject.map((subject) => requestParamsBySubjects[subject].sourceIdx).flat();
 
     if (needRequestForSubject.length) {
-        const results: Array<
-            Array<HistoryRecordMeta[Exclude<keyof HistoryRecordMeta, 'title' | 'description' | 'estimate'>]>
-        > = await Promise.all(
+        const results = await Promise.all(
             needRequestForSubject
                 .map((subject) => {
                     const { ids } = requestParamsBySubjects[subject];
+                    if (ids.length === 0) {
+                        return {
+                            execute: Promise.resolve,
+                        };
+                    }
+
                     switch (subject) {
                         case 'dependencies':
                             return goalBaseQuery()
@@ -231,7 +237,9 @@ export const extraDataForEachRecord = async <T extends HisrotyRecord>(
                     }
                 })
                 .map((query) => query.execute()),
-        );
+        ).then((results) => {
+            return results.filter((result) => result != null) as Array<ExtendedData>;
+        });
 
         const meta: Map<string, (typeof results)[number][number]> = new Map(
             results.flat().map((value) => [value.id, value]),
@@ -266,7 +274,6 @@ export const extraDataForEachRecord = async <T extends HisrotyRecord>(
     }
 
     // update state colors of jira tasks in criteria changes records
-
     historyWithMeta.forEach((record) => {
         if (record.subject === 'criteria') {
             if (record.nextValue?.externalTask != null) {
