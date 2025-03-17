@@ -14,6 +14,7 @@ import { trpc } from '../../utils/trpcClient';
 import { createProjectKeys, inviteUserKeys, createGoalKeys } from '../../utils/hotkeys';
 import { PageFooter } from '../PageFooter/PageFooter';
 import { ModalContext } from '../ModalOnEvent';
+import { FocusTracking } from '../FocusTracking';
 import { useGoalPreview } from '../GoalPreview/GoalPreviewProvider';
 import { PageNavigation } from '../PageNavigation/PageNavigation';
 import { pageContent } from '../../utils/domObjects';
@@ -106,6 +107,7 @@ export const Page: React.FC<PageProps> = ({
                 <link rel="stylesheet" id="themeVariables" href={`/theme/${theme}.css`} />
             </Head>
 
+            <FocusTracking />
             <OfflineBanner />
 
             <Toaster toastOptions={toastOptions} position="bottom-right" />
