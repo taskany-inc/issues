@@ -32,7 +32,8 @@ type EventType =
     | 'goalRemoveParticipant'
     | 'goalChangeState'
     | 'addPartnerProject'
-    | 'removePartnerProject';
+    | 'removePartnerProject'
+    | 'serviceVisibility';
 
 export interface AnalyticsEvent {
     event_type: EventType;
@@ -59,11 +60,12 @@ export interface AnalyticsEvent {
 interface ProcessEventOptions {
     eventType: EventType;
     url: string;
-    session: TrpcContext['session'];
+    session: Partial<TrpcContext['session']>;
     pathname?: string;
     searchParams?: Record<string, string | number>;
     uaHeader?: string;
     additionalData?: Record<string, string | number | boolean | null>;
+    appHost?: string;
 }
 
 const constructEvent = ({
@@ -74,6 +76,7 @@ const constructEvent = ({
     session,
     uaHeader,
     additionalData,
+    appHost = process.env.NEXTAUTH_URL,
 }: ProcessEventOptions) => {
     const parts = url.split('/');
     let locale = parts[3];
@@ -104,7 +107,7 @@ const constructEvent = ({
             query: JSON.stringify(searchParams),
             locale,
             host,
-            appHost: process.env.NEXTAUTH_URL || '',
+            appHost: appHost || '',
             ...additionalData,
         },
         device_type: ua.device.type,
@@ -130,12 +133,49 @@ export const trackEvent = (events: AnalyticsEvent[]) => {
             },
         });
     } else {
-        console.log('TELEMETRY EVENT', JSON.stringify(events));
+        console.log('TELEMETRY EVENT', JSON.stringify(events, null, 4));
     }
 };
 
 export const processEvent = (options: ProcessEventOptions) => {
     const fullEvent = constructEvent(options);
+
+    trackEvent([fullEvent]);
+};
+
+export const processClientEvent = (options: Omit<ProcessEventOptions, 'appHost' | 'url' | 'pathname'>) => {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    const prepareSearchParams = (from: string | void): ProcessEventOptions['searchParams'] => {
+        const params: ProcessEventOptions['searchParams'] = {};
+
+        if (from == null || from.length < 2) {
+            return undefined;
+        }
+
+        const urlParams = new URLSearchParams(from);
+
+        urlParams.forEach((val, key) => {
+            params[key] = val;
+        });
+
+        return params;
+    };
+
+    const { location } = window;
+
+    const appHost = `${location.protocol}//${location.host}`;
+    const { pathname, href, search } = location;
+
+    const fullEvent = constructEvent({
+        ...options,
+        appHost,
+        pathname,
+        url: href,
+        searchParams: prepareSearchParams(search),
+    });
 
     trackEvent([fullEvent]);
 };
