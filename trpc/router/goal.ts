@@ -65,7 +65,7 @@ import { ReactionsMap } from '../../src/types/reactions';
 import { safeGetUserName } from '../../src/utils/getUserName';
 import { extraDataForEachRecord, goalHistorySeparator, historyQuery } from '../queries/history';
 import { getOrCreateExternalTask, updateExternalTask } from '../queries/external';
-import { jiraService, JiraUser, searchIssue } from '../../src/utils/integration/jira';
+import { jiraService, JiraUser, searchIssue, setGoalUrlToJiraIssue } from '../../src/utils/integration/jira';
 import { processEvent } from '../../src/utils/analyticsEvent';
 import { getProjectsEditableStatus } from '../../src/utils/db/getProjectEditable';
 
@@ -1289,6 +1289,11 @@ export const goal = router({
                         resolutionName: issue.resolution?.name,
                     });
                     criteriaTitle = externalTask?.title;
+
+                    await setGoalUrlToJiraIssue({
+                        jiraKey: externalTask.externalKey,
+                        goalId: `${actualGoal.projectId}-${actualGoal.scopeId}`,
+                    });
                 }
             }
 
