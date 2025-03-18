@@ -97,6 +97,7 @@ interface JiraServiceConfig {
     finishedCategory: JiraIssueStatus['statusCategory'] | null;
     mapStatusKey: Record<string, string>;
     mapStatusIdToColor: Record<string, string>;
+    customFieldIdLink: string;
 }
 
 const toCamelCase = (key: string): string => {
@@ -191,6 +192,10 @@ const initJiraClient = () => {
         get isEnable() {
             return isValidConfig;
         },
+
+        get customFieldForGoal() {
+            return `customfield_${config.customFieldIdLink}`;
+        },
     };
 };
 
@@ -255,4 +260,12 @@ export const searchIssue = async (params: { value: string; limit: number }): Pro
         ...val,
         ...val.fields,
     })) as Array<JiraIssue>;
+};
+
+export const setGoalUrlToJiraIssue = (params: { jiraKey: string; goalId: string }) => {
+    return jiraService.instance.updateIssue(params.jiraKey, {
+        fields: {
+            [jiraService.customFieldForGoal]: `${process.env.NEXTAUTH_URL}/goals/${params.goalId}`,
+        },
+    });
 };
