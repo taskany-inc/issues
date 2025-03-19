@@ -45,7 +45,7 @@ export const PageFooter: FC = () => {
 
     return (
         <Footer>
-            <FooterCopyright orgName={tr('Organization')} />
+            <FooterCopyright orgName="SD Goals" />
             <FooterMenu>
                 <FooterItem onClick={dispatchModalEvent(ModalEvent.FeedbackCreateModal)} className={s.FooterItem}>
                     {tr('Feedback')}
