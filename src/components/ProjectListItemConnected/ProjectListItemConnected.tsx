@@ -8,6 +8,7 @@ import { routes } from '../../hooks/router';
 import { ProjectListItemCollapsable } from '../ProjectListItemCollapsable/ProjectListItemCollapsable';
 import { ProjectGoalList } from '../ProjectGoalList/ProjectGoalList';
 import { Kanban } from '../Kanban/Kanban';
+import { useClientEvent } from '../../hooks/useClientEvent';
 
 interface ProjectListItemConnectedProps extends ComponentProps<typeof ProjectListItemCollapsable> {
     parent?: ComponentProps<typeof ProjectListItemCollapsable>['project'];
@@ -91,6 +92,15 @@ export const ProjectListItemConnected: FC<ProjectListItemConnectedProps> = ({
     useEffect(() => {
         setIsProjectEmpty(getIsProjectEmptySetter(subTree));
     }, [subTree]);
+
+    useClientEvent(
+        'projectTreeNodeToggle',
+        {
+            projectId: project.id,
+            isOpen: props.visible ?? null,
+        },
+        isNeedRender,
+    );
 
     return nullable(isNeedRender, () => (
         <>

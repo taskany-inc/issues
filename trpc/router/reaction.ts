@@ -12,6 +12,8 @@ export const reaction = router({
                 where: { emoji, goalId, commentId, activityId: ctx.session.user.activityId },
             });
 
+            // TODO: call processEvent `toggle raection`
+
             try {
                 if (isUserReaction) {
                     return prisma.reaction.delete({

@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import { Kysely, PostgresDialect } from 'kysely';
+import debug from 'debug';
 
 import { DB as Database } from '../generated/kysely/types'; // this is the Database interface we defined earlier
 
@@ -19,7 +20,7 @@ const dialect = new PostgresDialect({
     }),
 });
 
-const isDebugEnabled = process.env.NODE_ENV === 'development' && process.env.DEBUG?.includes('db:kysely:provider');
+const dbProviderLog = debug('goals:kysely');
 
 // Database interface is passed to Kysely's constructor, and from now on, Kysely
 // knows your database structure.
@@ -30,17 +31,16 @@ export const db = new Kysely<Database>({
     plugins: [
         {
             transformQuery(query) {
-                if (isDebugEnabled) {
-                    // eslint-disable-next-line no-console
-                    console.log(db.getExecutor().compileQuery(query.node, query.queryId));
+                if (dbProviderLog.enabled) {
+                    dbProviderLog(db.getExecutor().compileQuery(query.node, query.queryId));
                 }
                 return query.node;
             },
             async transformResult(res) {
-                if (isDebugEnabled) {
-                    // eslint-disable-next-line no-console
-                    console.table(res.result);
+                if (dbProviderLog.enabled) {
+                    dbProviderLog(JSON.stringify(res.result));
                 }
+
                 return res.result;
             },
         },

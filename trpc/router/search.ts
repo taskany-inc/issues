@@ -8,12 +8,21 @@ import { getProjectAccessFilter } from '../queries/access';
 import { addCalculatedGoalsFields } from '../../src/utils/db/calculatedGoalsFields';
 import { getProjectsEditableStatus } from '../../src/utils/db/getProjectEditable';
 import { nonArchivedPartialQuery } from '../queries/project';
+import { processEvent } from '../../src/utils/analyticsEvent';
 
 export const search = router({
     global: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
         const { activityId, role } = ctx.session.user;
 
         const translitInput = translit(input);
+
+        processEvent({
+            eventType: 'searchQuery',
+            url: ctx.headers.referer || '',
+            session: ctx.session,
+            uaHeader: ctx.headers['user-agent'],
+            additionalData: { query: translitInput, rawQuery: input },
+        });
 
         const [goals, projects] = await Promise.all([
             prisma.goal.findMany({
@@ -116,6 +125,19 @@ export const search = router({
 
         const projectIds = goals.map((g) => g.projectId || '').filter(Boolean);
         const editableMap = await getProjectsEditableStatus(projectIds, activityId, role);
+
+        processEvent({
+            eventType: 'searchResults',
+            url: ctx.headers.referer || '',
+            session: ctx.session,
+            uaHeader: ctx.headers['user-agent'],
+            additionalData: {
+                projectsCount: projects.length,
+                goalsCount: goals.length,
+                foundProjectIds: projects.map(({ id }) => id).join(','),
+                foundGoalIds: goals.map(({ id }) => id).join(','),
+            },
+        });
 
         return {
             goals: goals.map((g) => ({

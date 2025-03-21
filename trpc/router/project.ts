@@ -399,6 +399,17 @@ export const project = router({
         .mutation(({ ctx, input: { id, direction } }) => {
             const connection = { id };
 
+            processEvent({
+                eventType: 'projectStarred',
+                url: ctx.headers.referer || '',
+                session: ctx.session,
+                uaHeader: ctx.headers['user-agent'],
+                additionalData: {
+                    projectId: id ?? null,
+                    starred: !!direction,
+                },
+            });
+
             try {
                 return prisma.activity.update({
                     where: { id: ctx.session.user.activityId },
@@ -415,6 +426,17 @@ export const project = router({
         .use(projectAccessMiddleware)
         .mutation(({ ctx, input: { id, direction } }) => {
             const connection = { id };
+
+            processEvent({
+                eventType: 'projectWatching',
+                url: ctx.headers.referer || '',
+                session: ctx.session,
+                uaHeader: ctx.headers['user-agent'],
+                additionalData: {
+                    projectId: id ?? null,
+                    watching: !!direction,
+                },
+            });
 
             try {
                 return prisma.activity.update({
