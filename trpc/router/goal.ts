@@ -882,6 +882,19 @@ export const goal = router({
         .mutation(({ ctx, input: { id, direction } }) => {
             const connection = { id };
 
+            // TODO: processEvent 'starredGoal'
+
+            processEvent({
+                eventType: 'goalStarred',
+                url: ctx.headers.referer || '',
+                session: ctx.session,
+                uaHeader: ctx.headers['user-agent'],
+                additionalData: {
+                    goalId: id ?? null,
+                    starred: !!direction,
+                },
+            });
+
             try {
                 return prisma.activity.update({
                     where: { id: ctx.session.user.activityId },
@@ -898,6 +911,17 @@ export const goal = router({
         .use(goalAccessMiddleware)
         .mutation(({ ctx, input: { id, direction } }) => {
             const connection = { id };
+
+            processEvent({
+                eventType: 'goalWatching',
+                url: ctx.headers.referer || '',
+                session: ctx.session,
+                uaHeader: ctx.headers['user-agent'],
+                additionalData: {
+                    goalId: id ?? null,
+                    watching: !!direction,
+                },
+            });
 
             try {
                 return prisma.activity.update({

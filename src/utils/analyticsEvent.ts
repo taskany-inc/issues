@@ -1,12 +1,14 @@
 import { userAgentFromString } from 'next/server';
+import debug from 'debug';
 
 import { TrpcContext } from '../../trpc/context';
 
-type EventType =
+export type EventType =
     | 'pageview'
     | 'query'
     | 'click'
     | 'searchQuery'
+    | 'searchResults'
     | 'projectCreate'
     | 'projectUpdate'
     | 'projectRemove'
@@ -14,6 +16,8 @@ type EventType =
     | 'projectAddParticipant'
     | 'projectRemoveParticipant'
     | 'projectUpdateTeams'
+    | 'projectStarred'
+    | 'projectWatching'
     | 'goalCreate'
     | 'goalTransfer'
     | 'goalUpdate'
@@ -31,9 +35,13 @@ type EventType =
     | 'goalAddParticipant'
     | 'goalRemoveParticipant'
     | 'goalChangeState'
+    | 'goalStarred'
+    | 'goalWatching'
     | 'addPartnerProject'
     | 'removePartnerProject'
-    | 'serviceVisibility';
+    | 'serviceVisibility'
+    | 'goalPreviewOpen'
+    | 'projectTreeNodeToggle';
 
 export interface AnalyticsEvent {
     event_type: EventType;
@@ -67,6 +75,8 @@ interface ProcessEventOptions {
     additionalData?: Record<string, string | number | boolean | null>;
     appHost?: string;
 }
+
+const analyticsDebug = debug('goals:analytics');
 
 const constructEvent = ({
     eventType,
@@ -132,8 +142,8 @@ export const trackEvent = (events: AnalyticsEvent[]) => {
                 'Content-Type': 'application/json',
             },
         });
-    } else {
-        console.log('TELEMETRY EVENT', JSON.stringify(events, null, 4));
+    } else if (analyticsDebug.enabled) {
+        analyticsDebug('TELEMETRY EVENT', JSON.stringify(events, null, 4));
     }
 };
 

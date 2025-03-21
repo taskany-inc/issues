@@ -14,6 +14,7 @@ import { refreshInterval } from '../../utils/config';
 import { GoalByIdReturnType } from '../../../trpc/inferredTypes';
 import { trpc } from '../../utils/trpcClient';
 import { ModalEvent, MapModalToComponentProps, dispatchModalEvent } from '../../utils/dispatchModal';
+import { useClientEvent } from '../../hooks/useClientEvent';
 
 type GoalPreviewEvent = MapModalToComponentProps['GoalPreviewModal']['type'];
 
@@ -58,10 +59,20 @@ export const GoalPreviewProvider: FC<{ children: ReactNode }> = ({ children }) =
         enabled: !!shortId,
     });
 
-    const setPreview = useCallback((shortId: string | null, defaults: Partial<GoalByIdReturnType> = {}) => {
-        setPreviewId(shortId);
-        setDefaults(shortId ? defaults : null);
+    const setPreview = useCallback((newShortId: string | null, defaults: Partial<GoalByIdReturnType> = {}) => {
+        setPreviewId(newShortId);
+        setDefaults(newShortId ? defaults : null);
     }, []);
+
+    useClientEvent(
+        'goalPreviewOpen',
+        {
+            goalId: preview?.id || null,
+            scopedId: preview?._shortId || null,
+            personal: preview?.personal || null,
+        },
+        preview == null,
+    );
 
     useEffect(() => {
         const listener = (event: CustomEvent<MapModalToComponentProps[ModalEvent.GoalPreviewModal]>) => {
