@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.70.1](https://github.com/taskany-inc/issues/compare/v2.70.0...v2.70.1) (2025-03-24)
+
+
+### Bug Fixes
+
+* **INTERNAL-1717:** search goal by passed identifier ([e7312e6](https://github.com/taskany-inc/issues/commit/e7312e6e9bfc63caa39840fd17dd48195ececb7a))
+
 ## [2.70.0](https://github.com/taskany-inc/issues/compare/v2.69.0...v2.70.0) (2025-03-24)
 
 
