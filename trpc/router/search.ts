@@ -81,7 +81,7 @@ export const search = router({
                 orderBy: {
                     _relevance: {
                         fields: ['title', 'description'],
-                        search: input,
+                        search: input.replace(/[\s\n\t]/g, '_'),
                         sort: 'asc',
                     },
                 },
