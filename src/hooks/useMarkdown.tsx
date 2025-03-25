@@ -33,7 +33,7 @@ export const markdownComponents = {
     h5: (props: HTMLAttributes<HTMLDivElement>) => <Text as="h5" {...props} />,
     h6: (props: HTMLAttributes<HTMLDivElement>) => <Text as="h6" {...props} />,
     p: (props: HTMLAttributes<HTMLDivElement>) => <Text as="p" {...props} />,
-    strong: (props: HTMLAttributes<HTMLDivElement>) => <Text as="strong" {...props} />,
+    strong: (props: HTMLAttributes<HTMLDivElement>) => <Text as="strong" weight="bold" {...props} />,
     blockquote: (props: BlockquoteHTMLAttributes<HTMLQuoteElement>) => <Text as="blockquote" {...props} />,
 };
 
