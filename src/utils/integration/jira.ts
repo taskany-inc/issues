@@ -252,14 +252,20 @@ export const searchIssue = async (params: { value: string; limit: number }): Pro
         }
     }
 
-    const searchResults = await jiraService.instance.searchJira(`summary ~ "${escapeSearchString(params.value)}"`, {
-        maxResults: params.limit,
-    });
+    const summaryValue = escapeSearchString(params.value);
 
-    return searchResults.issues.map((val: { fields: any }) => ({
-        ...val,
-        ...val.fields,
-    })) as Array<JiraIssue>;
+    if (summaryValue.length) {
+        const searchResults = await jiraService.instance.searchJira(`summary ~ "${escapeSearchString(params.value)}"`, {
+            maxResults: params.limit,
+        });
+
+        return searchResults.issues.map((val: { fields: any }) => ({
+            ...val,
+            ...val.fields,
+        })) as Array<JiraIssue>;
+    }
+
+    return [];
 };
 
 export const setGoalUrlToJiraIssue = (params: { jiraKey: string; goalId: string }) => {

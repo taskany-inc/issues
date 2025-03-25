@@ -17,9 +17,9 @@ export const email: JobHandler<'email'> = async ({ template, data }) => {
 
 export const cron: JobHandler<'cron'> = async ({ template }) => {
     switch (template) {
-        // case 'externalTaskCheck':
-        //     externalTaskCheckJob();
-        //     break;
+        case 'externalTaskCheck':
+            /** do nothing */
+            break;
         case 'makeCriteriaQueue':
             makeCriteriaQueue();
             break;
