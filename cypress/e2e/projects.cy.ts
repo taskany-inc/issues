@@ -45,6 +45,7 @@ before(() => {
 
 describe('Projects', () => {
     beforeEach(() => {
+        cy.interceptWhatsNew();
         cy.signInViaEmail();
     });
 
@@ -77,6 +78,7 @@ describe('Projects', () => {
 
         describe('form data manipulation', () => {
             beforeEach(() => {
+                cy.interceptWhatsNew();
                 // we are using the simplest way to open dialog before every iteration
                 cy.get(createSelectButton.query).click();
                 cy.get(createProjectItem.query).click();
@@ -234,14 +236,21 @@ describe('Projects', () => {
         });
 
         beforeEach(() => {
-            cy.intercept('/api/trpc/v2.project.getUserDashboardProjects*').as('dashboardLoad');
+            cy.intercept('/api/trpc/*v2.project.getUserDashboardProjects*').as('dashboardLoad');
+            cy.intercept('/_next/data/**/*.json').as('ssrData');
+            cy.get(dashboardLoadMore.query).as('loadMoreBtn');
             cy.get(filtersPanelResetButton.query).should('exist').click();
+
+            cy.wait('@ssrData');
+
             cy.get(projectListItem.query).should('exist').and('have.length.greaterThan', 1);
             cy.get(projectListItemTitle.query).should('contain.text', testProjectTitle);
-            cy.get(dashboardLoadMore.query).click();
+            cy.get('@loadMoreBtn').should('be.enabled');
+            cy.get('@loadMoreBtn').click();
 
             cy.wait('@dashboardLoad');
 
+            cy.get('@loadMoreBtn').should('not.exist');
             cy.get(`[href="${routes.project(testProjectKey)}"]`).should('exist');
             cy.visit(exactUrl(routes.project(testProjectKey)));
             // wait for correct page
@@ -291,7 +300,6 @@ describe('Personal project', () => {
         cy.intercept('/api/trpc/*v2.project.getUserDashboardProjects*?*').as('userDashboard');
         cy.intercept('/api/trpc/*v2.project.getProjectGoalsById*?*').as('goalsByProject');
         cy.signInViaEmail(testUser);
-        cy.wait('@whatsnew.check');
         // @ts-ignore
         cy.createPersonalGoal({
             title: 'Personal test goal',
