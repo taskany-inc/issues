@@ -264,12 +264,6 @@ export const externalTaskCheckJob = async () => {
 };
 
 export const makeCriteriaQueue = async () => {
-    const currentJob = await prisma.job.findFirst({
-        where: {
-            kind: 'makeCriteriaQueue',
-        },
-    });
-
     const exstingQueueJob = await prisma.job.findFirst({
         where: {
             kind: jobKind.criteriaListToUpdate,
@@ -277,7 +271,6 @@ export const makeCriteriaQueue = async () => {
         },
     });
 
-    assert(currentJob, 'Job doesnt exists');
     assert(jiraService.config.finishedCategory, 'Jira config is undefined');
 
     const atYesterday = new Date();
