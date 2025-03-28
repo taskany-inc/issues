@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.71.0](https://github.com/taskany-inc/issues/compare/v2.70.1...v2.71.0) (2025-03-28)
+
+
+### Features
+
+* **INTERNAL-1671:** markdown strong tag bug ([d0b2bcf](https://github.com/taskany-inc/issues/commit/d0b2bcf1906993d8972bc3ba3fa82db24574f49b))
+* **INTERNAL-1741:** projects search bug ([a2ee6eb](https://github.com/taskany-inc/issues/commit/a2ee6ebd8069984f6d596e24fc6b383d65054834))
+
+
+### Bug Fixes
+
+* **INTERNAL-1745:** more stability ([d5295c8](https://github.com/taskany-inc/issues/commit/d5295c8d19d40be166e909fb38033882010b1f22))
+
 ## [2.70.1](https://github.com/taskany-inc/issues/compare/v2.70.0...v2.70.1) (2025-03-24)
 
 
