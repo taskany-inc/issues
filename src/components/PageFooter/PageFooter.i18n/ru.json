@@ -1,10 +1,8 @@
 {
-    "Feedback": "Обратная связь",
-    "Docs": "Документация",
-    "Contact SD Goals": "Контакты",
     "API": "API",
+    "Feedback": "Обратная связь",
+    "Docs": "Документы",
     "Locale change title": "En",
-    "Contact us": "Связаться с нами",
-    "Organization": "SD Goals",
-    "Support": "Поддержка"
+    "Support": "Поддержка",
+    "SD Goals": ""
 }
