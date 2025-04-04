@@ -1,7 +1,7 @@
 import { PrismaClient, Job, Prisma } from '@prisma/client';
-import * as Sentry from '@sentry/nextjs';
 import parser from 'cron-parser';
 
+import Sentry from './sentry';
 import { jobKind, jobState, defaultJobDelay } from './create';
 import * as resolve from './resolve';
 import { log } from './utils';
@@ -165,6 +165,10 @@ const worker = async () => {
     } catch (error: any) {
         // eslint-disable-next-line no-console
         console.error(error.message);
+
+        return Sentry.captureException(error, {
+            fingerprint: ['worker', 'resolve', 'error'],
+        });
     }
 };
 
