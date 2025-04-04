@@ -47,6 +47,7 @@
     "@react-email/render": "0.0.12",
     "@salutejs/web-telemetry": "1.0.3",
     "@sentry/nextjs": "7.120.1",
+    "@sentry/node": "9.11.0",
     "@tanstack/react-query": "4.29.5",
     "@tanstack/react-query-devtools": "4.29.6",
     "@taskany/bricks": "5.65.5",
