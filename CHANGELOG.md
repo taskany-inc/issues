@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.72.0](https://github.com/taskany-inc/issues/compare/v2.71.0...v2.72.0) (2025-04-08)
+
+
+### Features
+
+* **INTERNAL-1682:** fix editor file paste ([2afcbfa](https://github.com/taskany-inc/issues/commit/2afcbfa374af7bdd949bae29114e79ef1b9de0bc))
+
 ## [2.71.0](https://github.com/taskany-inc/issues/compare/v2.70.1...v2.71.0) (2025-03-28)
 
 
