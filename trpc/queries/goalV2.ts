@@ -671,6 +671,16 @@ export const getAllGoalsQuery = (params: Omit<GetGoalsQueryParams, 'projectId'>)
                         .end()
                         .as('partnershipProjects'),
                 ])
+                .$if(!!params.goalsQuery?.watching, (qb) =>
+                    qb.where('Goal.id', 'in', ({ selectFrom }) =>
+                        selectFrom('_goalWatchers').select('B').where('A', '=', params.activityId),
+                    ),
+                )
+                .$if(!!params.goalsQuery?.starred, (qb) =>
+                    qb.where('Goal.id', 'in', ({ selectFrom }) =>
+                        selectFrom('_goalStargizers').select('B').where('A', '=', params.activityId),
+                    ),
+                )
                 .where('Goal.archived', 'is not', true)
                 .where(getGoalAccessByProjectFilter({ activityId: params.activityId, role: params.role }))
                 .where(getGoalFilterExpressionBuilder(params.goalsQuery))
