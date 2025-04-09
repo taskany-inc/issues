@@ -1,10 +1,9 @@
 import { declareSsrProps } from './declareSsrProps';
 import { filtersPanelSsrInit } from './filters';
-import { QueryState } from './parseUrlParams';
 
 const pageSize = 20;
 
-export const declareGoalsSsrProps = (baseQueryState: Partial<QueryState> = {}) =>
+export const declareGoalsSsrProps = () =>
     declareSsrProps(
         async (props) => {
             const { ssrHelpers } = props;
@@ -12,7 +11,6 @@ export const declareGoalsSsrProps = (baseQueryState: Partial<QueryState> = {}) =
 
             const queryState = {
                 ...urlQueryState,
-                ...baseQueryState,
             };
 
             if (queryState.groupBy === 'project') {
@@ -33,7 +31,6 @@ export const declareGoalsSsrProps = (baseQueryState: Partial<QueryState> = {}) =
 
             return {
                 defaultPresetFallback,
-                baseQueryState,
             };
         },
         {

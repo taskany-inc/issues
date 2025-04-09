@@ -25,8 +25,11 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { groupBy, view, id, ...queries } = query;
 
+            const starred = router.route.includes('starred');
+            const watching = router.route.includes('watching');
+
             const { queryState = undefined, queryFilterState = undefined } = Object.keys(queries).length
-                ? parseQueryState({ groupBy, view, ...queries })
+                ? parseQueryState({ starred, watching, groupBy, view, ...queries })
                 : {};
 
             return {
@@ -38,7 +41,7 @@ export const useUrlFilterParams = ({ preset }: { preset?: FilterById }) => {
                 projectsSort: queryState?.projectsSort,
                 hideEmptyProjects: queryState?.hideEmptyProjects,
             };
-        }, [router.query, currentPreset]);
+        }, [currentPreset, router.query, router.route]);
 
     const queryString = router.asPath.split('?')[1];
 

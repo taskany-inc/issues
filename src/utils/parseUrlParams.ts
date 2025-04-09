@@ -1,4 +1,4 @@
-import { ParsedUrlQuery } from 'querystring';
+import { ParsedUrlQueryInput } from 'querystring';
 import z from 'zod';
 
 import { SortableProjectsPropertiesArray, StateTypeEnum } from '../schema/common';
@@ -179,15 +179,15 @@ export const buildURLSearchParams = ({
     return urlParams;
 };
 
-export const parseBaseValues = (query: ParsedUrlQuery): BaseQueryState => ({
-    starred: Boolean(parseInt(parseQueryParam(query.starred?.toString()).toString(), 10)),
-    watching: Boolean(parseInt(parseQueryParam(query.watching?.toString()).toString(), 10)),
+export const parseBaseValues = (query: ParsedUrlQueryInput): BaseQueryState => ({
+    starred: Boolean(query.starred),
+    watching: Boolean(query.watching),
     groupBy: parseGroupByParam(query.groupBy?.toString()),
     view: parseViewParam(query.view?.toString()),
     limit: query.limit ? Number(query.limit) : undefined,
 });
 
-export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
+export const parseFilterValues = (query: ParsedUrlQueryInput): FilterQueryState => {
     const queryMap = {} as FilterQueryState;
 
     if (query.priority) queryMap.priority = parseQueryParam(query.priority?.toString());
@@ -215,7 +215,7 @@ export const parseFilterValues = (query: ParsedUrlQuery): FilterQueryState => {
     return queryMap;
 };
 
-export const parseQueryState = (query: ParsedUrlQuery) => {
+export const parseQueryState = (query: ParsedUrlQueryInput) => {
     const queryBaseState = parseBaseValues(query);
     const queryFilterState = parseFilterValues(query);
     const queryState = { ...queryBaseState, ...queryFilterState };
