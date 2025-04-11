@@ -66,14 +66,13 @@ export const search = router({
                         },
                         {
                             project: {
-                                ...getProjectAccessFilter(activityId, role),
+                                ...getProjectAccessFilter(activityId),
                             },
                         },
                     ],
                 },
                 include: getGoalDeepQuery({
                     activityId,
-                    role,
                 }),
             }),
             prisma.project.findMany({
@@ -108,7 +107,7 @@ export const search = router({
                         },
                     ],
                     AND: {
-                        ...getProjectAccessFilter(activityId, role),
+                        ...getProjectAccessFilter(activityId),
                         ...nonArchivedPartialQuery,
                     },
                 },

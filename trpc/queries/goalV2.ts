@@ -177,20 +177,28 @@ const getGoalFilterExpressionBuilder =
     };
 
 const getGoalAccessByProjectFilter =
-    ({ activityId, role }: { activityId: string; role: Role }): GoalWhereExpressionBuilder =>
-    ({ and, eb, or, selectFrom }) => {
-        if (role === Role.ADMIN) return and([]);
-
+    ({ activityId }: { activityId: string }): GoalWhereExpressionBuilder =>
+    ({ eb, selectFrom, not, exists }) => {
         return eb(
             'Goal.projectId',
             'in',
             selectFrom('Project')
                 .select('Project.id')
-                .where(({ eb, exists, not }) =>
+                .where(({ or, eb, and }) =>
                     or([
-                        eb('Project.id', '=', activityId),
-                        eb('Project.id', 'in', selectFrom('_projectAccess').where('A', '=', activityId).select('B')),
-                        not(exists(selectFrom('_projectAccess').select('B').where('B', '=', 'Project.id'))),
+                        and([eb('Project.personal', '=', true), eb('Project.activityId', '=', activityId)]),
+                        and([
+                            eb('Project.personal', 'is not', true),
+                            or([
+                                eb('Project.id', '=', activityId),
+                                eb(
+                                    'Project.id',
+                                    'in',
+                                    selectFrom('_projectAccess').where('A', '=', activityId).select('B'),
+                                ),
+                                not(exists(selectFrom('_projectAccess').select('B').where('B', '=', 'Project.id'))),
+                            ]),
+                        ]),
                     ]),
                 ),
         );
@@ -682,7 +690,7 @@ export const getAllGoalsQuery = (params: Omit<GetGoalsQueryParams, 'projectId'>)
                     ),
                 )
                 .where('Goal.archived', 'is not', true)
-                .where(getGoalAccessByProjectFilter({ activityId: params.activityId, role: params.role }))
+                .where(getGoalAccessByProjectFilter({ activityId: params.activityId }))
                 .where(getGoalFilterExpressionBuilder(params.goalsQuery))
                 .groupBy(['Goal.id']),
         )

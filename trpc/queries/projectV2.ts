@@ -176,10 +176,10 @@ export const getDeepChildrenProjectsId = (params: { in: Array<{ id: string }> })
 
 interface GetUserProjectsQueryParams {
     activityId: string;
-    role: Role;
     filter?: string[];
     limit?: number;
     includeSubsGoals?: boolean;
+    includePersonal?: boolean;
 }
 
 export const getStarredProjectsIds = (activityId: string) => {
@@ -194,18 +194,30 @@ export const getStarredProjectsIds = (activityId: string) => {
 
 export const getUserProjectsQuery = ({
     activityId,
-    role,
     filter = [],
     limit = 5,
     includeSubsGoals,
+    includePersonal,
 }: GetUserProjectsQueryParams) => {
     return db
         .selectFrom('Project')
         .selectAll('Project')
         .where('Project.archived', 'is not', true)
-        .where(({ and, or, eb }) =>
+        .where(({ and, or, eb, not, exists }) =>
             and([
                 eb('Project.archived', 'is not', true),
+                ...(includePersonal ? [] : [eb('Project.personal', 'is not', true)]),
+                or([
+                    eb('Project.activityId', '=', activityId),
+                    eb('Project.id', 'in', ({ selectFrom }) =>
+                        selectFrom('_projectAccess').select('B').where('A', '=', activityId),
+                    ),
+                    not(
+                        exists(({ selectFrom }) =>
+                            selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
+                        ),
+                    ),
+                ]),
                 or(
                     [
                         eb('Project.activityId', '=', activityId),
@@ -254,20 +266,6 @@ export const getUserProjectsQuery = ({
             ]),
         )
         .$if(filter.length > 0, (qb) => qb.where('Project.id', 'not in', filter))
-        .$if(role === Role.USER, (qb) =>
-            qb.where(({ or, eb, not, exists }) =>
-                or([
-                    eb('Project.id', 'in', ({ selectFrom }) =>
-                        selectFrom('_projectAccess').select('B').where('A', '=', activityId),
-                    ),
-                    not(
-                        exists(({ selectFrom }) =>
-                            selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
-                        ),
-                    ),
-                ]),
-            ),
-        )
         .limit(limit)
         .orderBy('Project.updatedAt desc');
 };
@@ -442,38 +440,30 @@ export const getWholeGoalCountByProjectIds = (params: GetWholeGoalCountByProject
 
 interface GetProjectSuggestionsParams {
     activityId: string;
-    role: Role;
     query: string;
     filter?: string[];
     limit?: number;
 }
 
-export const getProjectSuggestions = ({
-    role,
-    filter = [],
-    query,
-    limit = 5,
-    activityId,
-}: GetProjectSuggestionsParams) => {
+export const getProjectSuggestions = ({ filter = [], query, limit = 5, activityId }: GetProjectSuggestionsParams) => {
     return db
         .selectFrom('Project')
         .selectAll()
         .where('Project.archived', 'is not', true)
+        .where('Project.personal', 'is not', true)
         .where('Project.title', 'ilike', `%${query}%`)
-        .$if(role === Role.USER, (qb) =>
-            qb.where(({ or, eb, not, exists }) =>
-                or([
-                    eb('Project.activityId', '=', activityId),
-                    eb('Project.id', 'in', ({ selectFrom }) =>
-                        selectFrom('_projectAccess').select('B').where('A', '=', activityId),
+        .where(({ or, eb, not, exists }) =>
+            or([
+                eb('Project.activityId', '=', activityId),
+                eb('Project.id', 'in', ({ selectFrom }) =>
+                    selectFrom('_projectAccess').select('B').where('A', '=', activityId),
+                ),
+                not(
+                    exists(({ selectFrom }) =>
+                        selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
                     ),
-                    not(
-                        exists(({ selectFrom }) =>
-                            selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
-                        ),
-                    ),
-                ]),
-            ),
+                ),
+            ]),
         )
         .$if(filter.length > 0, (qb) => qb.where('Project.id', 'not in', filter))
         .groupBy('Project.id')
@@ -556,25 +546,23 @@ export const getAllProjectsQuery = ({
                 .$if(Boolean(goalsQuery?.project && goalsQuery.project.length > 0), (qb) =>
                     qb.where('Project.id', 'in', goalsQuery?.project ?? []),
                 )
-                .$if(role === Role.USER, (qb) =>
-                    qb.where(({ or, eb, not, exists }) =>
-                        or([
-                            eb('Project.id', 'in', ({ selectFrom }) =>
-                                selectFrom('_projectAccess').select('B').where('A', '=', activityId),
-                            ),
-                            not(
-                                exists(({ selectFrom }) =>
-                                    selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
-                                ),
-                            ),
-                            eb('Project.personal', 'is not', true),
-                        ]),
-                    ),
-                )
                 .$if(firstLevel, (qb) =>
                     qb.where(({ not, exists, selectFrom }) =>
                         not(exists(selectFrom('_parentChildren').select('A').whereRef('B', '=', 'Project.id'))),
                     ),
+                )
+                .where(({ or, eb, not, exists }) =>
+                    or([
+                        eb('Project.activityId', '=', activityId),
+                        eb('Project.id', 'in', ({ selectFrom }) =>
+                            selectFrom('_projectAccess').select('B').where('A', '=', activityId),
+                        ),
+                        not(
+                            exists(({ selectFrom }) =>
+                                selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
+                            ),
+                        ),
+                    ]),
                 )
                 .limit(limit)
                 .offset(cursor)

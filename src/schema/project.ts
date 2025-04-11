@@ -20,6 +20,7 @@ export const projectSuggestionsSchema = z.object({
 export const userProjectsSchema = z.object({
     take: z.number().optional(),
     filter: z.array(z.string()).optional(),
+    includePersonal: z.boolean().optional(),
 });
 
 export type ProjectDeepInfo = z.infer<typeof projectDeepInfoSchema>;

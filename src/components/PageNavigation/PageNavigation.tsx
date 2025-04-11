@@ -45,7 +45,9 @@ export const PageNavigation: FC<AppNavigationProps> = ({ logo }) => {
     const nextRouter = useRouter();
     const activeRoute = nextRouter.asPath.split('?')[0];
 
-    const { data: projects = [] } = trpc.v2.project.userProjects.useQuery({});
+    const { data: projects = [] } = trpc.v2.project.userProjects.useQuery({
+        includePersonal: true,
+    });
 
     const { data: presets = [] } = trpc.filter.getUserFilters.useQuery(undefined, {
         keepPreviousData: true,

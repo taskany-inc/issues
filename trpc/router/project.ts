@@ -39,7 +39,7 @@ export const project = router({
             }),
         )
         .query(async ({ ctx, input: { ids, goalsQuery } }) => {
-            const { activityId, role } = ctx.session.user;
+            const { activityId } = ctx.session.user;
 
             let hideCriteriaFilterIds: string[] = [];
             if (goalsQuery?.hideCriteria) {
@@ -49,7 +49,6 @@ export const project = router({
 
             const projects = await prisma.project.findMany({
                 ...getProjectSchema({
-                    role,
                     activityId,
                     goalsQuery: { ...goalsQuery, hideCriteriaFilterIds },
                     whereQuery: {
@@ -61,20 +60,14 @@ export const project = router({
                                   OR: [
                                       {
                                           goals: {
-                                              some: goalsFilter(
-                                                  { ...goalsQuery, hideCriteriaFilterIds },
-                                                  activityId,
-                                                  role,
-                                              ).where,
+                                              some: goalsFilter({ ...goalsQuery, hideCriteriaFilterIds }, activityId)
+                                                  .where,
                                           },
                                       },
                                       {
                                           goals: {
-                                              none: goalsFilter(
-                                                  { ...goalsQuery, hideCriteriaFilterIds },
-                                                  activityId,
-                                                  role,
-                                              ).where,
+                                              none: goalsFilter({ ...goalsQuery, hideCriteriaFilterIds }, activityId)
+                                                  .where,
                                           },
                                           children: {
                                               some: {
@@ -82,7 +75,6 @@ export const project = router({
                                                       some: goalsFilter(
                                                           { ...goalsQuery, hideCriteriaFilterIds },
                                                           activityId,
-                                                          role,
                                                       ).where,
                                                   },
                                               },
