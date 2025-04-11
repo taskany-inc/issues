@@ -286,6 +286,7 @@ const mapProjectsSortParamsToTableColumns = (
         title: 'Project.title',
         updatedAt: 'Project.updatedAt',
         createdAt: 'Project.createdAt',
+        estimate: 'Project.estimate',
         stargizers: {
             asc: sql`(select count("A") from "_projectStargizers" where "B" = "Project".id) asc`,
             desc: sql`(select count("A") from "_projectStargizers" where "B" = "Project".id) desc`,

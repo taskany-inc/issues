@@ -22,9 +22,19 @@ const sortGoalsPropEnum = z.enum([
     'rankGlobal',
     'updatedAt',
     'createdAt',
+    'estimate',
 ]);
 
-const sortProjectsPropEnum = z.enum(['title', 'owner', 'updatedAt', 'createdAt', 'stargizers', 'watchers', 'goals']);
+const sortProjectsPropEnum = z.enum([
+    'title',
+    'owner',
+    'updatedAt',
+    'createdAt',
+    'stargizers',
+    'watchers',
+    'goals',
+    'estimate',
+]);
 
 export const sortableGoalsPropertiesArraySchema = z
     .array(

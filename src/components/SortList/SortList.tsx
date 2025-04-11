@@ -36,6 +36,7 @@ export const SortList = <T extends FilterQueryState['sort'] | FilterQueryState['
             owner: tr('Owner'),
             updatedAt: tr('UpdatedAt'),
             createdAt: tr('CreatedAt'),
+            estimate: tr('Estimate'),
         };
         const sortGoalsItems: Record<Exclude<SortableGoalsProps, SortableProjectsProps>, string> = {
             state: tr('State'),
