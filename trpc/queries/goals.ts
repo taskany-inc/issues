@@ -1,4 +1,4 @@
-import { Prisma, Role, StateType } from '@prisma/client';
+import { Prisma, StateType } from '@prisma/client';
 import { decodeUrlDateRange, getDateString } from '@taskany/bricks';
 
 import { QueryWithFilters } from '../../src/schema/common';
@@ -86,7 +86,6 @@ const getEstimateFilter = (data: QueryWithFilters): Prisma.GoalFindManyArgs['whe
 export const goalsFilter = (
     data: QueryWithFilters & { hideCriteriaFilterIds?: string[] },
     activityId: string,
-    role: Role,
     extra: Prisma.GoalFindManyArgs['where'] = {},
 ): {
     where: Prisma.GoalFindManyArgs['where'];
@@ -160,7 +159,7 @@ export const goalsFilter = (
           }
         : {};
 
-    const projectAccessFilter = getProjectAccessFilter(activityId, role);
+    const projectAccessFilter = getProjectAccessFilter(activityId);
     const projectFilter: Prisma.GoalFindManyArgs['where'] = data.project?.length
         ? {
               OR: [
@@ -311,12 +310,12 @@ export const goalsFilter = (
     };
 };
 
-export const getGoalDeepQuery = (user?: { activityId: string; role: Role }) => {
+export const getGoalDeepQuery = (user?: { activityId: string }) => {
     const depsWhere = {
         ...(user
             ? {
                   project: {
-                      ...getProjectAccessFilter(user.activityId, user.role),
+                      ...getProjectAccessFilter(user.activityId),
                   },
               }
             : {}),

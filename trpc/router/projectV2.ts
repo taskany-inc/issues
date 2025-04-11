@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { Role } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
 import { router, protectedProcedure } from '../trpcBackend';
@@ -133,11 +132,10 @@ export const project = router({
     suggestions: protectedProcedure
         .input(projectSuggestionsSchema)
         .query(async ({ input: { query, take = 5, filter }, ctx }) => {
-            const { activityId, role } = ctx.session.user;
+            const { activityId } = ctx.session.user;
 
             try {
                 const sql = getProjectSuggestions({
-                    role,
                     query,
                     filter,
                     limit: take,
@@ -156,11 +154,10 @@ export const project = router({
     userProjects: protectedProcedure
         .input(userProjectsSchema)
         .query(async ({ ctx, input: { take, filter, includePersonal } }) => {
-            const { activityId, role } = ctx.session.user;
+            const { activityId } = ctx.session.user;
             try {
                 const query = getUserProjectsQuery({
                     activityId,
-                    role,
                     limit: take,
                     filter,
                     includePersonal,
@@ -370,19 +367,17 @@ export const project = router({
                     in: rows.map(({ id }) => ({ id })),
                     ...user,
                 })
-                    .$if(user.role === Role.USER, (qb) =>
-                        qb.where(({ or, eb, not, exists }) =>
-                            or([
-                                eb('Project.id', 'in', ({ selectFrom }) =>
-                                    selectFrom('_projectAccess').select('B').where('A', '=', user.activityId),
+                    .where(({ or, eb, not, exists }) =>
+                        or([
+                            eb('Project.id', 'in', ({ selectFrom }) =>
+                                selectFrom('_projectAccess').select('B').where('A', '=', user.activityId),
+                            ),
+                            not(
+                                exists(({ selectFrom }) =>
+                                    selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
                                 ),
-                                not(
-                                    exists(({ selectFrom }) =>
-                                        selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
-                                    ),
-                                ),
-                            ]),
-                        ),
+                            ),
+                        ]),
                     )
                     .$castTo<ProjectResponse & Pick<DashboardProject, '_count'>>()
                     .execute();
