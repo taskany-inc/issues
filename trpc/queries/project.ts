@@ -67,19 +67,17 @@ export const checkProjectAccess = <T extends ProjectAccessEntity>(project: T, ac
     checkProjectEntity({ project, activityId, role });
 
 export const getProjectSchema = ({
-    role,
     goalsQuery,
     activityId,
     firstLevel,
     whereQuery,
 }: {
-    role: Role;
     activityId: string;
     goalsQuery?: QueryWithFilters & { hideCriteriaFilterIds?: string[] };
     firstLevel?: boolean;
     whereQuery?: Record<string, unknown>;
 }) => {
-    const projectAccessQuery = getProjectAccessFilter(activityId, role);
+    const projectAccessQuery = getProjectAccessFilter(activityId);
 
     let whereFilter: Record<string, unknown> = {
         ...whereQuery,
@@ -139,7 +137,7 @@ export const getProjectSchema = ({
                     goals:
                         goalsQuery && activityId
                             ? {
-                                  where: goalsFilter(goalsQuery, activityId, role).where,
+                                  where: goalsFilter(goalsQuery, activityId).where,
                               }
                             : true,
                     parent: true,

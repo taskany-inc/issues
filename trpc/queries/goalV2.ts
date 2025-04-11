@@ -177,10 +177,8 @@ const getGoalFilterExpressionBuilder =
     };
 
 const getGoalAccessByProjectFilter =
-    ({ activityId, role }: { activityId: string; role: Role }): GoalWhereExpressionBuilder =>
-    ({ and, eb, selectFrom, not, exists }) => {
-        if (role === Role.ADMIN) return and([]);
-
+    ({ activityId }: { activityId: string }): GoalWhereExpressionBuilder =>
+    ({ eb, selectFrom, not, exists }) => {
         return eb(
             'Goal.projectId',
             'in',
@@ -188,9 +186,7 @@ const getGoalAccessByProjectFilter =
                 .select('Project.id')
                 .where(({ or, eb, and }) =>
                     or([
-                        // Доступ для владельца приватного проекта
                         and([eb('Project.personal', '=', true), eb('Project.activityId', '=', activityId)]),
-                        // Стандартные правила доступа для публичных проектов
                         and([
                             eb('Project.personal', 'is not', true),
                             or([
@@ -684,8 +680,8 @@ export const getAllGoalsQuery = (params: Omit<GetGoalsQueryParams, 'projectId'>)
                         .as('partnershipProjects'),
                 ])
                 .where('Goal.archived', 'is not', true)
-                .where(getGoalAccessByProjectFilter({ activityId: params.activityId, role: params.role }))
-                // .where(getGoalFilterExpressionBuilder(params.goalsQuery))
+                .where(getGoalAccessByProjectFilter({ activityId: params.activityId }))
+                .where(getGoalFilterExpressionBuilder(params.goalsQuery))
                 .groupBy(['Goal.id']),
         )
         .with('goals_comment_count', (ctx) =>

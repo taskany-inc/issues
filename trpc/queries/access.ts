@@ -1,10 +1,4 @@
-import { Role } from '@prisma/client';
-
-export const getProjectAccessFilter = (activityId: string, role: Role) => {
-    if (role === 'ADMIN') {
-        return {};
-    }
-
+export const getProjectAccessFilter = (activityId: string) => {
     return {
         AND: {
             OR: [
@@ -26,7 +20,7 @@ export const getProjectAccessFilter = (activityId: string, role: Role) => {
     };
 };
 
-export const goalAchiveCriteriaFilter = (activityId: string, role: Role) => ({
+export const goalAchiveCriteriaFilter = (activityId: string) => ({
     OR: [
         {
             criteriaGoal: null,
@@ -34,7 +28,7 @@ export const goalAchiveCriteriaFilter = (activityId: string, role: Role) => ({
         {
             criteriaGoal: {
                 project: {
-                    ...getProjectAccessFilter(activityId, role),
+                    ...getProjectAccessFilter(activityId),
                 },
             },
         },
