@@ -59,7 +59,7 @@ export function declareSsrProps<T = ExternalPageProps>(
 
         await Promise.all([
             ssrHelpers.appConfig.get.fetch(),
-            ssrHelpers.v2.project.userProjects.fetch({}),
+            ssrHelpers.v2.project.userProjects.fetch({ includePersonal: true }),
             ssrHelpers.filter.getUserFilters.fetch(),
             ssrHelpers.jira.isEnable.fetch(),
         ]);

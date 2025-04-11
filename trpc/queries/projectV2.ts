@@ -180,6 +180,7 @@ interface GetUserProjectsQueryParams {
     filter?: string[];
     limit?: number;
     includeSubsGoals?: boolean;
+    includePersonal?: boolean;
 }
 
 export const getStarredProjectsIds = (activityId: string) => {
@@ -198,6 +199,7 @@ export const getUserProjectsQuery = ({
     filter = [],
     limit = 5,
     includeSubsGoals,
+    includePersonal,
 }: GetUserProjectsQueryParams) => {
     return db
         .selectFrom('Project')
@@ -206,6 +208,7 @@ export const getUserProjectsQuery = ({
         .where(({ and, or, eb }) =>
             and([
                 eb('Project.archived', 'is not', true),
+                ...(includePersonal ? [] : [eb('Project.personal', 'is not', true)]),
                 or(
                     [
                         eb('Project.activityId', '=', activityId),
@@ -459,6 +462,7 @@ export const getProjectSuggestions = ({
         .selectFrom('Project')
         .selectAll()
         .where('Project.archived', 'is not', true)
+        .where('Project.personal', 'is not', true)
         .where('Project.title', 'ilike', `%${query}%`)
         .$if(role === Role.USER, (qb) =>
             qb.where(({ or, eb, not, exists }) =>
@@ -567,7 +571,6 @@ export const getAllProjectsQuery = ({
                                     selectFrom('_projectAccess').select('B').whereRef('B', '=', 'Project.id'),
                                 ),
                             ),
-                            eb('Project.personal', 'is not', true),
                         ]),
                     ),
                 )

@@ -153,25 +153,28 @@ export const project = router({
                 return Promise.reject(error);
             }
         }),
-    userProjects: protectedProcedure.input(userProjectsSchema).query(async ({ ctx, input: { take, filter } }) => {
-        const { activityId, role } = ctx.session.user;
-        try {
-            const query = getUserProjectsQuery({
-                activityId,
-                role,
-                limit: take,
-                filter,
-            });
+    userProjects: protectedProcedure
+        .input(userProjectsSchema)
+        .query(async ({ ctx, input: { take, filter, includePersonal } }) => {
+            const { activityId, role } = ctx.session.user;
+            try {
+                const query = getUserProjectsQuery({
+                    activityId,
+                    role,
+                    limit: take,
+                    filter,
+                    includePersonal,
+                });
 
-            const res = await query.$castTo<ProjectResponse>().execute();
+                const res = await query.$castTo<ProjectResponse>().execute();
 
-            return res;
-        } catch (error) {
-            console.error(error);
+                return res;
+            } catch (error) {
+                console.error(error);
 
-            return Promise.reject();
-        }
-    }),
+                return Promise.reject();
+            }
+        }),
 
     starred: protectedProcedure.query(async ({ ctx }) => {
         const { activityId, role } = ctx.session.user;
