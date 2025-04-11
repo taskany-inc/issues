@@ -250,6 +250,7 @@ export type Project = {
     archived: Generated<boolean | null>;
     createdAt: Generated<Timestamp>;
     updatedAt: Generated<Timestamp>;
+    estimate: Generated<Timestamp>;
 };
 export type projectAccess = {
     A: string;

@@ -1338,6 +1338,10 @@
             "ru": "Создано",
             "en": "Created"
         },
+        "Estimate": {
+            "ru": "Срок",
+            "en": "Estimate"
+        },
         "State": {
             "ru": "Статус",
             "en": "State"

@@ -205,6 +205,7 @@ export const goalsFilter = (
             title: undefined,
             createdAt: undefined,
             updatedAt: undefined,
+            estimate: undefined,
             state: {
                 asc: { title: 'asc' },
                 desc: { title: 'desc' },
