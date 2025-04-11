@@ -85,15 +85,7 @@ export const createGoal = async (input: GoalCommon, projectId: string, activityI
     };
 };
 
-export const createPersonalProject = async ({
-    ownerId,
-    activityId,
-    role,
-}: {
-    ownerId: string;
-    activityId: string;
-    role: Role;
-}) => {
+export const createPersonalProject = async ({ ownerId, activityId }: { ownerId: string; activityId: string }) => {
     const usersInclude = {
         activity: { include: { user: true, ghost: true } },
         participants: { include: { user: true, ghost: true } },
@@ -101,7 +93,6 @@ export const createPersonalProject = async ({
     };
 
     const { include, where } = getProjectSchema({
-        role,
         activityId,
         whereQuery: {
             personal: true,

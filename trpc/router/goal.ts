@@ -122,14 +122,13 @@ export const goal = router({
                     AND: {
                         ...selectParams,
                         project: {
-                            ...getProjectAccessFilter(activityId, role),
+                            ...getProjectAccessFilter(activityId),
                         },
                         id: { not: { in: filter } },
                     },
                 },
                 include: getGoalDeepQuery({
                     activityId,
-                    role,
                 }),
             });
 
@@ -156,8 +155,8 @@ export const goal = router({
         .input(batchGoalsSchema.pick({ query: true, baseQuery: true }))
         .query(async ({ input, ctx }) => {
             const { query, baseQuery = {} } = input;
-            const { activityId, role } = ctx.session.user;
-            const projectAccessFilter = getProjectAccessFilter(activityId, role);
+            const { activityId } = ctx.session.user;
+            const projectAccessFilter = getProjectAccessFilter(activityId);
 
             let hideCriteriaFilterIds: string[] = [];
 
@@ -168,7 +167,7 @@ export const goal = router({
 
             const baseWhere = {
                 ...nonArchivedPartialQuery,
-                ...goalsFilter({ ...baseQuery, hideCriteriaFilterIds }, activityId, role).where,
+                ...goalsFilter({ ...baseQuery, hideCriteriaFilterIds }, activityId).where,
                 project: {
                     ...projectAccessFilter,
                 },
@@ -179,7 +178,7 @@ export const goal = router({
                     where: baseWhere,
                 }),
                 prisma.goal.count({
-                    where: query ? goalsFilter({ ...query, hideCriteriaFilterIds }, activityId, role).where : baseWhere,
+                    where: query ? goalsFilter({ ...query, hideCriteriaFilterIds }, activityId).where : baseWhere,
                 }),
             ]);
             return {
@@ -239,7 +238,6 @@ export const goal = router({
                     include: {
                         ...getGoalDeepQuery({
                             activityId,
-                            role,
                         }),
                         comments: {
                             orderBy: { updatedAt: 'desc' },
@@ -290,7 +288,7 @@ export const goal = router({
                             },
                             orderBy: [{ isDone: 'desc' }, { updatedAt: 'desc' }],
                             where: {
-                                AND: goalAchiveCriteriaFilter(activityId, role),
+                                AND: goalAchiveCriteriaFilter(activityId),
                                 OR: [{ deleted: false }, { deleted: null }],
                             },
                         },
@@ -310,7 +308,7 @@ export const goal = router({
                                         {
                                             goal: {
                                                 project: {
-                                                    ...getProjectAccessFilter(activityId, role),
+                                                    ...getProjectAccessFilter(activityId),
                                                 },
                                             },
                                         },
@@ -406,7 +404,6 @@ export const goal = router({
                 : await createPersonalProject({
                       ownerId: input.owner.id,
                       activityId,
-                      role,
                   });
 
         if (!actualProject) {
@@ -546,7 +543,6 @@ export const goal = router({
                     include: {
                         ...getGoalDeepQuery({
                             activityId,
-                            role,
                         }),
                         goalInCriteria: goalIncludeCriteriaParams,
                     },
@@ -730,7 +726,6 @@ export const goal = router({
                 const newParent = await createPersonalProject({
                     ownerId: input.owner.id,
                     activityId,
-                    role,
                 });
                 await changeGoalProject(actualGoal.id, newParent.id);
                 await updateProjectUpdatedAt(newParent.id);
@@ -787,7 +782,6 @@ export const goal = router({
                     include: {
                         ...getGoalDeepQuery({
                             activityId,
-                            role,
                         }),
                         goalInCriteria: goalIncludeCriteriaParams,
                     },
@@ -1062,7 +1056,6 @@ export const goal = router({
                 activityId,
                 role,
             );
-
             const promises: Promise<any>[] = [
                 prisma.goal.update({
                     where: {
@@ -1273,7 +1266,7 @@ export const goal = router({
                 where: { id: input.goalId },
             });
 
-            const { activityId, role } = ctx.session.user;
+            const { activityId } = ctx.session.user;
 
             if (!actualGoal) {
                 return null;
@@ -1387,7 +1380,7 @@ export const goal = router({
                                 },
                                 externalTask: true,
                             },
-                            where: goalAchiveCriteriaFilter(activityId, role),
+                            where: goalAchiveCriteriaFilter(activityId),
                         },
                     },
                 });
@@ -1427,7 +1420,7 @@ export const goal = router({
                 where: { id: input.id },
             });
 
-            const { activityId, role } = ctx.session.user;
+            const { activityId } = ctx.session.user;
 
             try {
                 if (!currentCriteria) {
@@ -1532,7 +1525,7 @@ export const goal = router({
                                     },
                                     externalTask: true,
                                 },
-                                where: goalAchiveCriteriaFilter(activityId, role),
+                                where: goalAchiveCriteriaFilter(activityId),
                             },
                         },
                     }),
@@ -2292,7 +2285,6 @@ export const goal = router({
                 const newProject = await createPersonalProject({
                     ownerId: input.ownerId,
                     activityId,
-                    role,
                 });
 
                 await changeGoalProject(actualGoal.id, newProject.id);
@@ -2340,7 +2332,6 @@ export const goal = router({
                     include: {
                         ...getGoalDeepQuery({
                             activityId,
-                            role,
                         }),
                         goalInCriteria: goalIncludeCriteriaParams,
                     },
@@ -2389,28 +2380,28 @@ export const goal = router({
                 return;
             }
 
-            const { activityId, role } = ctx.session.user;
+            const { activityId } = ctx.session.user;
 
             try {
                 const query = extendQuery(criteriaQuery({ goalId: input.id }), (qb) =>
-                    qb.$if(role === 'USER', (qb) =>
-                        /* check private access to project */
-                        qb.where(({ eb, not, exists, selectFrom }) =>
-                            eb.or([
-                                eb(
-                                    'linkedGoal.projectId',
-                                    'in',
-                                    selectFrom('_projectAccess').select('B').where('A', '=', activityId),
+                    qb.where(({ eb, not, exists, selectFrom }) =>
+                        eb.or([
+                            eb(
+                                'linkedGoal.projectId',
+                                'in',
+                                selectFrom('Project').select('Project.id').where('Project.activityId', '=', activityId),
+                            ),
+                            eb(
+                                'linkedGoal.projectId',
+                                'in',
+                                selectFrom('_projectAccess').select('B').where('A', '=', activityId),
+                            ),
+                            not(
+                                exists(
+                                    selectFrom('_projectAccess').select('B').where('_projectAccess.A', '=', activityId),
                                 ),
-                                not(
-                                    exists(
-                                        selectFrom('_projectAccess')
-                                            .select('B')
-                                            .where('_projectAccess.A', '=', activityId),
-                                    ),
-                                ),
-                            ]),
-                        ),
+                            ),
+                        ]),
                     ),
                 );
                 const res = await query.execute();
