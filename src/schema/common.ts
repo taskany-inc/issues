@@ -22,6 +22,7 @@ const sortGoalsPropEnum = z.enum([
     'rankGlobal',
     'updatedAt',
     'createdAt',
+    'estimate',
 ]);
 
 const sortProjectsPropEnum = z.enum(['title', 'owner', 'updatedAt', 'createdAt', 'stargizers', 'watchers', 'goals']);

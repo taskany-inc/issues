@@ -23,7 +23,8 @@ export type SortableGoalsProps =
     | 'owner'
     | 'rankGlobal'
     | 'updatedAt'
-    | 'createdAt';
+    | 'createdAt'
+    | 'estimate';
 
 export const groupByValue = {
     project: true,
