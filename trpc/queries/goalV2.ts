@@ -53,6 +53,10 @@ export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R =
             desc: sql`${dbKey}."createdAt" desc`,
             asc: sql`${dbKey}."createdAt" asc`,
         },
+        estimate: {
+            desc: sql`${dbKey}."estimate" desc, case when ${dbKey}."estimateType" = 'Quarter' then 0 else 1 end desc`,
+            asc: sql`${dbKey}."estimate" asc, case when ${dbKey}."estimateType" = 'Quarter' then 0 else 1 end asc`,
+        },
         state: {
             asc: sql`(select title from "State" where "State".id = ${dbKey}."stateId") asc`,
             desc: sql`(select title from "State" where "State".id = ${dbKey}."stateId") desc`,
