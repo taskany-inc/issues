@@ -93,12 +93,14 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
             title: project.data!.title,
             description: project.data?.description,
             parent: project.data?.parent,
+            accessUsers: project.data?.accessUsers,
         },
         defaultValues: {
             id: project.data?.id,
             title: project.data?.title,
             description: project.data?.description,
             parent: project.data?.parent,
+            accessUsers: project.data?.accessUsers,
         },
     });
 
@@ -111,6 +113,7 @@ export const ProjectSettingsPage = ({ user, ssrTime, params: { id } }: ExternalP
                 title: data?.title,
                 description: data?.description,
                 parent: data?.parent,
+                accessUsers: data?.accessUsers,
             });
         },
         [reset],
