@@ -34,6 +34,10 @@ export const tag = router({
         });
     }),
     getByIds: protectedProcedure.input(z.array(z.string())).query(({ input }) => {
+        if (!input.length) {
+            return [];
+        }
+
         return tagQuery({ id: input }).execute();
     }),
 });

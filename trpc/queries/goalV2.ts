@@ -123,7 +123,11 @@ const getGoalFilterExpressionBuilder =
                     .select('State.id')
                     .where('State.type', 'in', goalsQuery?.stateType || []),
             ),
-            tag: eb('tag.id', 'in', goalsQuery?.tag || []),
+            tag: eb('Goal.id', 'in', ({ selectFrom }) =>
+                selectFrom('_GoalToTag')
+                    .select('A')
+                    .where('B', 'in', goalsQuery?.tag || []),
+            ),
             estimate:
                 // eslint-disable-next-line no-nested-ternary
                 estimate.length > 0
@@ -174,6 +178,24 @@ const getGoalFilterExpressionBuilder =
         }
 
         return and(filterToApply);
+    };
+
+const getStarredOrWatchingFilterByActivity =
+    (goalsQuery: QueryWithFilters | void, activityId: string): GoalWhereExpressionBuilder =>
+    ({ eb, and }) => {
+        if (goalsQuery?.starred) {
+            return eb('Goal.id', 'in', ({ selectFrom }) =>
+                selectFrom('_goalStargizers').select('B').where('A', '=', activityId),
+            );
+        }
+
+        if (goalsQuery?.watching) {
+            return eb('Goal.id', 'in', ({ selectFrom }) =>
+                selectFrom('_goalWatchers').select('B').where('A', '=', activityId),
+            );
+        }
+
+        return and([]);
     };
 
 const getGoalAccessByProjectFilter =
@@ -683,6 +705,7 @@ export const getAllGoalsQuery = (params: Omit<GetGoalsQueryParams, 'projectId'>)
                 )
                 .where('Goal.archived', 'is not', true)
                 .where(getGoalAccessByProjectFilter({ activityId: params.activityId, role: params.role }))
+                .where(getStarredOrWatchingFilterByActivity(params.goalsQuery, params.activityId))
                 .where(getGoalFilterExpressionBuilder(params.goalsQuery))
                 .groupBy(['Goal.id']),
         )
