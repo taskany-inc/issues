@@ -1,5 +1,5 @@
 import { Text, Counter } from '@taskany/bricks/harmony';
-import { useState, useEffect, useMemo, ComponentProps, useCallback } from 'react';
+import { useState, useEffect, ComponentProps, useCallback } from 'react';
 import { nullable } from '@taskany/bricks';
 
 import { trpc } from '../../utils/trpcClient';
@@ -41,26 +41,7 @@ export const TagDropdown = ({
         setInputState(query);
     }, [query]);
 
-    const { data: suggestions } = trpc.tag.suggestions.useQuery(
-        { query: inputState, include: value.map(({ id }) => id) },
-        {
-            enabled: inputState.length >= 2,
-            staleTime: 0,
-        },
-    );
-
-    const items = useMemo(() => {
-        if (mode === 'single') {
-            return suggestions;
-        }
-
-        const valuesMap = value.reduce<Record<string, boolean>>((acc, cur) => {
-            acc[cur.id] = true;
-            return acc;
-        }, {});
-
-        return suggestions?.filter((suggest) => !valuesMap[suggest.id]);
-    }, [mode, suggestions, value]);
+    const { data: suggestions } = trpc.tag.suggestions.useQuery({ query: inputState }, { staleTime: 0 });
 
     const handleClose = useCallback(() => {
         onClose?.();
@@ -86,7 +67,7 @@ export const TagDropdown = ({
                 width={320}
                 value={value}
                 title={tr('Tags')}
-                items={items}
+                items={suggestions}
                 placement={placement}
                 mode={mode}
                 selectable
