@@ -43,7 +43,7 @@
     "@opentelemetry/sdk-node": "0.45.1",
     "@opentelemetry/sdk-trace-node": "1.18.1",
     "@opentelemetry/semantic-conventions": "1.22.0",
-    "@react-email/components": "0.0.14",
+    "@react-email/components": "0.0.36",
     "@react-email/render": "0.0.12",
     "@salutejs/web-telemetry": "1.0.3",
     "@sentry/nextjs": "7.120.1",
