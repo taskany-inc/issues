@@ -18,7 +18,7 @@ interface GroupedGoalListProps {
 
 export const projectsSize = 20;
 
-const ProjectItem: React.FC<{ project: GroupedProjectById; preset?: FilterById }> = ({ project, preset }) => {
+export const ProjectItem: React.FC<{ project: GroupedProjectById; preset?: FilterById }> = ({ project, preset }) => {
     const { queryState } = useUrlFilterParams({ preset });
 
     const { data } = trpc.v2.project.getProjectChildrenTree.useQuery({

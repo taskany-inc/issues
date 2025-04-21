@@ -1,35 +1,36 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 
-import { router, protectedProcedure } from '../trpcBackend';
+import { protectedProcedure, router } from '../trpcBackend';
 import { projectsChildrenIdsSchema, projectSuggestionsSchema, userProjectsSchema } from '../../src/schema/project';
 import {
-    getProjectsByIds,
-    getStarredProjectsIds,
-    getProjectSuggestions,
-    getUserProjectsQuery,
-    getWholeGoalCountByProjectIds,
-    getDeepChildrenProjectsId,
     getAllProjectsQuery,
-    getProjectChildrenTreeQuery,
-    getProjectById,
     getChildrenProjectByParentProjectId,
+    getDeepChildrenProjectsId,
+    getProjectById,
+    getProjectChildrenTreeQuery,
+    getProjectsByExternalTeamId,
+    getProjectsByIds,
+    getProjectSuggestions,
+    getRealDashboardQueryByProjectIds,
+    getStarredProjectsIds,
     getUserProjects,
     getUserProjectsByGoals,
-    getRealDashboardQueryByProjectIds,
+    getUserProjectsQuery,
+    getWholeGoalCountByProjectIds,
 } from '../queries/projectV2';
 import { queryWithFiltersSchema, sortableProjectsPropertiesArraySchema } from '../../src/schema/common';
 import {
-    Project,
-    User,
-    Goal,
-    Tag,
-    State,
-    GoalAchieveCriteria,
-    Ghost,
     Activity,
+    Ghost,
+    Goal,
+    GoalAchieveCriteria,
     Priority,
+    Project,
+    State,
+    Tag,
     Team,
+    User,
 } from '../../src/utils/db/generated/kysely/types';
 import { calculateProjectRules, ExtractTypeFromGenerated, pickUniqueValues, ProjectRoles } from '../utils';
 import { baseCalcCriteriaWeight } from '../../src/utils/recalculateCriteriaScore';
@@ -533,4 +534,16 @@ export const project = router({
                 },
             };
         }),
+    getCrewTeamProjectGoals: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
+        const { activityId, role } = ctx.session.user;
+        const { id } = input;
+
+        const projects = await getProjectsByExternalTeamId({ externalTeamId: id }).execute();
+
+        const res = await getProjectsByIds({ activityId, in: projects.map(({ id }) => ({ id })), role })
+            .$castTo<ProjectResponse & Pick<DashboardProject, '_count'>>()
+            .execute();
+
+        return res;
+    }),
 });
