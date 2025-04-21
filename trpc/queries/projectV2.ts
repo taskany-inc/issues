@@ -1020,3 +1020,14 @@ export const getRealDashboardQueryByProjectIds = ({
         .limit(limit)
         .offset(offset);
 };
+
+export const getProjectsByExternalTeamId = ({ externalTeamId }: { externalTeamId: string }) => {
+    return db
+        .selectFrom('_projects')
+        .select('A as id') // projectId
+        .where(
+            'B',
+            '=',
+            ({ selectFrom }) => selectFrom('Team').select('id').where('externalTeamId', '=', externalTeamId), // externalTeamId
+        );
+};

@@ -14,7 +14,7 @@ import { FiltersPanel } from '../FiltersPanel/FiltersPanel';
 
 import { tr } from './GoalsPage.i18n';
 
-export const GoalsPage = ({ user, ssrTime, defaultPresetFallback, baseQueryState }: ExternalPageProps) => {
+export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPageProps) => {
     const { preset } = useFiltersPreset({
         defaultPresetFallback,
     });
@@ -29,12 +29,10 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback, baseQueryState
 
     const queryState = {
         ...urlQueryState,
-        ...baseQueryState,
     };
 
     const { data } = trpc.goal.getGoalsCount.useQuery({
         query: queryState,
-        baseQuery: baseQueryState,
     });
 
     const groupedView = groupBy === 'project';

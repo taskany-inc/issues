@@ -11,7 +11,7 @@ import { TableRowItem, TableRowItemTitle } from '../TableRowItem/TableRowItem';
 
 import s from './ProjectListItemCollapsable.module.css';
 
-type Project = NonNullable<Omit<DashboardProjectV2, 'children' | 'goals' | '_partnerProjectIds'>>;
+export type Project = NonNullable<Omit<DashboardProjectV2, 'children' | 'goals' | '_partnerProjectIds'>>;
 
 interface ProjectListItemCollapsableProps extends Omit<ComponentProps<typeof TreeViewNode>, 'title'> {
     href?: string;
