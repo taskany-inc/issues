@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit guidelines.
 
+## [2.74.0](https://github.com/taskany-inc/issues/compare/v2.73.0...v2.74.0) (2025-04-23)
+
+
+### Features
+
+* **INTERNAL-1159:** crew team projects page ([60a59ff](https://github.com/taskany-inc/issues/commit/60a59ff337b7b54c08743de7b287c46ba7d4cd00))
+
 ## [2.73.0](https://github.com/taskany-inc/issues/compare/v2.72.0...v2.73.0) (2025-04-16)
 
 
