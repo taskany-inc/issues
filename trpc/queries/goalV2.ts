@@ -91,7 +91,7 @@ export const mapSortParamsToTableColumns = <T extends DB, K extends keyof T, R =
 };
 
 const getGoalFilterExpressionBuilder =
-    (goalsQuery?: QueryWithFilters): GoalWhereExpressionBuilder =>
+    (activityId: string, goalsQuery?: QueryWithFilters): GoalWhereExpressionBuilder =>
     ({ or, and, eb, selectFrom, cast, val }) => {
         const estimate: Array<Date> = [];
 
@@ -164,8 +164,16 @@ const getGoalFilterExpressionBuilder =
             ),
             hideEmptyProjects: null,
             sort: null,
-            starred: null,
-            watching: null,
+            starred: goalsQuery?.starred
+                ? eb('Goal.id', 'in', ({ selectFrom }) =>
+                      selectFrom('_goalStargizers').select('B').where('A', '=', activityId),
+                  )
+                : null,
+            watching: goalsQuery?.watching
+                ? eb('Goal.id', 'in', ({ selectFrom }) =>
+                      selectFrom('_goalWatchers').select('B').where('A', '=', activityId),
+                  )
+                : null,
             limit: null,
             offset: null,
         };
@@ -182,24 +190,6 @@ const getGoalFilterExpressionBuilder =
         }
 
         return and(filterToApply);
-    };
-
-const getStarredOrWatchingFilterByActivity =
-    (goalsQuery: QueryWithFilters | void, activityId: string): GoalWhereExpressionBuilder =>
-    ({ eb, and }) => {
-        if (goalsQuery?.starred) {
-            return eb('Goal.id', 'in', ({ selectFrom }) =>
-                selectFrom('_goalStargizers').select('B').where('A', '=', activityId),
-            );
-        }
-
-        if (goalsQuery?.watching) {
-            return eb('Goal.id', 'in', ({ selectFrom }) =>
-                selectFrom('_goalWatchers').select('B').where('A', '=', activityId),
-            );
-        }
-
-        return and([]);
     };
 
 const getGoalAccessByProjectFilter =
@@ -433,7 +423,7 @@ export const getGoalsQuery = (params: GetGoalsQueryParams) =>
                         return and([]);
                     }),
                 )
-                .where(getGoalFilterExpressionBuilder(params.goalsQuery))
+                .where(getGoalFilterExpressionBuilder(params.activityId, params.goalsQuery))
                 .groupBy(['Goal.id']),
         )
         .with('goals_comment_count', (ctx) =>
@@ -600,8 +590,7 @@ export const getGoalsForCSVExport = ({
             'Priority.title as priority',
             'State.title as state',
         ])
-        .where(getGoalFilterExpressionBuilder(goalsQuery))
-        .orderBy(mapSortParamsToTableColumns(goalsQuery?.sort, 'Goal', activityId));
+        .where(getGoalFilterExpressionBuilder(activityId, goalsQuery));
 };
 
 export const getAllGoalsQuery = (params: Omit<GetGoalsQueryParams, 'projectId'>) => {
@@ -717,8 +706,7 @@ export const getAllGoalsQuery = (params: Omit<GetGoalsQueryParams, 'projectId'>)
                 )
                 .where('Goal.archived', 'is not', true)
                 .where(getGoalAccessByProjectFilter({ activityId: params.activityId }))
-                .where(getStarredOrWatchingFilterByActivity(params.goalsQuery, params.activityId))
-                .where(getGoalFilterExpressionBuilder(params.goalsQuery))
+                .where(getGoalFilterExpressionBuilder(params.activityId, params.goalsQuery))
                 .groupBy(['Goal.id']),
         )
         .with('goals_comment_count', (ctx) =>
