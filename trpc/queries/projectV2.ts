@@ -12,6 +12,35 @@ import { ProjectRoles, ProjectRules } from '../utils';
 
 import { getUserActivity } from './activity';
 
+export const isEmptyFilters = (goalsQuery?: QueryWithFilters): boolean => {
+    if (!goalsQuery) return true;
+
+    const filterKeys: Array<keyof QueryWithFilters> = [
+        'project',
+        'partnershipProject',
+        'owner',
+        'issuer',
+        'participant',
+        'priority',
+        'state',
+        'stateType',
+        'tag',
+        'estimate',
+        'query',
+        'hideCriteria',
+        'starred',
+        'watching',
+    ];
+
+    return !filterKeys.some((key) => {
+        const value = goalsQuery[key];
+        if (Array.isArray(value)) {
+            return value.length > 0;
+        }
+        return !!value;
+    });
+};
+
 export const getProjectsByIds = (params: { in: Array<{ id: string }>; activityId: string; role: Role }) => {
     return db
         .with('project_goals', () =>
@@ -314,7 +343,7 @@ const mapProjectsSortParamsToTableColumns = (
 };
 
 const getGoalsFiltersWhereExpressionBuilder =
-    (goalsQuery?: QueryWithFilters): ExpressionFactory<DB, 'Goal', SqlBool> =>
+    (goalsQuery?: QueryWithFilters, activityId?: string): ExpressionFactory<DB, 'Goal', SqlBool> =>
     ({ or, and, eb, selectFrom, cast, val }) => {
         const estimate: Array<Date> = [];
 
@@ -371,6 +400,20 @@ const getGoalsFiltersWhereExpressionBuilder =
                               eb('Goal.estimate', '<=', cast<Date>(val<Date>(estimate[1]), 'date')),
                           ])
                     : null,
+            starred: goalsQuery?.starred
+                ? eb('Goal.id', 'in', ({ selectFrom }) =>
+                      selectFrom('_goalStargizers')
+                          .select('B')
+                          .where('A', '=', activityId || ''),
+                  )
+                : null,
+            watching: goalsQuery?.watching
+                ? eb('Goal.id', 'in', ({ selectFrom }) =>
+                      selectFrom('_goalWatchers')
+                          .select('B')
+                          .where('A', '=', activityId || ''),
+                  )
+                : null,
             query: or([
                 eb('Goal.title', 'ilike', goalsQuery?.query || ''),
                 eb('Goal.description', 'ilike', goalsQuery?.query || ''),
@@ -393,8 +436,6 @@ const getGoalsFiltersWhereExpressionBuilder =
             ),
             hideEmptyProjects: null,
             sort: null,
-            starred: null,
-            watching: null,
             limit: null,
             offset: null,
         };
@@ -474,7 +515,6 @@ export const getProjectSuggestions = ({ filter = [], query, limit = 5, activityI
 interface GetAllProjectsQueryParams {
     activityId: string;
     role: Role;
-    firstLevel: boolean;
     limit: number;
     cursor: number;
     goalsQuery?: QueryWithFilters;
@@ -484,12 +524,13 @@ interface GetAllProjectsQueryParams {
 export const getAllProjectsQuery = ({
     activityId,
     role,
-    firstLevel,
     limit,
     cursor,
     goalsQuery,
     projectsSort,
 }: GetAllProjectsQueryParams) => {
+    const hasActiveFilters = !isEmptyFilters(goalsQuery);
+
     return db
         .selectFrom(({ selectFrom }) =>
             selectFrom('Project')
@@ -505,19 +546,24 @@ export const getAllProjectsQuery = ({
                         eb('Project.id', 'in', ({ selectFrom }) =>
                             selectFrom(() =>
                                 db
-                                    .withRecursive('projectTree', (qb) =>
-                                        qb
+                                    .withRecursive('projectTree', (qb) => {
+                                        const baseQuery = qb
                                             .selectFrom('Goal')
                                             .select(['Goal.projectId as id'])
                                             .where('Goal.archived', 'is not', true)
-                                            .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery))
-                                            .union(
+                                            .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery, activityId));
+
+                                        if (!hasActiveFilters) {
+                                            return baseQuery.union(
                                                 qb
                                                     .selectFrom('_parentChildren')
                                                     .innerJoin('projectTree', 'projectTree.id', '_parentChildren.B')
                                                     .select('_parentChildren.A as id'),
-                                            ),
-                                    )
+                                            );
+                                        }
+
+                                        return baseQuery;
+                                    })
                                     .selectFrom('projectTree')
                                     .select('id')
                                     .as('filtered_projects'),
@@ -546,7 +592,7 @@ export const getAllProjectsQuery = ({
                 .$if(Boolean(goalsQuery?.project && goalsQuery.project.length > 0), (qb) =>
                     qb.where('Project.id', 'in', goalsQuery?.project ?? []),
                 )
-                .$if(firstLevel, (qb) =>
+                .$if(!hasActiveFilters, (qb) =>
                     qb.where(({ not, exists, selectFrom }) =>
                         not(exists(selectFrom('_parentChildren').select('A').whereRef('B', '=', 'Project.id'))),
                     ),
@@ -593,7 +639,16 @@ export const getAllProjectsQuery = ({
         ]);
 };
 
-export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; goalsQuery?: QueryWithFilters }) => {
+export const getProjectChildrenTreeQuery = (
+    {
+        id,
+        goalsQuery,
+    }: {
+        id: string;
+        goalsQuery?: QueryWithFilters;
+    },
+    activityId: string,
+) => {
     return db
         .withRecursive('childs', (qb) => {
             return qb
@@ -612,7 +667,7 @@ export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; go
                                 selectFrom('Goal')
                                     .select('Goal.projectId')
                                     .where('Goal.archived', 'is not', true)
-                                    .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery)),
+                                    .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery, activityId)),
                             ),
                     ),
                 )
@@ -636,7 +691,7 @@ export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; go
                                         selectFrom('Goal')
                                             .select('Goal.projectId')
                                             .where('Goal.archived', 'is not', true)
-                                            .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery)),
+                                            .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery, activityId)),
                                     ),
                             ),
                         ),
@@ -650,7 +705,7 @@ export const getProjectChildrenTreeQuery = ({ id, goalsQuery }: { id: string; go
                     .select(({ fn }) => fn.count('Goal.id').as('goal_count'))
                     .whereRef('Goal.projectId', '=', 'Project.id')
                     .where('Goal.archived', 'is not', true)
-                    .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery))
+                    .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery, activityId))
                     .as('goal'),
             (join) => join.onTrue(),
         )
@@ -989,7 +1044,7 @@ export const getRealDashboardQueryByProjectIds = ({
                             ]),
                         ]),
                     )
-                    .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery))
+                    .where(getGoalsFiltersWhereExpressionBuilder(goalsQuery, activityId))
                     .as('goals'),
             (join) => join.onTrue(),
         )

@@ -19,17 +19,9 @@ export const GoalsPage = ({ user, ssrTime, defaultPresetFallback }: ExternalPage
         defaultPresetFallback,
     });
 
-    const {
-        currentPreset,
-        queryState: urlQueryState,
-        groupBy,
-    } = useUrlFilterParams({
+    const { currentPreset, queryState, groupBy } = useUrlFilterParams({
         preset,
     });
-
-    const queryState = {
-        ...urlQueryState,
-    };
 
     const { data } = trpc.goal.getGoalsCount.useQuery({
         query: queryState,

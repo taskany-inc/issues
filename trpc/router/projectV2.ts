@@ -331,7 +331,6 @@ export const project = router({
 
             const projects = await getAllProjectsQuery({
                 ...ctx.session.user,
-                firstLevel: goalsQuery?.project == null,
                 limit: limit + 1,
                 cursor,
                 goalsQuery,
@@ -363,7 +362,9 @@ export const project = router({
                     session: { user },
                 },
             }) => {
-                const rows = await getProjectChildrenTreeQuery(input).$castTo<ProjectTreeRow>().execute();
+                const rows = await getProjectChildrenTreeQuery(input, user.activityId)
+                    .$castTo<ProjectTreeRow>()
+                    .execute();
                 const projects = await getProjectsByIds({
                     in: rows.map(({ id }) => ({ id })),
                     ...user,
