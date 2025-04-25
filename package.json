@@ -90,6 +90,7 @@
     "react-remark": "2.1.0",
     "react-sortablejs": "6.1.4",
     "remark-emoji": "4.0.1",
+    "sharp": "0.34.1",
     "sortablejs": "1.15.3",
     "throttle-debounce": "5.0.0",
     "tinykeys": "1.4.0",

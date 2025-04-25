@@ -1,6 +1,7 @@
 import JiraApi from 'jira-client';
 
 import { safelyParseJson } from '../safelyParseJson';
+import { db } from '../db/connection/kysely';
 
 export enum AvatarSize {
     x1 = 16,
@@ -272,6 +273,53 @@ export const setGoalUrlToJiraIssue = (params: { jiraKey: string; goalId: string 
     return jiraService.instance.updateIssue(params.jiraKey, {
         fields: {
             [jiraService.customFieldForGoal]: `${process.env.NEXTAUTH_URL}/goals/${params.goalId}`,
+        },
+    });
+};
+
+export const setGoalTitleToJiraIssue = (params: { jiraKey: string; title: string }) => {
+    return jiraService.instance.updateIssue(params.jiraKey, {
+        fields: {
+            [jiraService.customFieldForGoal]: params.title,
+        },
+    });
+};
+
+export const addGoalMetaDataToJiraIssue = async (params: { goalId: string; jiraKey: string }) => {
+    const appConfig = await db.selectFrom('AppConfig').select('AppConfig.favicon').limit(1).executeTakeFirst();
+    const goal = await db
+        .selectFrom('Goal')
+        .innerJoin('State', 'State.id', 'Goal.stateId')
+        .select(({ fn, val, cast }) => [
+            fn.agg('concat', ['Goal.projectId', cast(val('-'), 'text'), 'Goal.scopeId']).as('scopeId'),
+            'State.lightForeground as color',
+            'Goal.title',
+        ])
+        .where('Goal.id', '=', params.goalId)
+        .executeTakeFirst();
+
+    if (goal?.color == null) {
+        throw new Error('Not found');
+    }
+
+    await setGoalTitleToJiraIssue({ jiraKey: params.jiraKey, title: goal.title });
+
+    await jiraService.instance.createRemoteLink(params.jiraKey, {
+        object: {
+            icon:
+                appConfig != null
+                    ? {
+                          title: 'SD Goals',
+                          url16x16: `${process.env.NEXTAUTH_URL}${appConfig.favicon}`,
+                      }
+                    : null,
+            status: {
+                icon: {
+                    url16x16: `${process.env.NEXTAUTH_URL}/api/goals/${goal.scopeId}/state`,
+                },
+            },
+            title: goal.title,
+            url: `${process.env.NEXTAUTH_URL}/goals/${params.goalId}`,
         },
     });
 };
